@@ -123,8 +123,8 @@
 
   /* ===== ВЕТКИ ===== */
   const arcs=[
-    { id:'surface', title:'Поверхность', desc:'Иона и «Цветок».', order:['epitimya','tsvetok'] },
-    { id:'kainrax',  title:'Кайнракс',    desc:'Остальные рассказы из мира Кайнракса.', order:['dorogovato','chelovecheskiy-faktor'] },
+    { id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.', order:['epitimya','tsvetok'] },
+    { id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести, действие в которых происходит внутри Кайнракс.', order:['dorogovato','chelovecheskiy-faktor'] },
     { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.', order:['ibut-g1','ibut-g2'] }
   ];
   const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
