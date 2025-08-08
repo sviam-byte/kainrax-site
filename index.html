@@ -6,6 +6,7 @@
   <title>Кайрнакс — рассказы</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии." />
   <meta name="theme-color" content="#0b0f14" />
+  <!-- динамический favicon ⭐ -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6l7.6 15.4L56 23l-12 11.7L47.2 58 32 48.8 16.8 58 20 34.7 8 23l16.4-1.6z'/%3E%3C/svg%3E">
 
   <style>
@@ -62,15 +63,16 @@
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
 
+  /* фон: звёзды + горы (лёгкий) */
   #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
   #mountains{position:fixed;left:0;right:0;bottom:0;height:30vh;z-index:0;pointer-events:none;opacity:.9}
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* админ‐панелька (показ только в admin-режиме) */
+  /* админ-UI скрыт по умолчанию */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminDock .btn{background:var(--card)}
-  #adminBtns{display:none} /* ← скрыто по умолчанию */
+  #adminBtns{display:none}
 
   #c-anon{min-height:300px}
   </style>
@@ -95,7 +97,7 @@
         <a class="btn" href="#/about">О мире</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
 
-        <!-- админ‐кнопки скрыты по умолчанию -->
+        <!-- админ-кнопки (покажем только в админ-режиме) -->
         <span id="adminBtns" style="display:none">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
@@ -109,13 +111,14 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ====== КОНФИГ ====== */
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369"; // твой Cusdis App ID
+  /* ===== КОНФИГ ===== */
+  // Важно: в панели Cusdis укажи Allowed Domains: kainrax.netlify.app (+ твоё доменное)
+  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
   const app=document.getElementById('app'); const qEl=document.getElementById('q');
 
-  /* ====== ВЕТКИ ====== */
+  /* ===== ВЕТКИ ===== */
   const arcs=[
     { id:'surface', title:'Поверхность', desc:'Иона и «Цветок».', order:['epitimya','tsvetok'] },
     { id:'kainrax',  title:'Кайнракс',    desc:'Остальные рассказы из мира Кайнракса.', order:['dorogovato','chelovecheskiy-faktor'] },
@@ -124,7 +127,7 @@
   const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
   const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
 
-  /* ====== ДАННЫЕ (фолбэки, потом перезатираются контентом) ====== */
+  /* ===== ДАННЫЕ (фолбэки, перезатираются контентом) ===== */
   let stories=[{id:'epitimya',slug:'epitimya',title:'Епитимья',date:'2025-08-01',minutes:12,tags:['Кайрнакс','Иона'],arc:'surface',text:'ЗАГЛУШКА'}];
   let notes=[{id:'n-2025-08-08-a',slug:'n-2025-08-08-a',title:'О тоне',date:'2025-08-08',text:'ЗАГЛУШКА'}];
 
@@ -136,7 +139,7 @@
     }catch(e){}
   }
 
-  /* ====== ТЕМА + FAVICON ====== */
+  /* ===== ТЕМА + FAVICON ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
@@ -153,7 +156,7 @@
     applyTheme();
   };
 
-  /* ====== ADMIN MODE (скрыт для обычных) ====== */
+  /* ===== ADMIN MODE (скрыт для обычных) ===== */
   let isAdmin =
     new URLSearchParams(location.search).has('admin') ||
     localStorage.getItem('admin') === '1';
@@ -169,7 +172,7 @@
     if (!isAdmin) adminDockHide();
   }
 
-  // горячая кнопка переключения admin-режима: Alt+Shift+A
+  // горячая кнопка: Alt+Shift+A
   addEventListener('keydown', (e) => {
     if (e.altKey && e.shiftKey && e.key.toLowerCase() === 'a') {
       isAdmin = !isAdmin;
@@ -178,11 +181,11 @@
     }
   });
 
-  /* ====== РОУТЕР / ПОИСК ====== */
+  /* ===== РОУТЕР / ПОИСК ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ====== ВЬЮХИ ====== */
+  /* ===== ВЬЮХИ ===== */
   function renderList(){
     const q=state.q;
     const items=stories.filter(s=>!q || s.title.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
@@ -319,9 +322,10 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ====== ЛЕНИВАЯ ЗАГРУЗКА КОММЕНТОВ (SPA-безопасно) ====== */
+  /* ===== ЛЕНИВАЯ ЗАГРУЗКА КОММЕНТОВ (скорость + SPA-совместимость) ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
+
     wrap.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <button class="btn" id="tab-gh">GitHub</button>
@@ -330,20 +334,21 @@
       <div id="c-gh"></div>
       <div id="c-anon" style="display:none;min-height:300px"></div>`;
 
+    const ghBox=wrap.querySelector('#c-gh');
+    const anonBox=wrap.querySelector('#c-anon');
     let ghLoaded=false, anonLoaded=false;
-    const ghBox=wrap.querySelector('#c-gh'); const anonBox=wrap.querySelector('#c-anon');
 
     function loadGH(){
       if (ghLoaded) return; ghLoaded=true;
+      ghBox.innerHTML='';
       const s=document.createElement('script');
       s.src='https://utteranc.es/client.js';
-      s.setAttribute('repo','sviam-byte/kainrax-site');     // ВАЖНО: Issues ON в репозитории
-      s.setAttribute('issue-term', term || 'home');         // уникальный термин для SPA
+      s.setAttribute('repo','sviam-byte/kainrax-site');   // Issues должны быть включены
+      s.setAttribute('issue-term', term || 'home');       // УНИКАЛЬНЫЙ ключ: story:slug / note:slug
       s.setAttribute('label','comments');
       s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
       s.setAttribute('crossorigin','anonymous');
-      s.async=true;
-      ghBox.appendChild(s);
+      s.async=true; ghBox.appendChild(s);
     }
 
     function loadAnon(){
@@ -352,34 +357,41 @@
         return;
       }
       if (anonLoaded) return; anonLoaded=true;
+      anonBox.innerHTML='';
+      const t=document.createElement('div');
+      t.id='cusdis_thread';
+      t.dataset.host='https://cusdis.com';
+      t.dataset.appId=window.CUSDIS_APP_ID;
+      t.dataset.pageId=term || (location.pathname+location.hash); // уникальный ID
+      t.dataset.pageUrl=location.href;
+      t.dataset.pageTitle=document.title;
+      t.dataset.lang='ru';
+      t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
+      anonBox.appendChild(t);
+
       if (!window.__cusdisLoaded){
         const s=document.createElement('script');
         s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
-        s.onload=()=>{ window.__cusdisLoaded=true; setCusdisTheme(); renderCusdis(); };
+        s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} };
         document.body.appendChild(s);
-      } else renderCusdis();
-
-      function renderCusdis(){
-        anonBox.innerHTML='';
-        const t=document.createElement('div');
-        t.id='cusdis_thread';
-        t.dataset.host='https://cusdis.com';
-        t.dataset.appId=window.CUSDIS_APP_ID;
-        t.dataset.pageId=term || (location.pathname+location.hash); // уникальный ID
-        t.dataset.pageUrl=location.href;
-        t.dataset.pageTitle=document.title;
-        t.dataset.lang='ru';
-        t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
-        anonBox.appendChild(t);
-        window.CUSDIS?.renderTo?.('#cusdis_thread');
+      } else {
+        try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){}
       }
     }
+
     function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
     function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
     wrap.querySelector('#tab-gh').onclick=showGH;
     wrap.querySelector('#tab-anon').onclick=showAnon;
-    if (window.CUSDIS_APP_ID) showAnon(); else showGH();
+
+    // производительность: вообще ничего не грузим, пока не доскроллили
+    const io=new IntersectionObserver((entries)=>{
+      if(entries.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); }
+    },{rootMargin:'200px'});
+    io.observe(wrap);
   }
+
+  // смена темы у виджетов
   function setUtterancesTheme(theme){
     const iframe=document.querySelector('iframe.utterances-frame');
     if(iframe) iframe.contentWindow.postMessage(
@@ -391,7 +403,7 @@
     try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){}
   }
 
-  /* ====== АДМИН «ПРАВИТЬ» ====== */
+  /* ===== АДМИН «ПРАВИТЬ» ===== */
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
@@ -402,7 +414,7 @@
     adminDock.style.display='block';
   }
 
-  /* ====== ПРОГРЕСС + ВОССТ. СКРОЛЛА ====== */
+  /* ===== ПРОГРЕСС + ВОССТ. СКРОЛЛА ===== */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true; requestAnimationFrame(()=>{
@@ -422,34 +434,35 @@
     const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ====== ЗВЁЗДЫ (облегчённо) ====== */
+  /* ===== ЗВЁЗДЫ (облегчённые + respect reduced motion) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
-  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); }
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
   addEventListener('resize', resize);
+
   function makeStars(){
-    const base = document.documentElement.getAttribute('data-theme')==='light' ? 80 : 140;
-    const k = (W*H)/26000;
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120;
+    const k = (W*H)/30000;
     const count = Math.floor(base + k);
     starsArr = Array.from({length: count}, ()=>({
-      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.2+0.3, s: Math.random()*0.6+0.2
+      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2
     }));
   }
-  function drawStars(ts){
-    if(!running) return requestAnimationFrame(drawStars);
+
+  function drawStars(ts, once=false){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
     for(const st of starsArr){
-      const a = 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
+      const a = once ? 0.7 : 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
       ctx.globalAlpha = a;
       ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
     }
-    requestAnimationFrame(drawStars);
+    if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
   }
-  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; });
-  resize(); requestAnimationFrame(drawStars);
+  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
-  /* ====== РЕНДЕР ====== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -463,7 +476,7 @@
     renderList();
   }
 
-  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); });
+  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); });
   </script>
 </body>
 </html>
