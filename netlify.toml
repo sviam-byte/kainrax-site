@@ -1,8 +1,7 @@
 [build]
-  # Команда для сборки: установка зависимостей и запуск скрипта
-  command = "npm ci && node scripts/build-index.mjs"
-  # Папка для публикации (в вашем случае — корень проекта)
+  command = "npm install --no-audit --no-fund && node scripts/build-index.mjs"
   publish = "."
+
 
 [build.environment]
   # Указываем версию Node.js, как в package.json
