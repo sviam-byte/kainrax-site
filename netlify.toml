@@ -1,6 +1,15 @@
 [build]
+  # Команда для сборки: установка зависимостей и запуск скрипта
   command = "npm ci && node scripts/build-index.mjs"
+  # Папка для публикации (в вашем случае — корень проекта)
   publish = "."
 
 [build.environment]
+  # Указываем версию Node.js, как в package.json
   NODE_VERSION = "20"
+
+# Правило для корректной работы роутинга в одностраничном приложении (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
