@@ -31,58 +31,46 @@
   }
 
   html,body{height:100%}
-  body{margin:0; background:var(--bg); color:var(--fg);
-    font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;}
-  [data-theme="cringe"] body{font-family:"Comic Sans MS","Impact",system-ui,sans-serif}
-
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link)}
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--shadow)}
-  .btn,button{border:1px solid var(--line); background:var(--card); color:var(--fg); padding:8px 12px; border-radius:10px; cursor:pointer; text-decoration:none; box-shadow:var(--shadow)}
-  input[type="search"]{padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--fg)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+  .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
+  input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
 
-  header{
-    position:sticky; top:0; z-index:5;
-    background:linear-gradient(to bottom, rgba(15,21,32,.9), rgba(15,21,32,.65));
-    backdrop-filter: blur(10px) saturate(1.1);
-    border-bottom:1px solid var(--line);
-  }
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.9), rgba(15,21,32,.65));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
   [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
-  .head{max-width:var(--max); margin:0 auto; padding:12px 16px; display:flex; gap:10px; align-items:center}
-  .brand{font-weight:800; letter-spacing:.2px}
-  .brand a{color:var(--fg); text-decoration:none}
-  .search{flex:1; display:flex; gap:8px; align-items:center}
-  main{max-width:var(--max); margin:0 auto; padding:20px 16px 80px; position:relative; z-index:1}
-  .grid{display:grid; grid-template-columns:1fr; gap:16px}
-  @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr; gap:22px} }
-  .list{display:flex; flex-direction:column; gap:12px}
-  .story-item{padding:14px; border-radius:12px; background:linear-gradient(180deg, rgba(125,211,252,.08), transparent); border:1px solid rgba(125,211,252,.18)}
-  .story-item a{color:var(--fg); text-decoration:none}
+  .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
+  .brand{font-weight:800;letter-spacing:.2px}
+  .brand a{color:var(--fg);text-decoration:none}
+  .search{flex:1;display:flex;gap:8px;align-items:center}
+  main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
+  .list{display:flex;flex-direction:column;gap:12px}
+  .story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
+  .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
-  .prose{font-family: Georgia, "Times New Roman", serif; font-size:18px; line-height:1.75}
+  .prose{font-family: Georgia, "Times New Roman", serif;font-size:18px;line-height:1.75}
   .prose p{margin:0 0 14px}
-  /* звёздочка у ссылок в тексте */
-  article.prose a::before{content:"✦ "; color:var(--muted)}
-
-  .tag{display:inline-flex; gap:6px; align-items:center; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:12px; margin-right:6px}
-  .tag:before{content:"✦"; color:var(--muted)}
+  article.prose a::before{content:"✦ ";color:var(--muted)}
+  .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
+  .tag:before{content:"✦";color:var(--muted)}
   [data-theme="light"] .tag:before{content:"#";}
+  .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
+  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
 
-  .back{display:inline-flex; align-items:center; gap:8px; margin:6px 0 12px}
-  .progress{position:fixed; left:0; top:0; height:3px; background:linear-gradient(90deg, var(--accent), var(--accent2)); width:0; z-index:6}
-
-  /* фон: звёзды + горы */
-  #stars{position:fixed; inset:0; z-index:0; pointer-events:none}
-  #mountains{position:fixed; left:0; right:0; bottom:0; height:30vh; z-index:0; pointer-events:none; opacity:.9}
-  #mountains svg{width:100%; height:100%; display:block}
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+  #mountains{position:fixed;left:0;right:0;bottom:0;height:30vh;z-index:0;pointer-events:none;opacity:.9}
+  #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* админ «править» */
-  #adminDock{position:fixed; right:14px; bottom:14px; z-index:7; display:none}
+  /* админ‐панелька (показ только в admin-режиме) */
+  #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminDock .btn{background:var(--card)}
-  #adminBtns{display:flex; gap:8px; align-items:center}
+  #adminBtns{display:none} /* ← скрыто по умолчанию */
 
   #c-anon{min-height:300px}
   </style>
@@ -106,7 +94,9 @@
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/about">О мире</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
-        <span id="adminBtns">
+
+        <!-- админ‐кнопки скрыты по умолчанию -->
+        <span id="adminBtns" style="display:none">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
           <a class="btn" id="newNoteBtn"  href="/admin/#/collections/notes/new"  target="_blank" rel="noopener">+ Заметка</a>
@@ -119,20 +109,22 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* конфиг */
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
+  /* ====== КОНФИГ ====== */
+  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369"; // твой Cusdis App ID
 
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
   const app=document.getElementById('app'); const qEl=document.getElementById('q');
 
-  /* ветки */
+  /* ====== ВЕТКИ ====== */
   const arcs=[
     { id:'surface', title:'Поверхность', desc:'Иона и «Цветок».', order:['epitimya','tsvetok'] },
     { id:'kainrax',  title:'Кайнракс',    desc:'Остальные рассказы из мира Кайнракса.', order:['dorogovato','chelovecheskiy-faktor'] },
     { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.', order:['ibut-g1','ibut-g2'] }
   ];
+  const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
+  const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
 
-  /* фолбэки на случай пустых папок */
+  /* ====== ДАННЫЕ (фолбэки, потом перезатираются контентом) ====== */
   let stories=[{id:'epitimya',slug:'epitimya',title:'Епитимья',date:'2025-08-01',minutes:12,tags:['Кайрнакс','Иона'],arc:'surface',text:'ЗАГЛУШКА'}];
   let notes=[{id:'n-2025-08-08-a',slug:'n-2025-08-08-a',title:'О тоне',date:'2025-08-08',text:'ЗАГЛУШКА'}];
 
@@ -144,15 +136,12 @@
     }catch(e){}
   }
 
-  /* тема + favicon */
+  /* ====== ТЕМА + FAVICON ====== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
     setUtterancesTheme(state.theme);
     setCusdisTheme();
-    updateFavicon();
-  }
-  function updateFavicon(){
     const el=document.getElementById('favicon');
     const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
     const svg = `%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6l7.6 15.4L56 23l-12 11.7L47.2 58 32 48.8 16.8 58 20 34.7 8 23l16.4-1.6z'/%3E%3C/svg%3E`;
@@ -164,14 +153,36 @@
     applyTheme();
   };
 
-  /* роутер */
+  /* ====== ADMIN MODE (скрыт для обычных) ====== */
+  let isAdmin =
+    new URLSearchParams(location.search).has('admin') ||
+    localStorage.getItem('admin') === '1';
+
+  if (new URLSearchParams(location.search).has('admin')) {
+    localStorage.setItem('admin', '1');
+    history.replaceState({}, '', location.pathname + location.hash); // убрать ?admin=1 из URL
+  }
+
+  function ensureAdminUI() {
+    const bar = document.getElementById('adminBtns');
+    if (bar) bar.style.display = isAdmin ? 'inline-flex' : 'none';
+    if (!isAdmin) adminDockHide();
+  }
+
+  // горячая кнопка переключения admin-режима: Alt+Shift+A
+  addEventListener('keydown', (e) => {
+    if (e.altKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+      isAdmin = !isAdmin;
+      localStorage.setItem('admin', isAdmin ? '1' : '0');
+      ensureAdminUI();
+    }
+  });
+
+  /* ====== РОУТЕР / ПОИСК ====== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
-  const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
-
-  /* вьюхи */
+  /* ====== ВЬЮХИ ====== */
   function renderList(){
     const q=state.q;
     const items=stories.filter(s=>!q || s.title.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
@@ -209,7 +220,7 @@
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
         </aside>
       </div>`;
-    adminDockHide();
+    adminDockHide(); ensureAdminUI();
   }
 
   function renderArcs(){
@@ -220,7 +231,7 @@
         <div class="muted">${a.order.length} текст(а)</div>
         <div>${a.desc}</div>
       </a></div>`).join('')}</div></section>`;
-    adminDockHide();
+    adminDockHide(); ensureAdminUI();
   }
 
   function renderArc(id){
@@ -234,7 +245,7 @@
           <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
         </a></li>`).join('')}
       </ol></section>`;
-    adminDockHide();
+    adminDockHide(); ensureAdminUI();
   }
 
   function renderNotes(){
@@ -244,7 +255,7 @@
         <div class="title">✦ ${n.title}</div>
         <div class="muted">${fmtDate(n.date)}</div>
       </a></div>`).join('')}</div></section>`;
-    adminDockHide();
+    adminDockHide(); ensureAdminUI();
   }
 
   function renderNote(id){
@@ -256,8 +267,8 @@
       ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
     </article>
     <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments(); setTimeout(restoreScroll,0);
-    adminDockFor('note', n.slug);
+    mountComments('note:'+ (n.slug||n.id)); setTimeout(restoreScroll,0);
+    adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
   function renderAbout(){
@@ -267,7 +278,7 @@
       <p><strong>Кайрнакс</strong> — подземная цивилизация на границе с «линиями». Сектора A/B/C/R, упрямая инженерия и странные поведенческие эффекты.</p>
       <p>Ветки: <em>Поверхность</em> (Иона, «Цветок»), <em>Кайнракс</em> (остальное), <em>ИБУТ</em>.</p>
     </div></section>`;
-    adminDockHide();
+    adminDockHide(); ensureAdminUI();
   }
 
   function renderArticle(id){
@@ -291,8 +302,8 @@
         </div>
       </article>
       <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
-    mountComments(); setTimeout(restoreScroll,0);
-    adminDockFor('story', s.slug);
+    mountComments('story:'+ (s.slug||s.id)); setTimeout(restoreScroll,0);
+    adminDockFor('story', s.slug||s.id); ensureAdminUI();
   }
 
   function renderTag(tag){
@@ -305,11 +316,11 @@
           <div class="title">✦ ${s.title}</div>
           <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
         </a></div>`).join('')}</div></section>`;
-    adminDockHide();
+    adminDockHide(); ensureAdminUI();
   }
 
-  /* ленивые комментарии */
-  function mountComments(){
+  /* ====== ЛЕНИВАЯ ЗАГРУЗКА КОММЕНТОВ (SPA-безопасно) ====== */
+  function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:10px">
@@ -326,14 +337,20 @@
       if (ghLoaded) return; ghLoaded=true;
       const s=document.createElement('script');
       s.src='https://utteranc.es/client.js';
-      s.setAttribute('repo','sviam-byte/kainrax-site');
-      s.setAttribute('issue-term','pathname');
+      s.setAttribute('repo','sviam-byte/kainrax-site');     // ВАЖНО: Issues ON в репозитории
+      s.setAttribute('issue-term', term || 'home');         // уникальный термин для SPA
+      s.setAttribute('label','comments');
       s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
       s.setAttribute('crossorigin','anonymous');
-      s.async=true; ghBox.appendChild(s);
+      s.async=true;
+      ghBox.appendChild(s);
     }
+
     function loadAnon(){
-      if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+      if (!window.CUSDIS_APP_ID){
+        anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>';
+        return;
+      }
       if (anonLoaded) return; anonLoaded=true;
       if (!window.__cusdisLoaded){
         const s=document.createElement('script');
@@ -348,7 +365,7 @@
         t.id='cusdis_thread';
         t.dataset.host='https://cusdis.com';
         t.dataset.appId=window.CUSDIS_APP_ID;
-        t.dataset.pageId=location.pathname+location.hash;
+        t.dataset.pageId=term || (location.pathname+location.hash); // уникальный ID
         t.dataset.pageUrl=location.href;
         t.dataset.pageTitle=document.title;
         t.dataset.lang='ru';
@@ -359,30 +376,33 @@
     }
     function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
     function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
-
     wrap.querySelector('#tab-gh').onclick=showGH;
     wrap.querySelector('#tab-anon').onclick=showAnon;
     if (window.CUSDIS_APP_ID) showAnon(); else showGH();
   }
   function setUtterancesTheme(theme){
     const iframe=document.querySelector('iframe.utterances-frame');
-    if(iframe) iframe.contentWindow.postMessage({type:'set-theme',theme:theme==='light'?'github-light':'github-dark'},'https://utteranc.es');
+    if(iframe) iframe.contentWindow.postMessage(
+      {type:'set-theme', theme:theme==='light'?'github-light':'github-dark'},
+      'https://utteranc.es'
+    );
   }
   function setCusdisTheme(){
     try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){}
   }
 
-  /* «править» */
+  /* ====== АДМИН «ПРАВИТЬ» ====== */
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
   function adminDockFor(kind, slug){
+    if (!isAdmin) return adminDockHide();
     if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
     else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
     adminDock.style.display='block';
   }
 
-  /* прогресс + восстановление скролла */
+  /* ====== ПРОГРЕСС + ВОССТ. СКРОЛЛА ====== */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true; requestAnimationFrame(()=>{
@@ -402,7 +422,7 @@
     const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* звёзды (облегчённые) */
+  /* ====== ЗВЁЗДЫ (облегчённо) ====== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); }
@@ -429,6 +449,7 @@
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; });
   resize(); requestAnimationFrame(drawStars);
 
+  /* ====== РЕНДЕР ====== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -441,7 +462,8 @@
     if(r==='/notes'){ renderNotes(); return; }
     renderList();
   }
-  loadContent().then(()=>{ applyTheme(); render(); });
+
+  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); });
   </script>
 </body>
 </html>
