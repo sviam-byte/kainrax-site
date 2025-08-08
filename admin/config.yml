@@ -2,35 +2,35 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "media"
-public_folder: "/media"
-locale: "ru"
+media_folder: "static/uploads"
+public_folder: "/static/uploads"
+
+publish_mode: simple
 
 collections:
   - name: "stories"
     label: "Рассказы"
-    label_singular: "Рассказ"
     folder: "content/stories"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
-      - { label: Заголовок, name: title, widget: string }
-      - { label: Дата, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
-      - { label: "Минуты чтения", name: minutes, widget: number, value_type: "int", min: 1, max: 60, default: 8 }
-      - { label: Теги, name: tags, widget: list, default: [] }
-      - { label: Ветка, name: arc, widget: select, options: ["surface","kainrax","ibut"], default: "kainrax" }
-      - { label: Текст, name: body, widget: markdown }
+      - { label: "Заголовок", name: "title", widget: "string" }
+      - { label: "Дата", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Минуты чтения", name: "minutes", widget: "number", default: 8, value_type: "int" }
+      - { label: "Ветка", name: "arc", widget: "select", options: ["surface","kainrax","ibut"], default: "kainrax" }
+      - { label: "Теги", name: "tags", widget: "list", default: [] }
+      - { label: "Текст", name: "body", widget: "markdown" }
 
   - name: "notes"
-    label: "Авторские заметки"
+    label: "Заметки"
     folder: "content/notes"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
     fields:
-      - { label: Заголовок, name: title, widget: string }
-      - { label: Дата, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
-      - { label: Текст, name: body, widget: markdown }
+      - { label: "Заголовок", name: "title", widget: "string" }
+      - { label: "Дата", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Текст", name: "body", widget: "markdown" }
