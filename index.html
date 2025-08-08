@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Кайрнакс — рассказы</title>
-  <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии." />
+  <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии. Обновления — пятница/суббота." />
   <meta name="theme-color" content="#0b0f14" />
-  <!-- динамический favicon ⭐ -->
-  <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6l7.6 15.4L56 23l-12 11.7L47.2 58 32 48.8 16.8 58 20 34.7 8 23l16.4-1.6z'/%3E%3C/svg%3E">
+  <!-- favicon: простая восьмиконечная «искра» (не похоже на примогем) -->
+  <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
   <style>
   :root{
@@ -36,6 +36,7 @@
   a{color:var(--link)}
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
@@ -46,7 +47,7 @@
   .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
   .brand{font-weight:800;letter-spacing:.2px}
   .brand a{color:var(--fg);text-decoration:none}
-  .search{flex:1;display:flex;gap:8px;align-items:center}
+  .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
@@ -56,16 +57,19 @@
   .title{font-weight:700}
   .prose{font-family: Georgia, "Times New Roman", serif;font-size:18px;line-height:1.75}
   .prose p{margin:0 0 14px}
-  article.prose a::before{content:"✦ ";color:var(--muted)}
+  article.prose a::before{content:"✶ ";color:var(--muted)} /* неблестящая «искра», не геншин */
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
-  .tag:before{content:"✦";color:var(--muted)}
+  .tag:before{content:"✶";color:var(--muted)}
   [data-theme="light"] .tag:before{content:"#";}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
 
-  /* фон: звёзды + горы (лёгкий) */
+  /* фон: звёзды + «горы» сверху и снизу (подземный свод) */
   #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
-  #mountains{position:fixed;left:0;right:0;bottom:0;height:30vh;z-index:0;pointer-events:none;opacity:.9}
+  #ceiling{position:fixed;left:0;right:0;top:0;height:18vh;z-index:0;pointer-events:none;opacity:.95}
+  #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)} /* перевёрнутый гребень — как потолок */
+  #ceiling path{fill:var(--mountain)}
+  #mountains{position:fixed;left:0;right:0;bottom:0;height:28vh;z-index:0;pointer-events:none;opacity:.92}
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
@@ -79,6 +83,14 @@
 </head>
 <body>
   <canvas id="stars" aria-hidden="true"></canvas>
+
+  <!-- потолок (свод) -->
+  <div id="ceiling" aria-hidden="true">
+    <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+      <path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/>
+    </svg>
+  </div>
+  <!-- пол (гребень) -->
   <div id="mountains" aria-hidden="true">
     <svg viewBox="0 0 100 30" preserveAspectRatio="none">
       <path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/>
@@ -89,15 +101,16 @@
 
   <header>
     <div class="head">
-      <div class="brand"><a href="#/">Кайрнакс ✦</a></div>
-      <div class="search" style="max-width:620px">
+      <div class="brand"><a href="#/">Кайрнакс ✶</a></div>
+      <div class="search" style="max-width:720px">
+        <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
         <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
         <a class="btn" href="#/arcs">Ветки</a>
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/about">О мире</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
 
-        <!-- админ-кнопки (покажем только в админ-режиме) -->
+        <!-- админ-кнопки (видны только в admin-режиме) -->
         <span id="adminBtns" style="display:none">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
@@ -112,7 +125,7 @@
 
   <script>
   /* ===== КОНФИГ ===== */
-  // Важно: в панели Cusdis укажи Allowed Domains: kainrax.netlify.app (+ твоё доменное)
+  // В Cusdis → Project Settings внеси Allowed Domains: kainrax.netlify.app (+ твой домен)
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
@@ -145,9 +158,10 @@
     localStorage.setItem('theme', state.theme);
     setUtterancesTheme(state.theme);
     setCusdisTheme();
+    // смена цвета favicon под тему
     const el=document.getElementById('favicon');
     const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
-    const svg = `%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6l7.6 15.4L56 23l-12 11.7L47.2 58 32 48.8 16.8 58 20 34.7 8 23l16.4-1.6z'/%3E%3C/svg%3E`;
+    const svg = `%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
     el.href = `data:image/svg+xml,${svg}`;
   }
   applyTheme();
@@ -193,13 +207,13 @@
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
-          <div class="muted">Короткая НФ без лорового барьера. Выбирай и читай.</div>
+          <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
           <div class="list">
             ${items.map(s=>{
               const ex=(s.text||'').replace(/\n+/g,' ').slice(0,130).trim()+((s.text||'').length>130?'…':'');
               return `<div class="story-item">
                 <a href="#/read/${s.id}">
-                  <div class="title">✦ ${s.title}</div>
+                  <div class="title">✶ ${s.title}</div>
                   <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин чтения · ветка: ${arcById(s.arc).title}</div>
                   <div>${ex}</div>
                 </a>
@@ -213,7 +227,7 @@
             ${arcs.map(a=>`
               <div class="story-item">
                 <a href="#/arc/${a.id}">
-                  <div class="title">✦ ${a.title}</div>
+                  <div class="title">✶ ${a.title}</div>
                   <div class="muted">${a.order.length} текст(а)</div>
                   <div>${a.desc}</div>
                 </a>
@@ -230,7 +244,7 @@
     app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item"><a href="#/arc/${a.id}">
-        <div class="title">✦ ${a.title}</div>
+        <div class="title">✶ ${a.title}</div>
         <div class="muted">${a.order.length} текст(а)</div>
         <div>${a.desc}</div>
       </a></div>`).join('')}</div></section>`;
@@ -244,7 +258,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc}</div>
       <ol class="list" style="margin-top:10px">${arr.map((s,i)=>`
         <li class="story-item"><a href="#/read/${s.id}">
-          <div class="title">✦ ${i+1}. ${s.title}</div>
+          <div class="title">✶ ${i+1}. ${s.title}</div>
           <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
         </a></li>`).join('')}
       </ol></section>`;
@@ -255,7 +269,7 @@
     app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
     <div class="list">${notes.map(n=>`
       <div class="story-item"><a href="#/note/${n.id}">
-        <div class="title">✦ ${n.title}</div>
+        <div class="title">✶ ${n.title}</div>
         <div class="muted">${fmtDate(n.date)}</div>
       </a></div>`).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
@@ -276,11 +290,31 @@
 
   function renderAbout(){
     app.innerHTML=`<section class="card">
-    <h1>О мире «Кайрнакс»</h1>
-    <div class="prose">
-      <p><strong>Кайрнакс</strong> — подземная цивилизация на границе с «линиями». Сектора A/B/C/R, упрямая инженерия и странные поведенческие эффекты.</p>
-      <p>Ветки: <em>Поверхность</em> (Иона, «Цветок»), <em>Кайнракс</em> (остальное), <em>ИБУТ</em>.</p>
-    </div></section>`;
+      <h1>О мире «Кайрнакс»</h1>
+      <div class="prose">
+        <p><em>«На поверхности есть сказка — сказка про человека, который однажды убил бога, которому клялся служить. Звали этого человека Каин, и грех его — первородным.</em></p>
+        <p><em>Но Воздвиженцы не клялись в верности ни одним богам.</em><br>
+        <em>Они ушли из-под неприветливых божественных крыльев, где вместо перьев был частокол забора, и назвали себя — нацией Каина, Каин-нацией.</em></p>
+        <p><em>Подземная жизнь, суровая и неприхотливая, обточила это имя, и придала ему звучание, какое не могло родиться на поверхности.</em><br>
+        <em>Кайнракс.</em><br>
+        <em>И имя первого человеческого грешника — человека, который убил бога, который отказался считать себя недостойным божественных стоп, — мы носим с гордостью».</em></p>
+        <p class="muted">Пергамент. Наставление к молодым. Первая редакция; 67г от Воздвижения; Элиара, Второй Хроникёр.</p>
+
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+
+        <p><em>«Древние сказки Поверхности говорят о грешнике, что поднял руку на своего брата из зависти, и звали его Каин. Но мы, дети Первого Света, знаем истину, которую они забыли! Ибо был другой Каин, первый из людей, кто посмел поднять взгляд к небу и увидел не бога, а тюремщика.</em></p>
+        <p><em>Мы — Воздвиженцы, и мы не клялись в верности тюремщикам. Мы не склоняли головы перед теми, кто создал мир не как дар, а как клетку с позолоченными прутьями. Мы разорвали цепи! Мы ушли из-под их каменных крыльев и назвали себя гордо — Каин-ракс, Народ Каина, Нация Первого Человека, отказавшегося быть рабом!</em></p>
+        <p><em>Пусть Поверхность помнит лишь грех. Мы же помним подвиг. Каждый удар молота, отесывающий камень наших городов, каждый луч нашего искусственного неба вторит этому имени. Ибо Кайнракс — это не просто название. Это клятва. Клятва вечно нести свет разума во тьму слепой веры и никогда, никогда больше не преклонять колен».</em></p>
+        <p class="muted">Пергамент. Наставление к молодым. Седьмая редакция; 180г от Воздвижения; Элиара, Второй Хроникёр.</p>
+
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+
+        <p><em>«На Поверхности бытует наивная сказка о Каине, убийце богов. Подобные мифы полезны для воспитания детей и солдат, но зрелый разум должен видеть за ними суть.</em></p>
+        <p><em>Воздвиженцы не были ни героями, ни грешниками. Они были прагматиками, столкнувшимися с системным сбоем. Боги того времени — были не тиранами, а нестабильными, вышедшими из-под контроля функциями. "Убийство бога" было не актом бунта, а необходимой процедурой по удалению поврежденного модуля для предотвращения полного коллапса системы.</em></p>
+        <p><em>Мы назвали себя Кайнракс не из гордости за некий "грех", а в знак признания суровой реальности: порядок требует жертв, а стабильность системы важнее любого ее отдельного элемента. Имя Каина — это не знамя революции, а вечное напоминание о цене, которую приходится платить за контроль. Помнить об этом — долг каждого, кто несет ответственность за выживание нашего мира».</em></p>
+        <p class="muted">Пергамент. Наставление к молодым. Двадцать третья редакция; 250г от Воздвижения; Итур, Четвёртый Хроникёр.</p>
+      </div>
+    </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
@@ -316,13 +350,13 @@
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
         <div class="story-item"><a href="#/read/${s.id}">
-          <div class="title">✦ ${s.title}</div>
+          <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
         </a></div>`).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ЛЕНИВАЯ ЗАГРУЗКА КОММЕНТОВ (скорость + SPA-совместимость) ===== */
+  /* ===== ЛЕНИВАЯ ЗАГРУЗКА КОММЕНТОВ ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
 
@@ -384,7 +418,7 @@
     wrap.querySelector('#tab-gh').onclick=showGH;
     wrap.querySelector('#tab-anon').onclick=showAnon;
 
-    // производительность: вообще ничего не грузим, пока не доскроллили
+    // ничего не грузим, пока не доскроллили
     const io=new IntersectionObserver((entries)=>{
       if(entries.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); }
     },{rootMargin:'200px'});
@@ -434,7 +468,7 @@
     const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ===== ЗВЁЗДЫ (облегчённые + respect reduced motion) ===== */
+  /* ===== ЗВЁЗДЫ (лёгкие + respect reduced motion) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
