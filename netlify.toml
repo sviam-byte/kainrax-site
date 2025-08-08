@@ -1,13 +1,10 @@
 [build]
-  command = "npm install --no-audit --no-fund && node scripts/build-index.mjs"
+  command = "node scripts/build-index.mjs"
   publish = "."
 
+  [build.environment]
+    NODE_VERSION = "18"
 
-[build.environment]
-  # Указываем версию Node.js, как в package.json
-  NODE_VERSION = "20"
-
-# Правило для корректной работы роутинга в одностраничном приложении (SPA)
 [[redirects]]
   from = "/*"
   to = "/index.html"
