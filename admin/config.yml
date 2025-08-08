@@ -4,41 +4,33 @@ backend:
 
 media_folder: "media"
 public_folder: "/media"
-
 locale: "ru"
 
 collections:
   - name: "stories"
     label: "Рассказы"
     label_singular: "Рассказ"
-    files:
-      - file: "content/stories.json"
-        label: "Все рассказы"
-        name: "stories_root"
-        fields:
-          - { label: "Рассказы", name: "stories", widget: "list", summary: "{{fields.title}} ({{fields.date}})", fields:
-              [
-                { label: ID, name: id, widget: string },
-                { label: Заголовок, name: title, widget: string },
-                { label: Дата, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false },
-                { label: "Минуты чтения", name: minutes, widget: number, value_type: "int", min: 1, max: 60 },
-                { label: Теги, name: tags, widget: list, default: [] },
-                { label: Ветка, name: arc, widget: select, options: ["dominus","lines","infra","ibut"] },
-                { label: Текст, name: text, widget: text }
-              ]
-            }
+    folder: "content/stories"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: Заголовок, name: title, widget: string }
+      - { label: Дата, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { label: "Минуты чтения", name: minutes, widget: number, value_type: "int", min: 1, max: 60, default: 8 }
+      - { label: Теги, name: tags, widget: list, default: [] }
+      - { label: Ветка, name: arc, widget: select, options: ["surface","kainrax","ibut"], default: "kainrax" }
+      - { label: Текст, name: body, widget: markdown }
+
   - name: "notes"
     label: "Авторские заметки"
-    files:
-      - file: "content/notes.json"
-        label: "Все заметки"
-        name: "notes_root"
-        fields:
-          - { label: "Заметки", name: "notes", widget: "list", summary: "{{fields.title}} ({{fields.date}})", fields:
-              [
-                { label: ID, name: id, widget: string },
-                { label: Заголовок, name: title, widget: string },
-                { label: Дата, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false },
-                { label: Текст, name: text, widget: text }
-              ]
-            }
+    folder: "content/notes"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: Заголовок, name: title, widget: string }
+      - { label: Дата, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { label: Текст, name: body, widget: markdown }
