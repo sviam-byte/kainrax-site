@@ -1,476 +1,389 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Кайрнакс — рассказы</title>
-  <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии." />
-  <meta name="theme-color" content="#0b0f14" />
-  <style>
-  /* ===== TOKENS ===== */
-  :root{
-    --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
-    --card:rgba(16,21,32,.85); --line:#243447;
-    --accent:#7dd3fc; --accent2:#a78bfa; --link:#93c5fd;
-    --max:960px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
-    --code:#0a0e16; --mountain:#121723; --star:rgba(255,255,255,.9);
-  }
-  [data-theme="light"]{
-    --bg:#f7fbff; --fg:#0b0f14; --muted:#5a6774;
-    --card:rgba(255,255,255,.92); --line:#e6ecf2;
-    --accent:#0ea5e9; --accent2:#7c3aed; --link:#1d4ed8;
-    --shadow:0 8px 24px rgba(0,0,0,.08);
-    --code:#f6f8fb; --mountain:#dfe7f3; --star:rgba(10,20,40,.85);
-  }
-  /* CRINGE (намеренно перебор) */
-  [data-theme="cringe"]{
-    --bg:linear-gradient(135deg,#ffb6f3,#ffd699 50%,#b3f1ff);
-    --fg:#111; --muted:#333; --card:rgba(255,255,255,.88); --line:#ffd1f4;
-    --accent:#ff3ea5; --accent2:#07f49e; --link:#7c00ff;
-    --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb;
-  }
-
-  /* ===== BASE ===== */
-  html,body{height:100%}
-  body{
-    margin:0; background:var(--bg); color:var(--fg);
-    font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
-  }
-  [data-theme="cringe"] body{font-family:"Comic Sans MS","Impact",system-ui,sans-serif}
-  a{color:var(--link)}
-  h1{margin:6px 0 10px;font-size:28px} h2{margin:6px 0 8px} h3{margin:6px 0 8px}
-  .muted{color:var(--muted)}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:18px; box-shadow:var(--shadow)}
-  .btn,button{border:1px solid var(--line); background:var(--card); color:var(--fg); padding:8px 12px; border-radius:10px; cursor:pointer; text-decoration:none; box-shadow:var(--shadow)}
-  input[type="search"]{padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--fg)}
-
-  /* ===== LAYOUT ===== */
-  header{
-    position:sticky; top:0; z-index:5;
-    background:linear-gradient(to bottom, rgba(15,21,32,.9), rgba(15,21,32,.65));
-    backdrop-filter: blur(10px) saturate(1.1);
-    border-bottom:1px solid var(--line);
-  }
-  [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
-  [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
-  .head{max-width:var(--max); margin:0 auto; padding:12px 16px; display:flex; gap:10px; align-items:center}
-  .brand{font-weight:800; letter-spacing:.2px}
-  .brand a{color:var(--fg); text-decoration:none}
-  .search{flex:1; display:flex; gap:8px; align-items:center}
-  main{max-width:var(--max); margin:0 auto; padding:20px 16px 80px; position:relative; z-index:1}
-  .grid{display:grid; grid-template-columns:1fr; gap:16px}
-  @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr; gap:22px} }
-  .list{display:flex; flex-direction:column; gap:12px}
-  .story-item{padding:14px; border-radius:12px; background:linear-gradient(180deg, rgba(125,211,252,.08), transparent); border:1px solid rgba(125,211,252,.18)}
-  .story-item a{color:var(--fg); text-decoration:none}
-  .title{font-weight:700}
-  .prose{font-family: Georgia, "Times New Roman", serif; font-size:18px; line-height:1.75}
-  .prose p{margin:0 0 14px}
-  .tag{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:12px; margin-right:6px}
-  .back{display:inline-flex; align-items:center; gap:8px; margin:6px 0 12px}
-  .progress{position:fixed; left:0; top:0; height:3px; background:linear-gradient(90deg, var(--accent), var(--accent2)); width:0; z-index:6}
-
-  /* ===== BACKGROUND: STARS + MOUNTAINS ===== */
-  #stars{position:fixed; inset:0; z-index:0; pointer-events:none}
-  #mountains{position:fixed; left:0; right:0; bottom:0; height:30vh; z-index:0; pointer-events:none; opacity:.9}
-  #mountains svg{width:100%; height:100%; display:block}
-  #mountains path{fill:var(--mountain)}
-  [data-theme="cringe"] #mountains path{filter:drop-shadow(0 0 12px rgba(255,0,255,.35))}
-
-  /* ===== ADMIN BAR ===== */
-  #adminBtns{display:none; gap:8px; align-items:center}
-  #adminDock{position:fixed; right:14px; bottom:14px; z-index:7; display:none}
-  #adminDock .btn{background:var(--card)}
-
-  /* ===== CRINGE EXTRA ===== */
-  [data-theme="cringe"] .sparkles:after{
-    content:"✨💥🦄✨"; position:fixed; right:12px; bottom:12px; font-size:22px; animation: spin 8s linear infinite; opacity:.9; pointer-events:none
-  }
-  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-  </style>
-  <!-- Netlify Identity widget, чтобы на сайте понимать «вошёл/нет» -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Кайрнакс — рассказы</title>
+<meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии." />
+<meta name="theme-color" content="#0b0f14" />
+<style>
+:root{--bg:#0b0f14;--fg:#e6e6e6;--muted:#9aa5b1;--card:rgba(16,21,32,.85);--line:#243447;--accent:#7dd3fc;--accent2:#a78bfa;--link:#93c5fd;--max:960px;--r:14px;--shadow:0 12px 36px rgba(0,0,0,.45);--mountain:#121723;--star:rgba(255,255,255,.9)}
+[data-theme="light"]{--bg:#f7fbff;--fg:#0b0f14;--muted:#5a6774;--card:rgba(255,255,255,.92);--line:#e6ecf2;--accent:#0ea5e9;--accent2:#7c3aed;--link:#1d4ed8;--shadow:0 8px 24px rgba(0,0,0,.08);--mountain:#dfe7f3;--star:rgba(10,20,40,.85)}
+[data-theme="cringe"]{--bg:linear-gradient(135deg,#ffb6f3,#ffd699 50%,#b3f1ff);--fg:#111;--muted:#333;--card:rgba(255,255,255,.88);--line:#ffd1f4;--accent:#ff3ea5;--accent2:#07f49e;--link:#7c00ff;--shadow:0 14px 40px rgba(0,0,0,.25);--mountain:#ffc6fb}
+html,body{height:100%} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
+[data-theme="cringe"] body{font-family:"Comic Sans MS","Impact",system-ui,sans-serif}
+a{color:var(--link)} h1{margin:6px 0 10px;font-size:28px} h2{margin:6px 0 8px}
+.muted{color:var(--muted)} .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
+input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom,rgba(15,21,32,.9),rgba(15,21,32,.65));backdrop-filter:blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
+[data-theme="light"] header{background:linear-gradient(to bottom,rgba(255,255,255,.95),rgba(255,255,255,.75))}
+[data-theme="cringe"] header{background:linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,255,255,.6))}
+.head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
+.brand{font-weight:800;letter-spacing:.2px}.brand a{text-decoration:none;color:var(--fg)}
+.search{flex:1;display:flex;gap:8px;align-items:center}
+main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:900px){.grid{grid-template-columns:1.15fr .85fr;gap:22px}}
+.list{display:flex;flex-direction:column;gap:12px}
+.story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(125,211,252,.08),transparent);border:1px solid rgba(125,211,252,.18)}
+.story-item a{color:var(--fg);text-decoration:none}
+.title{font-weight:700}.prose{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.75}
+.prose p{margin:0 0 14px}.tag{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
+.back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
+.progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;z-index:6}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+#mountains{position:fixed;left:0;right:0;bottom:0;height:30vh;z-index:0;pointer-events:none;opacity:.9}
+#mountains svg{width:100%;height:100%;display:block} #mountains path{fill:var(--mountain)}
+#adminBtns{display:none;gap:8px;align-items:center} #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
+#c-anon{min-height:260px} /* чтоб форма Cusdis не выглядела «плоско» */
+</style>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <canvas id="stars" aria-hidden="true"></canvas>
-  <div id="mountains" aria-hidden="true">
-    <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-      <path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/>
-    </svg>
-  </div>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div id="mountains" aria-hidden="true">
+  <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+    <path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/>
+  </svg>
+</div>
+<div class="progress" id="progress"></div>
 
-  <div class="progress" id="progress"></div>
-
-  <header class="sparkles">
-    <div class="head">
-      <div class="brand"><a href="#/">Кайрнакс</a></div>
-      <div class="search" style="max-width:600px">
-        <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
-        <a class="btn" href="#/arcs">Ветки</a>
-        <a class="btn" href="#/notes">Заметки</a>
-        <a class="btn" href="#/about">О мире</a>
-        <button id="themeBtn" title="Тема">🌓</button>
-        <span id="adminBtns">
-          <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
-          <a class="btn" id="newStoryBtn"  target="_blank" rel="noopener">+ Рассказ</a>
-          <a class="btn" id="newNoteBtn"   target="_blank" rel="noopener">+ Заметка</a>
-        </span>
-      </div>
+<header>
+  <div class="head">
+    <div class="brand"><a href="#/">Кайрнакс</a></div>
+    <div class="search" style="max-width:600px">
+      <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
+      <a class="btn" href="#/arcs">Ветки</a>
+      <a class="btn" href="#/notes">Заметки</a>
+      <a class="btn" href="#/about">О мире</a>
+      <button id="themeBtn" title="Тема">🌓</button>
+      <span id="adminBtns">
+        <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
+        <a class="btn" id="newStoryBtn" target="_blank" rel="noopener">+ Рассказ</a>
+        <a class="btn" id="newNoteBtn"  target="_blank" rel="noopener">+ Заметка</a>
+      </span>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- Плавающая «✏️ Править этот текст» (только для залогиненных) -->
-  <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
+<div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
+<main id="app" aria-live="polite"></main>
 
-  <main id="app" aria-live="polite"></main>
+<script>
+/* ===== CONFIG ===== */
+window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369"; // твой ID
 
-  <script>
-  /* ======= CONFIG ======= */
-  // Если нужны анонимные комментарии — вставь сюда App ID из Cusdis (иначе оставь пустым)
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
+/* ===== STATE ===== */
+const state={ theme: localStorage.getItem('theme')||'dark', route: location.hash.slice(1)||'/', q:'' };
+const app=document.getElementById('app'); const qEl=document.getElementById('q');
 
+/* Ветки (как просила) */
+const arcs=[
+  { id:'surface', title:'Поверхность', desc:'Иона и «Цветок».', order:['epitimya','tsvetok'] },
+  { id:'kainrax', title:'Кайнракс',   desc:'Остальные рассказы.', order:['dorogovato','chelovecheskiy-faktor'] },
+  { id:'ibut',    title:'ИБУТ',       desc:'Лёгкое чтиво про попаданцев.', order:['ibut-g1','ibut-g2'] }
+];
 
-  /* ======= STATE & DATA ======= */
-  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
-  const app=document.getElementById('app'); const qEl=document.getElementById('q');
+/* Fallback (на случай, если index.json ещё не собран) */
+let stories=[{id:'epitimya',slug:'epitimya',title:'Епитимья',date:'2025-08-01',minutes:12,tags:['Кайрнакс','Иона'],arc:'surface',text:'ЗАГЛУШКА'}];
+let notes=[{id:'n-2025-08-08-a',slug:'n-2025-08-08-a',title:'О тоне',date:'2025-08-08',text:'ЗАГЛУШКА'}];
 
-  // === ВЕТКИ (обновлённые) ===
-  // 1) Поверхность: Иона + «Цветок»
-  // 2) Кайнракс: остальные рассказы
-  // 3) ИБУТ
-  const arcs=[
-    { id:'surface', title:'Поверхность', desc:'Иона и «Цветок» (повесть — заглушка).', order:['epitimya','tsvetok'] },
-    { id:'kainrax', title:'Кайнракс',   desc:'Остальные рассказы из мира Кайнракса.',  order:['dorogovato','chelovecheskiy-faktor'] },
-    { id:'ibut',    title:'ИБУТ',       desc:'Лёгкое чтиво про мир попаданцев.',        order:['ibut-g1','ibut-g2'] }
-  ];
+async function loadContent(){
+  try{
+    const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.json());
+    if(Array.isArray(j.stories)) stories=j.stories;
+    if(Array.isArray(j.notes))   notes=j.notes;
+  }catch(e){/* останемся на fallback */}
+}
 
-  // Fallback-контент (если JSON не загрузится)
-  let stories=[
-    { id:'epitimya', title:'Епитимья', date:'2025-08-01', minutes:12, tags:['Кайрнакс','Иона','DOMINUS'], arc:'surface', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Епитимья)'},
-    { id:'tsvetok', title:'Цветок (повесть, заглушка)', date:'2025-08-08', minutes:30, tags:['поверхность','Иона','повесть'], arc:'surface', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Цветок). Короткий синопсис: Иона поднимается на поверхность, где встречает «Цветок» — объект, меняющий поведенческие паттерны поселений.'},
-    { id:'dorogovato', title:'Дороговато', date:'2025-07-25', minutes:10, tags:['линии','R-сектор','Асси'], arc:'kainrax', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Дороговато)'},
-    { id:'chelovecheskiy-faktor', title:'Человеческий фактор', date:'2025-07-23', minutes:9, tags:['инженерия','B-сектор','Гидеон'], arc:'kainrax', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Человеческий фактор)'},
-    { id:'ibut-g1', title:'ИБУТ — глава 1', date:'2025-08-08', minutes:8, tags:['ИБУТ','попаданцы'], arc:'ibut', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (ИБУТ — глава 1)'},
-    { id:'ibut-g2', title:'ИБУТ — глава 2', date:'2025-08-08', minutes:8, tags:['ИБУТ','попаданцы'], arc:'ibut', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (ИБУТ — глава 2)'}
-  ];
-  let notes=[ { id:'n-2025-08-08-a', title:'О тоне и темпе «Кайрнакса»', date:'2025-08-08', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (заметка о тоне).' } ];
+/* THEME */
+function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme); localStorage.setItem('theme',state.theme); setUtterancesTheme(state.theme); }
+applyTheme();
+document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark'?'light':(state.theme==='light'?'cringe':'dark'); applyTheme(); };
 
-  async function loadContent(){
-    try{
-      const [s,n]=await Promise.all([
-        fetch('content/stories.json',{cache:'no-store'}).then(r=>r.ok?r.json():{stories}),
-        fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():{notes})
-      ]);
-      stories=s.stories||stories; notes=n.notes||notes;
-    }catch(_){}
-  }
+/* ROUTER */
+addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
+qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ======= THEME ======= */
-  function applyTheme(){
-    document.documentElement.setAttribute('data-theme', state.theme);
-    localStorage.setItem('theme', state.theme);
-    setUtterancesTheme(state.theme);
-  }
-  applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{
-    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
-    applyTheme();
-  };
+const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
+const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
 
-  /* ======= ROUTER ======= */
-  addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
-  qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
-
-  const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
-  const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
-
-  /* ======= VIEWS ======= */
-  function renderList(){
-    const q=state.q;
-    const items=stories.filter(s=>!q || s.title.toLowerCase().includes(q) || s.text.toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
-    app.innerHTML=`
-      <div class="grid">
-        <section class="card">
-          <h1>Рассказы</h1>
-          <div class="muted">Короткая НФ без лорового барьера. Выбирай и читай.</div>
-          <div class="list">
-            ${items.map(s=>{
-              const ex=s.text.replace(/\n+/g,' ').slice(0,130).trim()+(s.text.length>130?'…':'');
-              return `<div class="story-item">
-                <a href="#/read/${s.id}">
-                  <div class="title">${s.title}</div>
-                  <div class="muted">${fmtDate(s.date)} · ${s.minutes} мин чтения · ветка: ${arcById(s.arc).title}</div>
-                  <div>${ex}</div>
-                </a>
-              </div>`;
-            }).join('')}
-          </div>
-        </section>
-        <aside class="card">
-          <h2>Ветки</h2>
-          <div class="list">
-            ${arcs.map(a=>`
-              <div class="story-item">
-                <a href="#/arc/${a.id}">
-                  <div class="title">${a.title}</div>
-                  <div class="muted">${a.order.length} текст(а)</div>
-                  <div>${a.desc}</div>
-                </a>
-              </div>`).join('')}
-          </div>
-          <h3 style="margin-top:14px">Подписка</h3>
-          <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
-          <p><span class="tag">жанр: НФ</span> <span class="tag">обновления: пн/чт</span></p>
-        </aside>
-      </div>`;
-    adminDockHide();
-  }
-
-  function renderArcs(){
-    app.innerHTML=`<section class="card"><h1>Ветки</h1>
-    <div class="list">${arcs.map(a=>`
-      <div class="story-item"><a href="#/arc/${a.id}">
-        <div class="title">${a.title}</div>
-        <div class="muted">${a.order.length} текст(а)</div>
-        <div>${a.desc}</div>
-      </a></div>`).join('')}</div></section>`;
-    adminDockHide();
-  }
-
-  function renderArc(id){
-    const a=arcById(id); const arr=a.order.map(i=>stories.find(s=>s.id===i)).filter(Boolean);
-    app.innerHTML=`<section class="card">
-      <a class="back" href="#/arcs">← Ко всем веткам</a>
-      <h1>${a.title}</h1><div class="muted">${a.desc}</div>
-      <ol class="list" style="margin-top:10px">${arr.map((s,i)=>`
-        <li class="story-item"><a href="#/read/${s.id}">
-          <div class="title">${i+1}. ${s.title}</div>
-          <div class="muted">${fmtDate(s.date)} · ${s.minutes} мин</div>
-        </a></li>`).join('')}
-      </ol></section>`;
-    adminDockHide();
-  }
-
-  function renderTag(tag){
-    const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
-    app.innerHTML=`<section class="card">
-      <a class="back" href="#/">← На главную</a>
-      <h1>#${tag}</h1>
-      <div class="list">${items.map(s=>`
-        <div class="story-item"><a href="#/read/${s.id}">
-          <div class="title">${s.title}</div>
-          <div class="muted">${fmtDate(s.date)} · ${s.minutes} мин · ветка: ${arcById(s.arc).title}</div>
-        </a></div>`).join('')}</div></section>`;
-    adminDockHide();
-  }
-
-  function renderNotes(){
-    app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
-    <div class="list">${notes.map(n=>`
-      <div class="story-item"><a href="#/note/${n.id}">
-        <div class="title">${n.title}</div>
-        <div class="muted">${fmtDate(n.date)}</div>
-      </a></div>`).join('')}</div></section>`;
-    adminDockHide();
-  }
-
-  function renderNote(id){
-    const n=notes.find(x=>x.id===id); if(!n){location.hash='#/notes';return;}
-    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-    <article class="prose" data-id="${n.id}">
-      <h1>${n.title}</h1>
-      <div class="muted">${fmtDate(n.date)}</div>
-      ${n.text.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-    </article>
-    <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments(); setTimeout(restoreScroll,0);
-    adminDockFor('notes');
-  }
-
-  function renderAbout(){
-    app.innerHTML=`<section class="card">
-    <h1>О мире «Кайрнакс»</h1>
-    <div class="prose">
-    <p><strong>Кайрнакс</strong> — подземная цивилизация на границе с «линиями». Сектора A/B/C/R, упрямая инженерия и странные поведенческие эффекты.</p>
-    <p>Ветки: <em>Поверхность</em> (Иона, «Цветок»), <em>Кайнракс</em> (остальное), <em>ИБУТ</em>.</p>
-    </div></section>`;
-    adminDockHide();
-  }
-
-  function renderArticle(id){
-    const s=stories.find(x=>x.id===id); if(!s){location.hash='#/'; return;}
-    const a=arcById(s.arc), idx=a.order.indexOf(s.id);
-    const prevId=idx>0? a.order[idx-1]:null, nextId=idx<a.order.length-1? a.order[idx+1]:null;
-
-    app.innerHTML=`
-      <a class="back" href="#/">← К списку</a>
-      <article class="prose" data-id="${s.id}">
-        <h1>${s.title}</h1>
-        <div class="muted">${fmtDate(s.date)} · ${s.minutes} мин чтения · ветка: <a href="#/arc/${a.id}">${a.title}</a> (${idx+1}/${a.order.length})</div>
-        <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
-        ${s.text.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-        <div style="display:flex;justify-content:space-between;gap:10px">
-          ${prevId?`<a class="btn" href="#/read/${prevId}">← Предыдущая</a>`:'<span></span>'}
-          ${nextId?`<a class="btn" href="#/read/${nextId}">Следующая →</a>`:'<span></span>'}
-        </div>
-      </article>
-      <section class="card" style="margin-top:16px"><h3>Похожие</h3>
-        <div class="list">${
-          stories.filter(x=>x.id!==s.id && x.tags?.some(t=>s.tags?.includes(t))).slice(0,3)
-          .map(p=>`<div class="story-item"><a href="#/read/${p.id}">
-            <div class="title">${p.title}</div><div class="muted">${fmtDate(p.date)} · ${p.minutes} мин</div></a></div>`).join('') || '<div class="muted">Пока пусто.</div>'}
+/* VIEWS */
+function renderList(){
+  const q=state.q;
+  const items=stories.filter(s=>!q || s.title.toLowerCase().includes(q) || s.text.toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+  app.innerHTML=`
+    <div class="grid">
+      <section class="card">
+        <h1>Рассказы</h1>
+        <div class="muted">Короткая НФ без лорового барьера.</div>
+        <div class="list">
+          ${items.map(s=>{
+            const ex=(s.text||'').replace(/\n+/g,' ').slice(0,130).trim()+((s.text||'').length>130?'…':'');
+            return `<div class="story-item">
+              <a href="#/read/${s.id}">
+                <div class="title">${s.title}</div>
+                <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
+                <div>${ex}</div>
+              </a>
+            </div>`;
+          }).join('')}
         </div>
       </section>
-      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments(); setTimeout(restoreScroll,0);
-    adminDockFor('stories');
-  }
+      <aside class="card">
+        <h2>Ветки</h2>
+        <div class="list">
+          ${arcs.map(a=>`
+            <div class="story-item">
+              <a href="#/arc/${a.id}">
+                <div class="title">${a.title}</div>
+                <div class="muted">${a.order.length} текст(а)</div>
+                <div>${a.desc}</div>
+              </a>
+            </div>`).join('')}
+        </div>
+        <h3 style="margin-top:14px">Подписка</h3>
+        <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
+      </aside>
+    </div>`;
+  adminDockHide();
+}
 
-  /* ======= COMMENTS ======= */
-  function mountComments(){
-    const wrap=document.getElementById('comments'); if(!wrap) return;
+function renderArcs(){
+  app.innerHTML=`<section class="card"><h1>Ветки</h1>
+  <div class="list">${arcs.map(a=>`
+    <div class="story-item"><a href="#/arc/${a.id}">
+      <div class="title">${a.title}</div>
+      <div class="muted">${a.order.length} текст(а)</div>
+      <div>${a.desc}</div>
+    </a></div>`).join('')}</div></section>`;
+  adminDockHide();
+}
 
-    wrap.innerHTML = `
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="btn" id="tab-gh">GitHub</button>
-        <button class="btn" id="tab-anon">Анонимно</button>
+function renderArc(id){
+  const a=arcById(id); const arr=a.order.map(i=>stories.find(s=>s.id===i||s.slug===i)).filter(Boolean);
+  app.innerHTML=`<section class="card">
+    <a class="back" href="#/arcs">← Ко всем веткам</a>
+    <h1>${a.title}</h1><div class="muted">${a.desc}</div>
+    <ol class="list" style="margin-top:10px">${arr.map((s,i)=>`
+      <li class="story-item"><a href="#/read/${s.id}">
+        <div class="title">${i+1}. ${s.title}</div>
+        <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
+      </a></li>`).join('')}
+    </ol></section>`;
+  adminDockHide();
+}
+
+function renderNotes(){
+  app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
+  <div class="list">${notes.map(n=>`
+    <div class="story-item"><a href="#/note/${n.id}">
+      <div class="title">${n.title}</div>
+      <div class="muted">${fmtDate(n.date)}</div>
+    </a></div>`).join('')}</div></section>`;
+  adminDockHide();
+}
+
+function renderNote(id){
+  const n=notes.find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
+  app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
+  <article class="prose" data-id="${n.id}" data-slug="${n.slug}">
+    <h1>${n.title}</h1>
+    <div class="muted">${fmtDate(n.date)}</div>
+    ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+  </article>
+  <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
+  mountComments(); setTimeout(restoreScroll,0); adminDockFor('note', n.slug);
+}
+
+function renderAbout(){
+  app.innerHTML=`<section class="card">
+  <h1>О мире «Кайрнакс»</h1>
+  <div class="prose"><p>Ветки: <strong>Поверхность</strong> (Иона, «Цветок»), <strong>Кайнракс</strong> (остальное), <strong>ИБУТ</strong>.</p></div>
+  </section>`;
+  adminDockHide();
+}
+
+function renderArticle(id){
+  const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;}
+  const a=arcById(s.arc), idx=a.order.indexOf(s.id)||a.order.indexOf(s.slug);
+  const order=a.order.map(i=>stories.find(st=>st.id===i||st.slug===i)).filter(Boolean);
+  const pos=Math.max(0, order.findIndex(v=>v.id===s.id||v.slug===s.slug));
+  const prev=order[pos-1], next=order[pos+1];
+
+  app.innerHTML=`
+    <a class="back" href="#/">← К списку</a>
+    <article class="prose" data-id="${s.id}" data-slug="${s.slug}">
+      <h1>${s.title}</h1>
+      <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: <a href="#/arc/${a.id}">${a.title}</a> (${pos+1}/${order.length})</div>
+      <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+      ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+      <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+      <div style="display:flex;justify-content:space-between;gap:10px">
+        ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
+        ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
       </div>
-      <div id="c-gh"></div>
-      <div id="c-anon" style="display:none"></div>`;
+    </article>
+    <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
+  mountComments(); setTimeout(restoreScroll,0); adminDockFor('story', s.slug);
+}
 
-    // UTTERANCES (GitHub)
-    const ghBox = wrap.querySelector('#c-gh');
-    const gh = document.createElement('script');
-    gh.src = 'https://utteranc.es/client.js';
-    gh.setAttribute('repo','sviam-byte/kainrax-site');
-    gh.setAttribute('issue-term','pathname');
-    gh.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light' ? 'github-light' : 'github-dark');
-    gh.setAttribute('crossorigin','anonymous');
-    gh.async = true;
-    ghBox.appendChild(gh);
+/* TAG VIEW */
+function renderTag(tag){
+  const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
+  app.innerHTML=`<section class="card">
+    <a class="back" href="#/">← На главную</a>
+    <h1>#${tag}</h1>
+    <div class="list">${items.map(s=>`
+      <div class="story-item"><a href="#/read/${s.id}">
+        <div class="title">${s.title}</div>
+        <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
+      </a></div>`).join('')}</div></section>`;
+  adminDockHide();
+}
 
-    // CUSDIS (анонимно)
-    const anonBox = wrap.querySelector('#c-anon');
-    anonBox.innerHTML = '';
-    if (window.CUSDIS_APP_ID){
-      const thread = document.createElement('div');
-      thread.id = 'cusdis_thread';
-      thread.dataset.host = 'https://cusdis.com';
-      thread.dataset.appId = window.CUSDIS_APP_ID;
-      thread.dataset.pageId = location.pathname + location.hash;
-      thread.dataset.pageUrl = location.href;
-      thread.dataset.pageTitle = document.title;
-      anonBox.appendChild(thread);
+/* COMMENTS */
+function mountComments(){
+  const wrap=document.getElementById('comments'); if(!wrap) return;
+  wrap.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn" id="tab-gh">GitHub</button>
+      <button class="btn" id="tab-anon">Анонимно</button>
+    </div>
+    <div id="c-gh"></div>
+    <div id="c-anon" style="display:none"></div>`;
 
-      const s = document.createElement('script');
-      s.defer = true;
-      s.src = 'https://cusdis.com/js/cusdis.es.js';
-      anonBox.appendChild(s);
-    } else {
-      anonBox.innerHTML = '<div class="muted">Анонимные комментарии отключены. Добавь Cusdis App ID вверху index.html.</div>';
-    }
+  // UTTERANCES
+  const ghBox = wrap.querySelector('#c-gh');
+  const gh = document.createElement('script');
+  gh.src = 'https://utteranc.es/client.js';
+  gh.setAttribute('repo','sviam-byte/kainrax-site');
+  gh.setAttribute('issue-term','pathname');
+  gh.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light' ? 'github-light' : 'github-dark');
+  gh.setAttribute('crossorigin','anonymous');
+  gh.async = true;
+  ghBox.appendChild(gh);
 
-    // Tabs (если есть Cusdis — показываем сначала «Анонимно»)
-    const tabGh   = wrap.querySelector('#tab-gh');
-    const tabAnon = wrap.querySelector('#tab-anon');
-    function showGh(){ ghBox.style.display='block'; anonBox.style.display='none'; }
-    function showAnon(){ ghBox.style.display='none';  anonBox.style.display='block'; }
-    tabGh.onclick=showGh; tabAnon.onclick=showAnon;
-    if(window.CUSDIS_APP_ID){ showAnon(); } else { showGh(); }
+  // CUSDIS
+  const anonBox = wrap.querySelector('#c-anon');
+  anonBox.innerHTML = '';
+  if (window.CUSDIS_APP_ID){
+    const thread = document.createElement('div');
+    thread.id = 'cusdis_thread';
+    thread.dataset.host = 'https://cusdis.com';
+    thread.dataset.appId = window.CUSDIS_APP_ID;
+    thread.dataset.pageId = location.pathname + location.hash;
+    thread.dataset.pageUrl = location.href;
+    thread.dataset.pageTitle = document.title;
+    thread.dataset.lang = 'ru';
+    anonBox.appendChild(thread);
+
+    const s = document.createElement('script');
+    s.defer = true;
+    s.src = 'https://cusdis.com/js/cusdis.es.js';
+    anonBox.appendChild(s);
+  } else {
+    anonBox.innerHTML = '<div class="muted">Анонимные комментарии отключены (нужен Cusdis App ID).</div>';
   }
 
-  function setUtterancesTheme(theme){
-    const iframe=document.querySelector('iframe.utterances-frame');
-    if(!iframe) return;
-    iframe.contentWindow.postMessage({type:'set-theme', theme: theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
-  }
+  // Tabs — если есть Cusdis, открываем его первым
+  const showGh=()=>{ ghBox.style.display='block'; anonBox.style.display='none'; };
+  const showAnon=()=>{ ghBox.style.display='none';  anonBox.style.display='block'; };
+  wrap.querySelector('#tab-gh').onclick=showGh;
+  wrap.querySelector('#tab-anon').onclick=showAnon;
+  if (window.CUSDIS_APP_ID) showAnon(); else showGh();
+}
+function setUtterancesTheme(theme){
+  const iframe=document.querySelector('iframe.utterances-frame');
+  if(!iframe) return;
+  iframe.contentWindow.postMessage({type:'set-theme', theme: theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
+}
 
-  /* ======= ADMIN SHORTCUTS (видны только залогиненным через Netlify Identity) ======= */
-  const adminBtns=document.getElementById('adminBtns');
-  const adminDock=document.getElementById('adminDock');
-  const editThisBtn=document.getElementById('editThisBtn');
-  const newStoryBtn=document.getElementById('newStoryBtn');
-  const newNoteBtn=document.getElementById('newNoteBtn');
+/* ADMIN SHORTCUTS (без reload) */
+const adminBtns=document.getElementById('adminBtns');
+const adminDock=document.getElementById('adminDock');
+const editThisBtn=document.getElementById('editThisBtn');
+const newStoryBtn=document.getElementById('newStoryBtn');
+const newNoteBtn=document.getElementById('newNoteBtn');
 
-  function adminDockHide(){ adminDock.style.display='none'; }
-  function adminDockFor(kind){
-    if(!window.netlifyIdentity || !window.netlifyIdentity.currentUser()){ adminDockHide(); return; }
-    editThisBtn.href = kind==='stories'
-      ? '/admin/#/collections/stories/entries/stories_root'
-      : '/admin/#/collections/notes/entries/notes_root';
-    adminDock.style.display='block';
+function adminDockHide(){ adminDock.style.display='none'; }
+function adminDockFor(kind, slug){
+  if(!window.netlifyIdentity || !window.netlifyIdentity.currentUser()){ adminDockHide(); return; }
+  if (kind==='story') editThisBtn.href = `/admin/#/collections/stories/entries/${slug}`;
+  else if (kind==='note') editThisBtn.href = `/admin/#/collections/notes/entries/${slug}`;
+  adminDock.style.display='block';
+}
+function setupIdentity(){
+  const id=window.netlifyIdentity; if(!id) return;
+  function toggle(user){
+    const on=!!user;
+    adminBtns.style.display = on ? 'flex' : 'none';
+    newStoryBtn.href = '/admin/#/collections/stories/new';
+    newNoteBtn.href  = '/admin/#/collections/notes/new';
+    if(!on) adminDockHide();
   }
+  id.on('init', toggle);
+  id.on('login', toggle);
+  id.on('logout', toggle);
+  id.init();
+}
+setupIdentity();
 
-  function setupIdentity(){
-    const id=window.netlifyIdentity; if(!id) return;
-    function toggle(user){
-      const on=!!user;
-      adminBtns.style.display = on ? 'flex' : 'none';
-      newStoryBtn.href = '/admin/#/collections/stories/entries/stories_root';
-      newNoteBtn.href  = '/admin/#/collections/notes/entries/notes_root';
-      if(!on) adminDockHide();
-    }
-    id.on('init', toggle); id.on('login', u=>{toggle(u); location.reload();}); id.on('logout', ()=>{toggle(null); location.reload();});
-    id.init();
-  }
-  setupIdentity();
+/* PROGRESS + SCROLL */
+const progress=document.getElementById('progress'); let ticking=false;
+function onScroll(){
+  if(ticking) return; ticking=true; requestAnimationFrame(()=>{
+    const art=document.querySelector('article');
+    if(!art){progress.style.width='0%'; ticking=false; return;}
+    const total=art.scrollHeight - innerHeight + 1;
+    const pct=Math.min(100, Math.max(0, ((scrollY - art.offsetTop) / total)*100));
+    progress.style.width=(isFinite(pct)?pct:0)+'%';
+    const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, scrollY); }
+    ticking=false;
+  });
+}
+addEventListener('scroll', onScroll, {passive:true});
+function restoreScroll(){
+  const art=document.querySelector('article'); if(!art) return;
+  const id=art.dataset.slug||art.dataset.id;
+  const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
+}
 
-  /* ======= PROGRESS BAR & SCROLL ======= */
-  const progress=document.getElementById('progress'); let ticking=false;
-  function onScroll(){
-    if(ticking) return; ticking=true; requestAnimationFrame(()=>{
-      const art=document.querySelector('article');
-      if(!art){progress.style.width='0%'; ticking=false; return;}
-      const total=art.scrollHeight - window.innerHeight + 1;
-      const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
-      progress.style.width=(isFinite(pct)?pct:0)+'%';
-      const id=art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
-      ticking=false;
-    });
+/* STARS */
+const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
+let W,H,starsArr=[];
+function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); }
+addEventListener('resize', resize);
+function makeStars(){
+  const density = document.documentElement.getAttribute('data-theme')==='light' ? 120 : 220;
+  starsArr = Array.from({length: Math.floor((W*H)/14000) + density}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.5+0.2, s: Math.random()*0.8+0.2 }));
+}
+function drawStars(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
+  for(const st of starsArr){
+    ctx.globalAlpha = 0.6 + Math.sin((performance.now()/1000)*st.s + st.x)*0.4;
+    ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
   }
-  addEventListener('scroll', onScroll, {passive:true});
-  function restoreScroll(){
-    const art=document.querySelector('article'); if(!art) return;
-    const y=+localStorage.getItem('read:'+art.dataset.id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
-  }
+  requestAnimationFrame(drawStars);
+}
+resize(); requestAnimationFrame(drawStars);
 
-  /* ======= STARS ======= */
-  const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
-  let W,H,starsArr=[];
-  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); }
-  addEventListener('resize', resize);
-  function makeStars(){
-    const density = state.theme==='light' ? 120 : 220;
-    starsArr = Array.from({length: Math.floor((W*H)/14000) + density}, ()=>({
-      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.5+0.2, s: Math.random()*0.8+0.2
-    }));
-  }
-  function drawStars(){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
-    for(const st of starsArr){
-      ctx.globalAlpha = 0.6 + Math.sin((performance.now()/1000)*st.s + st.x)*0.4;
-      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
-    }
-    requestAnimationFrame(drawStars);
-  }
-  resize(); requestAnimationFrame(drawStars);
-
-  /* ======= BOOT ======= */
-  function render(){
-    const r=state.route;
-    if(r==='/'||r===''){ renderList(); return; }
-    if(r==='/about'){ renderAbout(); return; }
-    if(r==='/arcs'){ renderArcs(); return; }
-    const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
-    const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
-    const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
-    if(r==='/notes'){ renderNotes(); return; }
-    renderList();
-  }
-  loadContent().then(()=>{ applyTheme(); render(); });
-  </script>
+/* BOOT */
+function render(){
+  const r=state.route;
+  if(r==='/'||r===''){ renderList(); return; }
+  if(r==='/about'){ renderAbout(); return; }
+  if(r==='/arcs'){ renderArcs(); return; }
+  const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
+  const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
+  const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+  const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
+  if(r==='/notes'){ renderNotes(); return; }
+  renderList();
+}
+loadContent().then(()=>{ applyTheme(); render(); });
+</script>
 </body>
 </html>
