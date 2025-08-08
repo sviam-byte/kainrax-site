@@ -6,8 +6,6 @@
   <title>Кайрнакс — рассказы</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии." />
   <meta name="theme-color" content="#0b0f14" />
-
-  <!-- Динамический favicon-⭐ (меняется по теме) -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6l7.6 15.4L56 23l-12 11.7L47.2 58 32 48.8 16.8 58 20 34.7 8 23l16.4-1.6z'/%3E%3C/svg%3E">
 
   <style>
@@ -65,30 +63,31 @@
   .title{font-weight:700}
   .prose{font-family: Georgia, "Times New Roman", serif; font-size:18px; line-height:1.75}
   .prose p{margin:0 0 14px}
+  /* звёздочка у ссылок в тексте */
+  article.prose a::before{content:"✦ "; color:var(--muted)}
+
   .tag{display:inline-flex; gap:6px; align-items:center; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:12px; margin-right:6px}
-  .tag:before{content:"✦"; color:var(--muted)} /* звёздные маркеры для тёмной */
+  .tag:before{content:"✦"; color:var(--muted)}
   [data-theme="light"] .tag:before{content:"#";}
 
   .back{display:inline-flex; align-items:center; gap:8px; margin:6px 0 12px}
   .progress{position:fixed; left:0; top:0; height:3px; background:linear-gradient(90deg, var(--accent), var(--accent2)); width:0; z-index:6}
 
-  /* Фон: звёзды + горы */
+  /* фон: звёзды + горы */
   #stars{position:fixed; inset:0; z-index:0; pointer-events:none}
   #mountains{position:fixed; left:0; right:0; bottom:0; height:30vh; z-index:0; pointer-events:none; opacity:.9}
   #mountains svg{width:100%; height:100%; display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* Админ-панелька */
+  /* админ «править» */
   #adminDock{position:fixed; right:14px; bottom:14px; z-index:7; display:none}
   #adminDock .btn{background:var(--card)}
   #adminBtns{display:flex; gap:8px; align-items:center}
 
-  /* Комменты */
   #c-anon{min-height:300px}
   </style>
 </head>
 <body>
-  <!-- Звёздный фон + горы -->
   <canvas id="stars" aria-hidden="true"></canvas>
   <div id="mountains" aria-hidden="true">
     <svg viewBox="0 0 100 30" preserveAspectRatio="none">
@@ -106,8 +105,7 @@
         <a class="btn" href="#/arcs">Ветки</a>
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/about">О мире</a>
-        <button id="themeBtn" title="Тема">🌓</button>
-        <!-- Админ-кнопки: всегда видны, вход/права уже внутри /admin -->
+        <button id="themeBtn" title="Сменить тему">🌓</button>
         <span id="adminBtns">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
@@ -117,28 +115,24 @@
     </div>
   </header>
 
-  <!-- Плавающее «править» -->
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
-
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* === КОНФИГ === */
-  // Если нужны анонимные комментарии — оставь свой Cusdis App ID:
+  /* конфиг */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
-  /* === СОСТОЯНИЕ === */
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
   const app=document.getElementById('app'); const qEl=document.getElementById('q');
 
-  /* === ВЕТКИ === */
+  /* ветки */
   const arcs=[
     { id:'surface', title:'Поверхность', desc:'Иона и «Цветок».', order:['epitimya','tsvetok'] },
-    { id:'kainrax', title:'Кайнракс',   desc:'Остальные рассказы из мира Кайнракса.',  order:['dorogovato','chelovecheskiy-faktor'] },
-    { id:'ibut',    title:'ИБУТ',       desc:'Лёгкое чтиво про попаданцев.',            order:['ibut-g1','ibut-g2'] }
+    { id:'kainrax',  title:'Кайнракс',    desc:'Остальные рассказы из мира Кайнракса.', order:['dorogovato','chelovecheskiy-faktor'] },
+    { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.', order:['ibut-g1','ibut-g2'] }
   ];
 
-  /* === ДАННЫЕ (фолбэк) === */
+  /* фолбэки на случай пустых папок */
   let stories=[{id:'epitimya',slug:'epitimya',title:'Епитимья',date:'2025-08-01',minutes:12,tags:['Кайрнакс','Иона'],arc:'surface',text:'ЗАГЛУШКА'}];
   let notes=[{id:'n-2025-08-08-a',slug:'n-2025-08-08-a',title:'О тоне',date:'2025-08-08',text:'ЗАГЛУШКА'}];
 
@@ -147,10 +141,10 @@
       const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.json());
       if(Array.isArray(j.stories)) stories=j.stories;
       if(Array.isArray(j.notes))   notes=j.notes;
-    }catch(e){/* останемся на фолбэке */}
+    }catch(e){}
   }
 
-  /* === ТЕМА + FAVICON === */
+  /* тема + favicon */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
@@ -160,7 +154,7 @@
   }
   function updateFavicon(){
     const el=document.getElementById('favicon');
-    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A'; // тёмная звезда на светлой, золотая на тёмной
+    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
     const svg = `%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6l7.6 15.4L56 23l-12 11.7L47.2 58 32 48.8 16.8 58 20 34.7 8 23l16.4-1.6z'/%3E%3C/svg%3E`;
     el.href = `data:image/svg+xml,${svg}`;
   }
@@ -170,14 +164,14 @@
     applyTheme();
   };
 
-  /* === РОУТЕР === */
+  /* роутер */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
   const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
   const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
 
-  /* === ВИДЫ === */
+  /* вьюхи */
   function renderList(){
     const q=state.q;
     const items=stories.filter(s=>!q || s.title.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
@@ -314,10 +308,9 @@
     adminDockHide();
   }
 
-  /* === КОММЕНТЫ === */
+  /* ленивые комментарии */
   function mountComments(){
     const wrap=document.getElementById('comments'); if(!wrap) return;
-
     wrap.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <button class="btn" id="tab-gh">GitHub</button>
@@ -326,61 +319,60 @@
       <div id="c-gh"></div>
       <div id="c-anon" style="display:none;min-height:300px"></div>`;
 
-    // Utterances (GitHub)
-    const ghBox = wrap.querySelector('#c-gh');
-    const gh = document.createElement('script');
-    gh.src = 'https://utteranc.es/client.js';
-    gh.setAttribute('repo','sviam-byte/kainrax-site');
-    gh.setAttribute('issue-term','pathname');
-    gh.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light' ? 'github-light' : 'github-dark');
-    gh.setAttribute('crossorigin','anonymous');
-    gh.async = true;
-    ghBox.appendChild(gh);
+    let ghLoaded=false, anonLoaded=false;
+    const ghBox=wrap.querySelector('#c-gh'); const anonBox=wrap.querySelector('#c-anon');
 
-    // Cusdis (анонимно)
-    const anonBox = wrap.querySelector('#c-anon');
-    anonBox.innerHTML='';
-    if(window.CUSDIS_APP_ID){
-      if(!window.__cusdisLoaded){
+    function loadGH(){
+      if (ghLoaded) return; ghLoaded=true;
+      const s=document.createElement('script');
+      s.src='https://utteranc.es/client.js';
+      s.setAttribute('repo','sviam-byte/kainrax-site');
+      s.setAttribute('issue-term','pathname');
+      s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
+      s.setAttribute('crossorigin','anonymous');
+      s.async=true; ghBox.appendChild(s);
+    }
+    function loadAnon(){
+      if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+      if (anonLoaded) return; anonLoaded=true;
+      if (!window.__cusdisLoaded){
         const s=document.createElement('script');
         s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
-        s.onload=()=>{ window.__cusdisLoaded=true; setCusdisTheme(); };
+        s.onload=()=>{ window.__cusdisLoaded=true; setCusdisTheme(); renderCusdis(); };
         document.body.appendChild(s);
-      }
-      const thread=document.createElement('div');
-      thread.id='cusdis_thread';
-      thread.dataset.host='https://cusdis.com';
-      thread.dataset.appId=window.CUSDIS_APP_ID;
-      thread.dataset.pageId=location.pathname+location.hash;
-      thread.dataset.pageUrl=location.href;
-      thread.dataset.pageTitle=document.title;
-      thread.dataset.lang='ru';
-      thread.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
-      anonBox.appendChild(thread);
-      if(window.CUSDIS?.renderTo){ window.CUSDIS.renderTo('#cusdis_thread'); setCusdisTheme(); }
-    } else {
-      anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены (нужен Cusdis App ID).</div>';
-    }
+      } else renderCusdis();
 
-    const showGh=()=>{ ghBox.style.display='block'; anonBox.style.display='none'; };
-    const showAnon=()=>{ ghBox.style.display='none';  anonBox.style.display='block'; };
-    wrap.querySelector('#tab-gh').onclick=showGh;
+      function renderCusdis(){
+        anonBox.innerHTML='';
+        const t=document.createElement('div');
+        t.id='cusdis_thread';
+        t.dataset.host='https://cusdis.com';
+        t.dataset.appId=window.CUSDIS_APP_ID;
+        t.dataset.pageId=location.pathname+location.hash;
+        t.dataset.pageUrl=location.href;
+        t.dataset.pageTitle=document.title;
+        t.dataset.lang='ru';
+        t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
+        anonBox.appendChild(t);
+        window.CUSDIS?.renderTo?.('#cusdis_thread');
+      }
+    }
+    function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
+    function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
+
+    wrap.querySelector('#tab-gh').onclick=showGH;
     wrap.querySelector('#tab-anon').onclick=showAnon;
-    if(window.CUSDIS_APP_ID) showAnon(); else showGh();
+    if (window.CUSDIS_APP_ID) showAnon(); else showGH();
   }
   function setUtterancesTheme(theme){
     const iframe=document.querySelector('iframe.utterances-frame');
-    if(!iframe) return;
-    iframe.contentWindow.postMessage({type:'set-theme', theme: theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
+    if(iframe) iframe.contentWindow.postMessage({type:'set-theme',theme:theme==='light'?'github-light':'github-dark'},'https://utteranc.es');
   }
   function setCusdisTheme(){
-    try{
-      const t=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
-      window.CUSDIS?.setTheme?.(t);
-    }catch(_){}
+    try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){}
   }
 
-  /* === АДМИН-«ПРАВИТЬ» (без всякой авторизации на публичной) === */
+  /* «править» */
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
@@ -390,7 +382,7 @@
     adminDock.style.display='block';
   }
 
-  /* === ПРОГРЕСС + ВОССТАНОВЛЕНИЕ СКРОЛЛА === */
+  /* прогресс + восстановление скролла */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true; requestAnimationFrame(()=>{
@@ -410,29 +402,33 @@
     const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* === ЗВЁЗДЫ === */
+  /* звёзды (облегчённые) */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
-  let W,H,starsArr=[];
+  let W,H,starsArr=[], running=true;
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); }
   addEventListener('resize', resize);
   function makeStars(){
-    const density = document.documentElement.getAttribute('data-theme')==='light' ? 120 : 240;
-    starsArr = Array.from({length: Math.floor((W*H)/14000) + density}, ()=>({
-      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.4+0.3, s: Math.random()*0.8+0.2
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 80 : 140;
+    const k = (W*H)/26000;
+    const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({
+      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.2+0.3, s: Math.random()*0.6+0.2
     }));
   }
-  function drawStars(){
+  function drawStars(ts){
+    if(!running) return requestAnimationFrame(drawStars);
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
     for(const st of starsArr){
-      ctx.globalAlpha = 0.55 + Math.sin((performance.now()/1000)*st.s + st.x)*0.45;
+      const a = 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
+      ctx.globalAlpha = a;
       ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
     }
     requestAnimationFrame(drawStars);
   }
+  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; });
   resize(); requestAnimationFrame(drawStars);
 
-  /* === BOOT === */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
