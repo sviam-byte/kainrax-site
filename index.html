@@ -22,7 +22,7 @@
     --shadow:0 8px 24px rgba(0,0,0,.08);
     --code:#f6f8fb; --mountain:#dfe7f3; --star:rgba(10,20,40,.85);
   }
-  /* CRINGE: намеренно перебор */
+  /* CRINGE (намеренно перебор) */
   [data-theme="cringe"]{
     --bg:linear-gradient(135deg,#ffb6f3,#ffd699 50%,#b3f1ff);
     --fg:#111; --muted:#333; --card:rgba(255,255,255,.88); --line:#ffd1f4;
@@ -77,12 +77,19 @@
   #mountains path{fill:var(--mountain)}
   [data-theme="cringe"] #mountains path{filter:drop-shadow(0 0 12px rgba(255,0,255,.35))}
 
+  /* ===== ADMIN BAR ===== */
+  #adminBtns{display:none; gap:8px; align-items:center}
+  #adminDock{position:fixed; right:14px; bottom:14px; z-index:7; display:none}
+  #adminDock .btn{background:var(--card)}
+
   /* ===== CRINGE EXTRA ===== */
   [data-theme="cringe"] .sparkles:after{
     content:"✨💥🦄✨"; position:fixed; right:12px; bottom:12px; font-size:22px; animation: spin 8s linear infinite; opacity:.9; pointer-events:none
   }
   @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
   </style>
+  <!-- Netlify Identity widget, чтобы на сайте понимать «вошёл/нет» -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <canvas id="stars" aria-hidden="true"></canvas>
@@ -103,34 +110,45 @@
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/about">О мире</a>
         <button id="themeBtn" title="Тема">🌓</button>
+        <span id="adminBtns">
+          <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
+          <a class="btn" id="newStoryBtn"  target="_blank" rel="noopener">+ Рассказ</a>
+          <a class="btn" id="newNoteBtn"   target="_blank" rel="noopener">+ Заметка</a>
+        </span>
       </div>
     </div>
   </header>
+
+  <!-- Плавающая «✏️ Править этот текст» (только для залогиненных) -->
+  <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
 
   <main id="app" aria-live="polite"></main>
 
   <script>
   /* ======= CONFIG ======= */
-  // 🔸 Вставь App ID из Cusdis, если нужны анонимные комментарии. Иначе оставь пустым.
+  // Если нужны анонимные комментарии — вставь сюда App ID из Cusdis (иначе оставь пустым)
   window.CUSDIS_APP_ID = "";
 
   /* ======= STATE & DATA ======= */
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
   const app=document.getElementById('app'); const qEl=document.getElementById('q');
 
-  // Ветки
+  // === ВЕТКИ (обновлённые) ===
+  // 1) Поверхность: Иона + «Цветок»
+  // 2) Кайнракс: остальные рассказы
+  // 3) ИБУТ
   const arcs=[
-    { id:'dominus', title:'DOMINUS / Иона', desc:'Машина, исповедь и «Пустой Выбор».', order:['epitimya'] },
-    { id:'lines',   title:'Линии / Асси',   desc:'Курьеры, сектора и выживание.',       order:['dorogovato'] },
-    { id:'infra',   title:'Инфраструктура', desc:'Инженерия, люди и темпоральные швы.', order:['chelovecheskiy-faktor'] },
-    { id:'ibut',    title:'ИБУТ',           desc:'Лёгкое чтиво про мир попаданцев.',    order:['ibut-g1','ibut-g2'] }
+    { id:'surface', title:'Поверхность', desc:'Иона и «Цветок» (повесть — заглушка).', order:['epitimya','tsvetok'] },
+    { id:'kainrax', title:'Кайнракс',   desc:'Остальные рассказы из мира Кайнракса.',  order:['dorogovato','chelovecheskiy-faktor'] },
+    { id:'ibut',    title:'ИБУТ',       desc:'Лёгкое чтиво про мир попаданцев.',        order:['ibut-g1','ibut-g2'] }
   ];
 
   // Fallback-контент (если JSON не загрузится)
   let stories=[
-    { id:'epitimya', title:'Епитимья', date:'2025-08-01', minutes:12, tags:['Кайрнакс','DOMINUS','этика'], arc:'dominus', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Епитимья)'},
-    { id:'dorogovato', title:'Дороговато', date:'2025-07-25', minutes:10, tags:['Кайрнакс','линии','R-сектор'], arc:'lines', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Дороговато)'},
-    { id:'chelovecheskiy-faktor', title:'Человеческий фактор', date:'2025-07-23', minutes:9, tags:['Кайрнакс','инженерия'], arc:'infra', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Человеческий фактор)'},
+    { id:'epitimya', title:'Епитимья', date:'2025-08-01', minutes:12, tags:['Кайрнакс','Иона','DOMINUS'], arc:'surface', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Епитимья)'},
+    { id:'tsvetok', title:'Цветок (повесть, заглушка)', date:'2025-08-08', minutes:30, tags:['поверхность','Иона','повесть'], arc:'surface', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Цветок). Короткий синопсис: Иона поднимается на поверхность, где встречает «Цветок» — объект, меняющий поведенческие паттерны поселений.'},
+    { id:'dorogovato', title:'Дороговато', date:'2025-07-25', minutes:10, tags:['линии','R-сектор','Асси'], arc:'kainrax', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Дороговато)'},
+    { id:'chelovecheskiy-faktor', title:'Человеческий фактор', date:'2025-07-23', minutes:9, tags:['инженерия','B-сектор','Гидеон'], arc:'kainrax', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (Человеческий фактор)'},
     { id:'ibut-g1', title:'ИБУТ — глава 1', date:'2025-08-08', minutes:8, tags:['ИБУТ','попаданцы'], arc:'ibut', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (ИБУТ — глава 1)'},
     { id:'ibut-g2', title:'ИБУТ — глава 2', date:'2025-08-08', minutes:8, tags:['ИБУТ','попаданцы'], arc:'ibut', text:'ЗАГЛУШКА: ВСТАВИТЬ ТЕКСТ (ИБУТ — глава 2)'}
   ];
@@ -204,6 +222,7 @@
           <p><span class="tag">жанр: НФ</span> <span class="tag">обновления: пн/чт</span></p>
         </aside>
       </div>`;
+    adminDockHide();
   }
 
   function renderArcs(){
@@ -214,6 +233,7 @@
         <div class="muted">${a.order.length} текст(а)</div>
         <div>${a.desc}</div>
       </a></div>`).join('')}</div></section>`;
+    adminDockHide();
   }
 
   function renderArc(id){
@@ -227,6 +247,7 @@
           <div class="muted">${fmtDate(s.date)} · ${s.minutes} мин</div>
         </a></li>`).join('')}
       </ol></section>`;
+    adminDockHide();
   }
 
   function renderTag(tag){
@@ -239,6 +260,7 @@
           <div class="title">${s.title}</div>
           <div class="muted">${fmtDate(s.date)} · ${s.minutes} мин · ветка: ${arcById(s.arc).title}</div>
         </a></div>`).join('')}</div></section>`;
+    adminDockHide();
   }
 
   function renderNotes(){
@@ -248,6 +270,7 @@
         <div class="title">${n.title}</div>
         <div class="muted">${fmtDate(n.date)}</div>
       </a></div>`).join('')}</div></section>`;
+    adminDockHide();
   }
 
   function renderNote(id){
@@ -260,16 +283,17 @@
     </article>
     <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
     mountComments(); setTimeout(restoreScroll,0);
+    adminDockFor('notes');
   }
 
   function renderAbout(){
     app.innerHTML=`<section class="card">
     <h1>О мире «Кайрнакс»</h1>
     <div class="prose">
-    <p><strong>Кайрнакс</strong> — подземная цивилизация на границе с «линиями» — зонами искажений. Люди живут секторами A/B/C/R и держат инфраструктуру на упрямстве и ремёслах.</p>
-    <p>Навигация: <em>Рассказы</em>, <em>Ветки</em>, <em>Теги</em>, <em>Заметки</em>. Ветка <strong>ИБУТ</strong> читается по порядку — главы заведены.</p>
-    <p>Комментарии — GitHub (Issues) и опционально анонимные через Cusdis.</p>
+    <p><strong>Кайрнакс</strong> — подземная цивилизация на границе с «линиями». Сектора A/B/C/R, упрямая инженерия и странные поведенческие эффекты.</p>
+    <p>Ветки: <em>Поверхность</em> (Иона, «Цветок»), <em>Кайнракс</em> (остальное), <em>ИБУТ</em>.</p>
     </div></section>`;
+    adminDockHide();
   }
 
   function renderArticle(id){
@@ -299,13 +323,13 @@
       </section>
       <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
     mountComments(); setTimeout(restoreScroll,0);
+    adminDockFor('stories');
   }
 
-  /* ======= COMMENTS (без вставки <script> в строки) ======= */
+  /* ======= COMMENTS ======= */
   function mountComments(){
     const wrap=document.getElementById('comments'); if(!wrap) return;
 
-    // Вкладки
     wrap.innerHTML = `
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <button class="btn" id="tab-gh">GitHub</button>
@@ -346,11 +370,13 @@
       anonBox.innerHTML = '<div class="muted">Анонимные комментарии отключены. Добавь Cusdis App ID вверху index.html.</div>';
     }
 
-    // Переключение вкладок
+    // Tabs (если есть Cusdis — показываем сначала «Анонимно»)
     const tabGh   = wrap.querySelector('#tab-gh');
     const tabAnon = wrap.querySelector('#tab-anon');
-    tabGh.onclick   = () => { ghBox.style.display='block'; anonBox.style.display='none'; };
-    tabAnon.onclick = () => { ghBox.style.display='none';  anonBox.style.display='block'; };
+    function showGh(){ ghBox.style.display='block'; anonBox.style.display='none'; }
+    function showAnon(){ ghBox.style.display='none';  anonBox.style.display='block'; }
+    tabGh.onclick=showGh; tabAnon.onclick=showAnon;
+    if(window.CUSDIS_APP_ID){ showAnon(); } else { showGh(); }
   }
 
   function setUtterancesTheme(theme){
@@ -359,7 +385,37 @@
     iframe.contentWindow.postMessage({type:'set-theme', theme: theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
   }
 
-  /* ======= PROGRESS BAR & SCROLL RESTORE ======= */
+  /* ======= ADMIN SHORTCUTS (видны только залогиненным через Netlify Identity) ======= */
+  const adminBtns=document.getElementById('adminBtns');
+  const adminDock=document.getElementById('adminDock');
+  const editThisBtn=document.getElementById('editThisBtn');
+  const newStoryBtn=document.getElementById('newStoryBtn');
+  const newNoteBtn=document.getElementById('newNoteBtn');
+
+  function adminDockHide(){ adminDock.style.display='none'; }
+  function adminDockFor(kind){
+    if(!window.netlifyIdentity || !window.netlifyIdentity.currentUser()){ adminDockHide(); return; }
+    editThisBtn.href = kind==='stories'
+      ? '/admin/#/collections/stories/entries/stories_root'
+      : '/admin/#/collections/notes/entries/notes_root';
+    adminDock.style.display='block';
+  }
+
+  function setupIdentity(){
+    const id=window.netlifyIdentity; if(!id) return;
+    function toggle(user){
+      const on=!!user;
+      adminBtns.style.display = on ? 'flex' : 'none';
+      newStoryBtn.href = '/admin/#/collections/stories/entries/stories_root';
+      newNoteBtn.href  = '/admin/#/collections/notes/entries/notes_root';
+      if(!on) adminDockHide();
+    }
+    id.on('init', toggle); id.on('login', u=>{toggle(u); location.reload();}); id.on('logout', ()=>{toggle(null); location.reload();});
+    id.init();
+  }
+  setupIdentity();
+
+  /* ======= PROGRESS BAR & SCROLL ======= */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true; requestAnimationFrame(()=>{
@@ -378,7 +434,7 @@
     const y=+localStorage.getItem('read:'+art.dataset.id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ======= STARFIELD CANVAS ======= */
+  /* ======= STARS ======= */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[];
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); }
