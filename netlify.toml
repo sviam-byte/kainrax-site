@@ -1,5 +1,5 @@
 [build]
-  command = "node scripts/build-index.mjs"
+  command = "npm ci && node scripts/build-index.mjs"
   publish = "."
 
 [build.environment]
