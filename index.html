@@ -4,15 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Кайрнакс — рассказы</title>
-  <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, комментарии. Обновления — пятница/суббота." />
+  <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
-  <!-- favicon: простая восьмиконечная «искра» (не похоже на примогем) -->
+  <!-- простая «искра» как favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
   <style>
   :root{
     --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
-    --card:rgba(16,21,32,.85); --line:#243447;
+    --card:rgba(16,21,32,.85); --line:#223042;
     --accent:#7dd3fc; --accent2:#a78bfa; --link:#93c5fd;
     --max:960px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
     --code:#0a0e16; --mountain:#121723; --star:rgba(255,255,255,.9);
@@ -21,14 +21,13 @@
     --bg:#f7fbff; --fg:#0b0f14; --muted:#5a6774;
     --card:rgba(255,255,255,.92); --line:#e6ecf2;
     --accent:#0ea5e9; --accent2:#7c3aed; --link:#1d4ed8;
-    --shadow:0 8px 24px rgba(0,0,0,.08);
-    --code:#f6f8fb; --mountain:#dfe7f3; --star:rgba(10,20,40,.85);
+    --shadow:0 8px 24px rgba(0,0,0,.08); --code:#f6f8fb; --mountain:#dfe7f3; --star:rgba(10,20,40,.85);
   }
   [data-theme="cringe"]{
     --bg:linear-gradient(135deg,#ffb6f3,#ffd699 50%,#b3f1ff);
     --fg:#111; --muted:#333; --card:rgba(255,255,255,.88); --line:#ffd1f4;
     --accent:#ff3ea5; --accent2:#07f49e; --link:#7c00ff;
-    --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb; --star:rgba(0,0,0,.7);
+    --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb; --star:rgba(0,0,0,.75);
   }
 
   html,body{height:100%}
@@ -48,6 +47,7 @@
   .brand{font-weight:800;letter-spacing:.2px}
   .brand a{color:var(--fg);text-decoration:none}
   .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
   main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
@@ -55,63 +55,52 @@
   .story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
-  .prose{font-family: Georgia, "Times New Roman", serif;font-size:18px;line-height:1.75}
-  .prose p{margin:0 0 14px}
-  article.prose a::before{content:"✶ ";color:var(--muted)} /* неблестящая «искра», не геншин */
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
   .tag:before{content:"✶";color:var(--muted)}
   [data-theme="light"] .tag:before{content:"#";}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
+
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
 
-  /* фон: звёзды + «горы» сверху и снизу (подземный свод) */
+  /* аннотация */
+  .anno{color:var(--muted);font-style:italic;margin-top:6px}
+  .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
+  [data-theme="light"] .anno-box{background:rgba(14,165,233,.08)}
+  [data-theme="cringe"] .anno-box{background:rgba(255,62,165,.08)}
+  details.anno-dtl summary{cursor:pointer;user-select:none}
+
+  /* фон: звёзды + «горы» сверху/снизу (подземный свод) */
   #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
   #ceiling{position:fixed;left:0;right:0;top:0;height:18vh;z-index:0;pointer-events:none;opacity:.95}
-  #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)} /* перевёрнутый гребень — как потолок */
+  #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)}
   #ceiling path{fill:var(--mountain)}
   #mountains{position:fixed;left:0;right:0;bottom:0;height:28vh;z-index:0;pointer-events:none;opacity:.92}
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* админ-UI скрыт по умолчанию */
+  /* админ-панель скрыта */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
-  #adminDock .btn{background:var(--card)}
   #adminBtns{display:none}
-
-  #c-anon{min-height:300px}
   </style>
 </head>
 <body>
   <canvas id="stars" aria-hidden="true"></canvas>
-
-  <!-- потолок (свод) -->
-  <div id="ceiling" aria-hidden="true">
-    <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-      <path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/>
-    </svg>
-  </div>
-  <!-- пол (гребень) -->
-  <div id="mountains" aria-hidden="true">
-    <svg viewBox="0 0 100 30" preserveAspectRatio="none">
-      <path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/>
-    </svg>
-  </div>
-
+  <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
   <header>
     <div class="head">
       <div class="brand"><a href="#/">Кайрнакс ✶</a></div>
-      <div class="search" style="max-width:720px">
+      <div class="search" style="max-width:760px">
         <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
         <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
         <a class="btn" href="#/arcs">Ветки</a>
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/about">О мире</a>
+        <a class="btn" href="#/project">О проекте | планы</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
-
-        <!-- админ-кнопки (видны только в admin-режиме) -->
-        <span id="adminBtns" style="display:none">
+        <span id="adminBtns">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
           <a class="btn" id="newNoteBtn"  href="/admin/#/collections/notes/new"  target="_blank" rel="noopener">+ Заметка</a>
@@ -124,12 +113,13 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== КОНФИГ ===== */
-  // В Cusdis → Project Settings внеси Allowed Domains: kainrax.netlify.app (+ твой домен)
+  /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
+  // Для анонимных комментов — поставь App ID и добавь домены в Cusdis (Settings → Allowed Domains).
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
+  const app=document.getElementById('app');
+  const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
-  const app=document.getElementById('app'); const qEl=document.getElementById('q');
 
   /* ===== ВЕТКИ ===== */
   const arcs=[
@@ -139,30 +129,47 @@
   ];
   const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
   const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
+  const getAnno = (s) => {
+    const a = (s.annotation || s.anno || s.summary || '').trim();
+    if (a) return a;
+    const txt = (s.text || '').replace(/\s+/g, ' ').trim();
+    if (!txt) return '';
+    const cut = 180;
+    return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
+  };
 
-  /* ===== ДАННЫЕ (фолбэки, перезатираются контентом) ===== */
-  let stories=[{id:'epitimya',slug:'epitimya',title:'Епитимья',date:'2025-08-01',minutes:12,tags:['Кайрнакс','Иона'],arc:'surface',text:'ЗАГЛУШКА'}];
-  let notes=[{id:'n-2025-08-08-a',slug:'n-2025-08-08-a',title:'О тоне',date:'2025-08-08',text:'ЗАГЛУШКА'}];
-
+  /* ===== ДАННЫЕ + НАДЁЖНАЯ ЗАГРУЗКА ===== */
+  let stories=[], notes=[];
   async function loadContent(){
+    // Путь 1: общая выборка
     try{
-      const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.json());
+      const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject());
       if(Array.isArray(j.stories)) stories=j.stories;
       if(Array.isArray(j.notes))   notes=j.notes;
-    }catch(e){}
+    }catch(e){
+      // Путь 2: раздельные файлы (старый формат)
+      try{
+        const [sj,nj]=await Promise.all([
+          fetch('content/stories.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]),
+          fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():[])
+        ]);
+        stories = Array.isArray(sj)?sj:[]; notes = Array.isArray(nj)?nj:[];
+      }catch(_){}
+    }
+    // сортировка по дате у списка
+    stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
   }
 
-  /* ===== ТЕМА + FAVICON ===== */
+  /* ===== ТЕМА ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
     setUtterancesTheme(state.theme);
     setCusdisTheme();
-    // смена цвета favicon под тему
+    // подкраска favicon
     const el=document.getElementById('favicon');
     const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
-    const svg = `%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
-    el.href = `data:image/svg+xml,${svg}`;
+    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
   }
   applyTheme();
   document.getElementById('themeBtn').onclick=()=>{
@@ -170,30 +177,11 @@
     applyTheme();
   };
 
-  /* ===== ADMIN MODE (скрыт для обычных) ===== */
-  let isAdmin =
-    new URLSearchParams(location.search).has('admin') ||
-    localStorage.getItem('admin') === '1';
-
-  if (new URLSearchParams(location.search).has('admin')) {
-    localStorage.setItem('admin', '1');
-    history.replaceState({}, '', location.pathname + location.hash); // убрать ?admin=1 из URL
-  }
-
-  function ensureAdminUI() {
-    const bar = document.getElementById('adminBtns');
-    if (bar) bar.style.display = isAdmin ? 'inline-flex' : 'none';
-    if (!isAdmin) adminDockHide();
-  }
-
-  // горячая кнопка: Alt+Shift+A
-  addEventListener('keydown', (e) => {
-    if (e.altKey && e.shiftKey && e.key.toLowerCase() === 'a') {
-      isAdmin = !isAdmin;
-      localStorage.setItem('admin', isAdmin ? '1' : '0');
-      ensureAdminUI();
-    }
-  });
+  /* ===== ADMIN MODE (скрыт) ===== */
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  function ensureAdminUI(){ document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none'; if(!isAdmin) adminDockHide(); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
 
   /* ===== РОУТЕР / ПОИСК ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
@@ -202,25 +190,24 @@
   /* ===== ВЬЮХИ ===== */
   function renderList(){
     const q=state.q;
-    const items=stories.filter(s=>!q || s.title.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
     app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
           <div class="list">
-            ${items.map(s=>{
-              const ex=(s.text||'').replace(/\n+/g,' ').slice(0,130).trim()+((s.text||'').length>130?'…':'');
-              return `<div class="story-item">
+            ${items.length?items.map(s=>`
+              <div class="story-item">
                 <a href="#/read/${s.id}">
-                  <div class="title">✶ ${s.title}</div>
+                  <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин чтения · ветка: ${arcById(s.arc).title}</div>
-                  <div>${ex}</div>
                 </a>
-              </div>`;
-            }).join('')}
+                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+              </div>`).join(''):`<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>`}
           </div>
         </section>
+
         <aside class="card">
           <h2>Ветки</h2>
           <div class="list">
@@ -252,22 +239,26 @@
   }
 
   function renderArc(id){
-    const a=arcById(id); const arr=a.order.map(i=>stories.find(s=>s.id===i||s.slug===i)).filter(Boolean);
+    const a=arcById(id);
+    const arr=a.order.map(i=>stories.find(s=>s.id===i||s.slug===i)).filter(Boolean);
     app.innerHTML=`<section class="card">
       <a class="back" href="#/arcs">← Ко всем веткам</a>
       <h1>${a.title}</h1><div class="muted">${a.desc}</div>
       <ol class="list" style="margin-top:10px">${arr.map((s,i)=>`
-        <li class="story-item"><a href="#/read/${s.id}">
-          <div class="title">✶ ${i+1}. ${s.title}</div>
-          <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
-        </a></li>`).join('')}
+        <li class="story-item">
+          <a href="#/read/${s.id}">
+            <div class="title">✶ ${i+1}. ${s.title}</div>
+            <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
+          </a>
+          ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+        </li>`).join('')}
       </ol></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
   function renderNotes(){
     app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
-    <div class="list">${notes.map(n=>`
+    <div class="list">${(notes||[]).map(n=>`
       <div class="story-item"><a href="#/note/${n.id}">
         <div class="title">✶ ${n.title}</div>
         <div class="muted">${fmtDate(n.date)}</div>
@@ -276,15 +267,15 @@
   }
 
   function renderNote(id){
-    const n=notes.find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
+    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
     app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-    <article class="prose" data-id="${n.id}" data-slug="${n.slug}">
+    <article class="prose" data-id="${n.id}" data-slug="${n.slug||n.id}">
       <h1>${n.title}</h1>
       <div class="muted">${fmtDate(n.date)}</div>
       ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
     </article>
     <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+ (n.slug||n.id)); setTimeout(restoreScroll,0);
+    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0);
     adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
@@ -293,26 +284,34 @@
       <h1>О мире «Кайрнакс»</h1>
       <div class="prose">
         <p><em>«На поверхности есть сказка — сказка про человека, который однажды убил бога, которому клялся служить. Звали этого человека Каин, и грех его — первородным.</em></p>
-        <p><em>Но Воздвиженцы не клялись в верности ни одним богам.</em><br>
-        <em>Они ушли из-под неприветливых божественных крыльев, где вместо перьев был частокол забора, и назвали себя — нацией Каина, Каин-нацией.</em></p>
-        <p><em>Подземная жизнь, суровая и неприхотливая, обточила это имя, и придала ему звучание, какое не могло родиться на поверхности.</em><br>
-        <em>Кайнракс.</em><br>
-        <em>И имя первого человеческого грешника — человека, который убил бога, который отказался считать себя недостойным божественных стоп, — мы носим с гордостью».</em></p>
-        <p class="muted">Пергамент. Наставление к молодым. Первая редакция; 67г от Воздвижения; Элиара, Второй Хроникёр.</p>
-
+        <p><em>Но Воздвиженцы не клялись в верности ни одним богам.</em><br><em>Они ушли из-под неприветливых божественных крыльев, где вместо перьев был частокол забора, и назвали себя — нацией Каина, Каин-нацией.</em></p>
+        <p><em>Подземная жизнь, суровая и неприхотливая, обточила это имя, и придала ему звучание, какое не могло родиться на поверхности.</em><br><em>Кайнракс.</em><br><em>И имя первого человеческого грешника — человека, который убил бога, который отказался считать себя недостойным божественных стоп, — мы носим с гордостью».</em></p>
+        <p class="muted">Первая редакция; 67г от Воздвижения; Элиара, Второй Хроникёр.</p>
         <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-
-        <p><em>«Древние сказки Поверхности говорят о грешнике, что поднял руку на своего брата из зависти, и звали его Каин. Но мы, дети Первого Света, знаем истину, которую они забыли! Ибо был другой Каин, первый из людей, кто посмел поднять взгляд к небу и увидел не бога, а тюремщика.</em></p>
-        <p><em>Мы — Воздвиженцы, и мы не клялись в верности тюремщикам. Мы не склоняли головы перед теми, кто создал мир не как дар, а как клетку с позолоченными прутьями. Мы разорвали цепи! Мы ушли из-под их каменных крыльев и назвали себя гордо — Каин-ракс, Народ Каина, Нация Первого Человека, отказавшегося быть рабом!</em></p>
-        <p><em>Пусть Поверхность помнит лишь грех. Мы же помним подвиг. Каждый удар молота, отесывающий камень наших городов, каждый луч нашего искусственного неба вторит этому имени. Ибо Кайнракс — это не просто название. Это клятва. Клятва вечно нести свет разума во тьму слепой веры и никогда, никогда больше не преклонять колен».</em></p>
-        <p class="muted">Пергамент. Наставление к молодым. Седьмая редакция; 180г от Воздвижения; Элиара, Второй Хроникёр.</p>
-
+        <p><em>«Древние сказки Поверхности говорят о грешнике, что поднял руку на своего брата из зависти, и звали его Каин. Но мы, дети Первого Света, знаем истину, которую они забыли! … Кайн-ракс … клятва вечно нести свет разума во тьму слепой веры…»</em></p>
+        <p class="muted">Седьмая редакция; 180г от Воздвижения; Элиара, Второй Хроникёр.</p>
         <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+        <p><em>«…Воздвиженцы были прагматиками. "Убийство бога" — удаление повреждённого модуля ради стабильности системы. Имя Каина — напоминание о цене контроля».</em></p>
+        <p class="muted">Двадцать третья редакция; 250г; Итур, Четвёртый Хроникёр.</p>
+      </div>
+    </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
 
-        <p><em>«На Поверхности бытует наивная сказка о Каине, убийце богов. Подобные мифы полезны для воспитания детей и солдат, но зрелый разум должен видеть за ними суть.</em></p>
-        <p><em>Воздвиженцы не были ни героями, ни грешниками. Они были прагматиками, столкнувшимися с системным сбоем. Боги того времени — были не тиранами, а нестабильными, вышедшими из-под контроля функциями. "Убийство бога" было не актом бунта, а необходимой процедурой по удалению поврежденного модуля для предотвращения полного коллапса системы.</em></p>
-        <p><em>Мы назвали себя Кайнракс не из гордости за некий "грех", а в знак признания суровой реальности: порядок требует жертв, а стабильность системы важнее любого ее отдельного элемента. Имя Каина — это не знамя революции, а вечное напоминание о цене, которую приходится платить за контроль. Помнить об этом — долг каждого, кто несет ответственность за выживание нашего мира».</em></p>
-        <p class="muted">Пергамент. Наставление к молодым. Двадцать третья редакция; 250г от Воздвижения; Итур, Четвёртый Хроникёр.</p>
+  function renderProject(){
+    // найдём самую свежую заметку с тэгом WIP/планы/в работе для «Прямо сейчас пишется»
+    const wip = (notes||[])
+      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
+      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
+
+    app.innerHTML=`<section class="card">
+      <h1>О проекте | планы</h1>
+      <div class="prose">
+        <p>Последние пару лет меня не отпускает идея мира, где магия — ограниченно контролируемый сбой в физике, где боги — сломанный ИИ, а люди на фоне больших событий живут свои маленькие жизни.</p>
+        <p>Так родилась Кайнракс — цивилизация, построенная на костях убитых богов. Нация Каина, нация гениев и обычных людей, живущая под землёй в вечном стремлении исправить ошибки.</p>
+        <p>Здесь я буду писать её. Канальчик-творческая лаборатория, где я буду выкладывать сперва рассказы, картинки, наработки, а потом — эпический роман, уже наполовину готовый, но всё ещё полируемый.</p>
+        <p><strong>Добро пожаловать.</strong></p>
+        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtDate(wip.date)}` : `еженедельные тексты (обычно пт/сб)`}</div>
       </div>
     </section>`;
     adminDockHide(); ensureAdminUI();
@@ -327,19 +326,32 @@
 
     app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
-      <article class="prose" data-id="${s.id}" data-slug="${s.slug}">
+      <article class="prose" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <h1>${s.title}</h1>
         <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: <a href="#/arc/${a.id}">${a.title}</a> (${pos+1}/${order.length})</div>
         <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+
+        ${getAnno(s) ? `
+          <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
+            <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
+            <div style="margin-top:8px">${getAnno(s)}</div>
+          </details>
+        ` : ``}
+
         ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+
         <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
         <div style="display:flex;justify-content:space-between;gap:10px">
           ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
           ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
         </div>
       </article>
-      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
-    mountComments('story:'+ (s.slug||s.id)); setTimeout(restoreScroll,0);
+
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3>
+        <section id="comments"></section>
+      </section>`;
+    mountComments('story:'+(s.slug||s.id)); setTimeout(restoreScroll,0);
     adminDockFor('story', s.slug||s.id); ensureAdminUI();
   }
 
@@ -352,92 +364,62 @@
         <div class="story-item"><a href="#/read/${s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
-        </a></div>`).join('')}</div></section>`;
+        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ЛЕНИВАЯ ЗАГРУЗКА КОММЕНТОВ ===== */
+  /* ===== КОММЕНТЫ (лениво) ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
-
-    wrap.innerHTML = `
+    wrap.innerHTML=`
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <button class="btn" id="tab-gh">GitHub</button>
         <button class="btn" id="tab-anon">Анонимно</button>
       </div>
       <div id="c-gh"></div>
       <div id="c-anon" style="display:none;min-height:300px"></div>`;
-
-    const ghBox=wrap.querySelector('#c-gh');
-    const anonBox=wrap.querySelector('#c-anon');
+    const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon');
     let ghLoaded=false, anonLoaded=false;
 
     function loadGH(){
-      if (ghLoaded) return; ghLoaded=true;
-      ghBox.innerHTML='';
+      if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML='';
       const s=document.createElement('script');
       s.src='https://utteranc.es/client.js';
-      s.setAttribute('repo','sviam-byte/kainrax-site');   // Issues должны быть включены
-      s.setAttribute('issue-term', term || 'home');       // УНИКАЛЬНЫЙ ключ: story:slug / note:slug
+      s.setAttribute('repo','sviam-byte/kainrax-site');      // Issues ON
+      s.setAttribute('issue-term', term || 'home');          // уникальный ключ
       s.setAttribute('label','comments');
       s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
-      s.setAttribute('crossorigin','anonymous');
-      s.async=true; ghBox.appendChild(s);
+      s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s);
     }
-
     function loadAnon(){
-      if (!window.CUSDIS_APP_ID){
-        anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>';
-        return;
-      }
-      if (anonLoaded) return; anonLoaded=true;
-      anonBox.innerHTML='';
+      if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML='';
       const t=document.createElement('div');
-      t.id='cusdis_thread';
-      t.dataset.host='https://cusdis.com';
-      t.dataset.appId=window.CUSDIS_APP_ID;
-      t.dataset.pageId=term || (location.pathname+location.hash); // уникальный ID
-      t.dataset.pageUrl=location.href;
-      t.dataset.pageTitle=document.title;
-      t.dataset.lang='ru';
-      t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
+      t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID;
+      t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title;
+      t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
       anonBox.appendChild(t);
-
       if (!window.__cusdisLoaded){
-        const s=document.createElement('script');
-        s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
+        const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
         s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} };
         document.body.appendChild(s);
-      } else {
-        try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){}
-      }
+      } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
     }
-
     function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
     function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
     wrap.querySelector('#tab-gh').onclick=showGH;
     wrap.querySelector('#tab-anon').onclick=showAnon;
 
-    // ничего не грузим, пока не доскроллили
-    const io=new IntersectionObserver((entries)=>{
-      if(entries.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); }
-    },{rootMargin:'200px'});
+    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'});
     io.observe(wrap);
   }
-
-  // смена темы у виджетов
   function setUtterancesTheme(theme){
     const iframe=document.querySelector('iframe.utterances-frame');
-    if(iframe) iframe.contentWindow.postMessage(
-      {type:'set-theme', theme:theme==='light'?'github-light':'github-dark'},
-      'https://utteranc.es'
-    );
+    if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
   }
-  function setCusdisTheme(){
-    try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){}
-  }
+  function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
 
-  /* ===== АДМИН «ПРАВИТЬ» ===== */
+  /* ===== АДМИН ПЛАВАЮЩАЯ КНОПКА ===== */
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
@@ -448,7 +430,7 @@
     adminDock.style.display='block';
   }
 
-  /* ===== ПРОГРЕСС + ВОССТ. СКРОЛЛА ===== */
+  /* ===== ПРОГРЕСС + ВОССТ.СКРОЛЛ ===== */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true; requestAnimationFrame(()=>{
@@ -468,45 +450,40 @@
     const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ===== ЗВЁЗДЫ (лёгкие + respect reduced motion) ===== */
+  /* ===== ЗВЁЗДЫ ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
   addEventListener('resize', resize);
-
   function makeStars(){
     const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120;
-    const k = (W*H)/30000;
-    const count = Math.floor(base + k);
-    starsArr = Array.from({length: count}, ()=>({
-      x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2
-    }));
+    const k = (W*H)/30000; const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2 }));
   }
-
   function drawStars(ts, once=false){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
     for(const st of starsArr){
       const a = once ? 0.7 : 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
-      ctx.globalAlpha = a;
-      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
     }
     if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
   }
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
+  /* ===== РЕНДЕР ===== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
     if(r==='/about'){ renderAbout(); return; }
+    if(r==='/project'){ renderProject(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
     const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
     const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
-    if(r==='/notes'){ renderNotes(); return; }
     renderList();
   }
 
