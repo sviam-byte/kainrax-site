@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Кайнракс — рассказы</title>
+  <title>Кайрнакс — рассказы</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
@@ -13,7 +13,7 @@
     --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
     --card:rgba(16,21,32,.85); --line:#223042;
     --accent:#7dd3fc; --accent2:#a78bfa; --link:#93c5fd;
-    --max:1024px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
+    --max:960px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
     --code:#0a0e16; --mountain:#121723; --star:rgba(255,255,255,.9);
   }
   [data-theme="light"]{
@@ -27,151 +27,210 @@
     --fg:#111; --muted:#333; --card:rgba(255,255,255,.88); --line:#ffd1f4;
     --accent:#ff3ea5; --accent2:#07f49e; --link:#7c00ff;
     --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb; --star:rgba(0,0,0,.75);
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
   }
 
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link)}
-  h1,h2,h3{margin:6px 0 10px;font-weight:700}
-  h1{font-size:28px}
+  h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
-  input[type="search"],input[type="password"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);width:100%;box-sizing:border-box;}
+  input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
 
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.9), rgba(15,21,32,.65));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
   [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
-  .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
   .brand{font-weight:800;letter-spacing:.2px}
   .brand a{color:var(--fg);text-decoration:none}
-  .nav-links{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
   main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
-  @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
+  @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
   .list{display:flex;flex-direction:column;gap:12px}
   .story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
   .tag:before{content:"✶";color:var(--muted)}
-  [data-theme="light"] .tag:before{content:"#"}
+  [data-theme="light"] .tag:before{content:"#";}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
-  .prose p{line-height:1.75;margin:0 0 1.2em}
-  .prose p:last-child{margin-bottom:0}
 
+  /* ===== WOW-ФОН (лёгкий по производительности) ===== */
+  /* Слой 1: мягкая туманность из радиальных градиентов */
+  #nebula{position:fixed;inset:0;z-index:0;pointer-events:none;filter:saturate(1.2) blur(0.5px)}
+  #nebula:before, #nebula:after{content:"";position:absolute;inset:-20%;background:
+    radial-gradient(60vmax 60vmax at 10% 20%, rgba(125,211,252,.18), transparent 60%),
+    radial-gradient(50vmax 50vmax at 85% 10%, rgba(167,139,250,.16), transparent 55%),
+    radial-gradient(70vmax 70vmax at 70% 85%, rgba(14,165,233,.14), transparent 60%),
+    radial-gradient(60vmax 60vmax at 25% 85%, rgba(255,215,128,.08), transparent 60%);
+    mix-blend-mode:screen; opacity:.8; transform:translate3d(0,0,0);
+    animation: drift 60s linear infinite;
+  }
+  #nebula:after{animation-duration:90s;opacity:.7;filter:hue-rotate(15deg)}
+  @keyframes drift{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-2%, -1%, 0) scale(1.02) rotate(.2deg)}100%{transform:translate3d(0,0,0)}}
+
+  /* Слой 2: звёзды (канвас) */
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+  /* Слой 3: лёгкая «полярная заря» */
+  #aurora{position:fixed;inset:-20% -10% -10% -10%;z-index:0;pointer-events:none;opacity:.6;
+    background: conic-gradient(from 210deg at 30% 120%, rgba(99,102,241,.10), rgba(56,189,248,.08), rgba(167,139,250,.10), transparent 70%);
+    mask-image: radial-gradient(75% 60% at 50% 100%, black 40%, transparent 70%);
+    transform:translateZ(0) rotate(0deg);
+    animation: sway 24s ease-in-out infinite;
+  }
+  @keyframes sway{50%{transform:translateZ(0) rotate(2deg) translateY(2%)} }
+
+  /* Слой 4: верхний и нижний свод — стилизованные горы */
+  #ceiling, #mountains{position:fixed;left:0;right:0;pointer-events:none;opacity:.92;z-index:0}
+  #ceiling{top:0;height:18vh}
+  #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)}
+  #ceiling path{fill:var(--mountain)}
+  #mountains{bottom:0;height:28vh}
+  #mountains svg{width:100%;height:100%;display:block}
+  #mountains path{fill:var(--mountain)}
+
+  /* Аннотация */
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
   .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
   [data-theme="light"] .anno-box{background:rgba(14,165,233,.08)}
   [data-theme="cringe"] .anno-box{background:rgba(255,62,165,.08)}
   details.anno-dtl summary{cursor:pointer;user-select:none}
 
-  /* фон */
-  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
-  #ceiling,#mountains{display:none}
-  [data-theme="cringe"] #ceiling,[data-theme="cringe"] #mountains{display:block}
-  #ceiling path, #mountains path{fill:var(--mountain)}
-  
-  /* Модалка доступа к Пергаменту */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:20}
-  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow);max-width:440px;width:92%;text-align:center;}
-  @keyframes shake { 10%, 90% {transform:translate3d(-1px,0,0);} 20%, 80% {transform:translate3d(2px,0,0);} 30%, 50%, 70% {transform:translate3d(-4px,0,0);} 40%, 60% {transform:translate3d(4px,0,0);} }
-  .shake{animation:shake .82s cubic-bezier(.36,.07,.19,.97) both;}
-  .denied-text{color:#ef4444;font-weight:700;letter-spacing:1px;margin-top:8px;display:none;}
+  /* ===== Пасхалка: «Разрушенный бог» ===== */
+  #brokenGod{position:fixed;inset:0;z-index:2;pointer-events:none;display:none}
+  #brokenGod .halo{position:absolute;left:50%;top:32%;width:min(78vmin,820px);height:min(78vmin,820px);transform:translate(-50%,-50%);
+    background:radial-gradient(circle at 50% 50%, rgba(255,237,160,.18), rgba(255,200,80,.08) 40%, transparent 60%);
+    mask:
+      radial-gradient(circle at 50% 50%, #000 32%, transparent 33%) subtract,
+      repeating-conic-gradient(from 0deg, #000 0 2deg, transparent 2.5deg 4.5deg);
+    border-radius:50%; filter: blur(.6px) saturate(1.1);
+    animation: haloSpin 40s linear infinite;
+  }
+  @keyframes haloSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  #brokenGod svg{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:min(64vmin,700px);opacity:.9;filter:drop-shadow(0 18px 40px rgba(0,0,0,.55))}
+  #brokenGod .glitch{animation:glitch 4s infinite steps(1)}
+  @keyframes glitch{ 0%,15%,100%{transform:none;filter:none;opacity:.85} 16%{transform:translate(1px,-1px) skewX(.5deg);filter:hue-rotate(10deg)} 17%{transform:translate(-1px,1px)} 18%{transform:none} 60%{opacity:.9} 61%{opacity:.75} 62%{opacity:.9} }
 
-  /* Пергаментный стиль */
-  .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3); color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18)}
-  [data-theme="dark"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(90,70,40,.25), transparent 60%), linear-gradient(#2d261b, #201a12); color:#efe7d6; border-color:#5a4a35}
-  .parchment h1, .parchment h2, .parchment h3{ font-family: Georgia, 'Times New Roman', serif; letter-spacing:.3px }
-  .parchment .prose p{ text-indent:1.2em; }
+  .hint{position:fixed;right:12px;bottom:12px;z-index:3;font-size:12px;color:var(--muted);opacity:.7}
+  .hint kbd{padding:2px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--card)}
 
-  /* Маргиналии */
-  .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
-  @media (max-width:980px){ .with-margin{grid-template-columns:1fr} .margin-notes{display:none;} }
-  .margin-notes{position:sticky;top:76px;align-self:start}
-  .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
-
-  #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
-  #adminBtns{display:none}
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    #nebula:before,#nebula:after{animation:none}
+    #aurora{animation:none}
+    #brokenGod .halo{animation:none}
+  }
   </style>
 </head>
 <body>
+  <!-- WOW background layers -->
+  <div id="nebula" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
+  <div id="aurora" aria-hidden="true"></div>
   <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
+  <!-- Broken God Easter Egg (hidden) -->
+  <div id="brokenGod" aria-hidden="true">
+    <div class="halo"></div>
+    <!-- Силуэт: треснувшая маска + ребра (минималистичный SVG) -->
+    <svg viewBox="0 0 800 800" class="glitch">
+      <defs>
+        <linearGradient id="metal" x1="0" x2="1">
+          <stop offset="0" stop-color="#8fa3b8" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#e6eef8" stop-opacity=".35"/>
+        </linearGradient>
+      </defs>
+      <!-- Маска-лицо -->
+      <path d="M400 120c-120 0-210 90-210 210 0 180 130 270 210 270s210-90 210-270c0-120-90-210-210-210z" fill="url(#metal)"/>
+      <!-- Трещины -->
+      <path d="M410 120 L405 210 L340 260 L360 340 L320 420 L350 520" stroke="#ffe08a" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+      <path d="M390 120 L392 220 L450 300 L430 360 L480 430 L450 530" stroke="#87e0ff" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+      <!-- Пустые глазницы -->
+      <circle cx="350" cy="300" r="22" fill="#0b0f14"/>
+      <circle cx="450" cy="300" r="22" fill="#0b0f14"/>
+      <!-- Рёбра/артефакты -->
+      <g opacity=".35">
+        <rect x="150" y="560" width="500" height="12" fill="#c7d2fe"/>
+        <rect x="200" y="590" width="400" height="10" fill="#bae6fd"/>
+        <rect x="180" y="620" width="440" height="10" fill="#ddd6fe"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hint" id="eggHint" style="display:none">Пасхалка: нажми <kbd>↑ ↑ ↓ ↓ ← → ← → B A</kbd> или трижды кликни «Кайрнакс»</div>
+
   <header>
     <div class="head">
-      <div class="brand"><a href="#/">Кайнракс ✶</a></div>
-      <input id="q" type="search" placeholder="Поиск…" aria-label="Поиск" style="flex:1;min-width:120px;max-width:250px;" />
-      <div class="nav-links">
+      <div class="brand"><a href="#/" id="brandLink">Кайрнакс ✶</a></div>
+      <div class="search" style="max-width:760px">
+        <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
+        <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
         <a class="btn" href="#/arcs">Ветки</a>
-        <a class="btn" href="#/scrolls">Пергамент</a>
         <a class="btn" href="#/notes">Заметки</a>
-        <a class="btn" href="#/perg">Планы</a>
-        <a class="btn" href="#/project">О проекте</a>
+        <a class="btn" href="#/about">О мире</a>
+        <a class="btn" href="#/project">О проекте | планы</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
+        <span id="adminBtns" style="display:none">
+          <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
+          <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
+          <a class="btn" id="newNoteBtn"  href="/admin/#/collections/notes/new"  target="_blank" rel="noopener">+ Заметка</a>
+        </span>
       </div>
-      <span id="adminBtns">
-        <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
-        <a class="btn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
-        <a class="btn" href="/admin/#/collections/notes/new"  target="_blank" rel="noopener">+ Заметка</a>
-        <a class="btn" href="/admin/#/collections/pergament/new" target="_blank" rel="noopener">+ План</a>
-      </span>
     </div>
   </header>
 
-  <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
+  <div id="adminDock" style="position:fixed;right:14px;bottom:14px;z-index:7;display:none"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
   <script>
   /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
-
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
-  /* ===== УТИЛЫ ===== */
+  /* ===== ВЕТКИ ===== */
+  const arcs=[
+    { id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.', order:['epitimya','tsvetok'] },
+    { id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести, действие в которых происходит внутри Кайнракс.', order:['dorogovato','chelovecheskiy-faktor'] },
+    { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.', order:['ibut-g1','ibut-g2'] }
+  ];
+  const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
   const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
   const getAnno = (s) => {
     const a = (s.annotation || s.anno || s.summary || '').trim();
     if (a) return a;
-    const txt = (s.text || '').replace(/(<([^>]+)>)/gi, "").replace(/\s+/g, ' ').trim();
+    const txt = (s.text || '').replace(/\s+/g, ' ').trim();
     if (!txt) return '';
     const cut = 180;
     return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
-  const parseText = (text) => (text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
 
-  /* ===== ДАННЫЕ ===== */
-  let stories=[], notes=[], pergaments=[], scrolls=[];
-  async function safeJson(url, def=[]){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
+  /* ===== ДАННЫЕ + НАДЁЖНАЯ ЗАГРУЗКА ===== */
+  let stories=[], notes=[];
   async function loadContent(){
-    // Основной контент
-    const j = await safeJson('content/index.json', {});
-    stories = Array.isArray(j.stories) ? j.stories : await safeJson('content/stories.json');
-    notes = Array.isArray(j.notes) ? j.notes : await safeJson('content/notes.json');
-    pergaments = Array.isArray(j.pergaments) ? j.pergaments : await safeJson('content/pergament.json');
-
-    // Пергаменты (внутримировые)
-    scrolls = await safeJson('content/scrolls/index.json');
-    
-    [stories, notes, pergaments, scrolls].forEach(arr => arr.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0))));
-  }
-
-  /* ===== ВЕТКИ ===== */
-  const arcMeta = { surface:{id:'surface',title:'Поверхность'}, kainrax:{id:'kainrax',title:'Кайнракс'}, ibut:{id:'ibut',title:'ИБУТ'} };
-  function buildArcs(){
-    const map = {}; stories.forEach(s => { const id = s.arc || 'kainrax'; if(!map[id]) map[id] = { ...(arcMeta[id]||{id,title:id}), items:[] }; map[id].items.push(s); });
-    for(const k in map) map[k].items.sort((a,b)=> (a.order||Infinity)-(b.order||Infinity)||(new Date(a.date||0))-(new Date(b.date||0)));
-    return Object.values(map);
+    try{
+      const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject());
+      if(Array.isArray(j.stories)) stories=j.stories;
+      if(Array.isArray(j.notes))   notes=j.notes;
+    }catch(e){
+      try{
+        const [sj,nj]=await Promise.all([
+          fetch('content/stories.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]),
+          fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():[])
+        ]);
+        stories = Array.isArray(sj)?sj:[]; notes = Array.isArray(nj)?nj:[];
+      }catch(_){ }
+    }
+    stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
   }
 
   /* ===== ТЕМА ===== */
@@ -180,62 +239,59 @@
     localStorage.setItem('theme', state.theme);
     setUtterancesTheme(state.theme);
     setCusdisTheme();
-    const el=document.getElementById('favicon'); const color=state.theme==='light'?'%230A1830':'%23FFD54A';
+    const el=document.getElementById('favicon');
+    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
     el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
   }
   applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark'?'light':(state.theme==='light'?'cringe':'dark'); applyTheme(); };
+  document.getElementById('themeBtn').onclick=()=>{
+    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
+    applyTheme();
+  };
 
-  /* ===== АДМИНКА ===== */
-  let isAdmin=new URLSearchParams(location.search).has('admin')||localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){localStorage.setItem('admin','1');history.replaceState({},'',location.pathname+location.hash);}
-  function ensureAdminUI(){document.getElementById('adminBtns').style.display=isAdmin?'inline-flex':'none';if(!isAdmin)adminDockHide();}
-  addEventListener('keydown',e=>{if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){isAdmin=!isAdmin;localStorage.setItem('admin',isAdmin?'1':'0');ensureAdminUI();}});
+  /* ===== ADMIN MODE (скрыт) ===== */
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  function ensureAdminUI(){ document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none'; if(!isAdmin) adminDockHide(); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
 
-  /* ===== РОУТЕР ===== */
-  addEventListener('hashchange',()=>{state.route=location.hash.slice(1)||'/';render();restoreScroll();});
-  qEl.addEventListener('input',()=>{state.q=qEl.value.trim().toLowerCase();render();});
+  /* ===== РОУТЕР / ПОИСК ===== */
+  addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
+  qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== РЕНДЕР СТРАНИЦ ===== */
-  function renderItem(item, type) {
-    let href, typeName;
-    switch(type) {
-      case 'story': href = `#/read/${item.slug||item.id}`; typeName = `Ветка: ${(arcMeta[item.arc||'kainrax']||{title:''}).title}`; break;
-      case 'note': href = `#/note/${item.slug||item.id}`; typeName = `Заметка`; break;
-      case 'perg': href = `#/perg/${item.slug||item.id}`; typeName = `План`; break;
-    }
-    return `<div class="story-item">
-        <a href="${href}">
-          <div class="title">✶ ${item.title}</div>
-          <div class="muted">${fmtDate(item.date)} · ${typeName}</div>
-        </a>
-        ${getAnno(item)?`<div class="anno">${getAnno(item)}</div>`:''}
-      </div>`;
-  }
-
+  /* ===== ВЬЮХИ ===== */
   function renderList(){
-    const q = state.q;
-    let filteredItemsHtml = '';
-    if (q) {
-        const allContent = [
-            ...stories.map(s => ({...s, type: 'story'})),
-            ...notes.map(n => ({...n, type: 'note'})),
-            ...pergaments.map(p => ({...p, type: 'perg'}))
-        ];
-        const items = allContent.filter(s => s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
-        filteredItemsHtml = items.length ? items.map(item => renderItem(item, item.type)).join('') : '<div class="muted">Ничего не найдено.</div>';
-    }
-
-    const arcs = buildArcs();
-    app.innerHTML= q ? `<section class="card"><h1>Результаты поиска</h1><div class="list">${filteredItemsHtml}</div></section>` : `
+    const q=state.q;
+    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+    app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
-          <div class="list">${stories.map(s=>renderItem(s, 'story')).join('')}</div>
+          <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+          <div class="list">
+            ${items.length?items.map(s=>`
+              <div class="story-item">
+                <a href="#/read/${s.id}">
+                  <div class="title">✶ ${s.title||'Без названия'}</div>
+                  <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин чтения · ветка: ${arcById(s.arc).title}</div>
+                </a>
+                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+              </div>`).join(''):`<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>`}
+          </div>
         </section>
+
         <aside class="card">
           <h2>Ветки</h2>
-          <div class="list">${arcs.map(a=>`<div class="story-item"><a href="#/arc/${a.id}"><div class="title">✶ ${a.title}</div><div class="muted">${a.items.length} текст(а)</div></a></div>`).join('')}</div>
+          <div class="list">
+            ${arcs.map(a=>`
+              <div class="story-item">
+                <a href="#/arc/${a.id}">
+                  <div class="title">✶ ${a.title}</div>
+                  <div class="muted">${a.order.length} текст(а)</div>
+                  <div>${a.desc}</div>
+                </a>
+              </div>`).join('')}
+          </div>
           <h3 style="margin-top:14px">Подписка</h3>
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
         </aside>
@@ -243,252 +299,320 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  function renderArticle(id, collection, backUrl, type, renderFunc) {
-      const item = collection.find(x => x.id === id || x.slug === id);
-      if (!item) { location.hash = backUrl; return; }
-      
-      let headerMeta = `<div class="muted">${fmtDate(item.date)}</div>`;
-      let navHtml = '';
-
-      if (type === 'story') {
-        const arcs = buildArcs();
-        const a = arcs.find(x => x.id === (item.arc || 'kainrax')) || { items: [] };
-        const order = a.items;
-        const pos = Math.max(0, order.findIndex(v => v.id === item.id || (v.slug && v.slug === item.slug)));
-        const prev = order[pos - 1], next = order[pos + 1];
-        headerMeta = `<div class="muted">${fmtDate(item.date)} · ${item.minutes||'5'} мин · <a href="#/arc/${item.arc||'kainrax'}">${(arcMeta[item.arc||'kainrax']||{title:'Ветка'}).title}</a></div>`;
-        navHtml = `<hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-          <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.slug||prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.slug||next.id}">${next.title} →</a>`:'<span></span>'}
-          </div>`;
-      }
-
-      app.innerHTML = `
-        <a class="back" href="${backUrl}">← Назад</a>
-        <article class="prose with-margin" data-id="${item.id}" data-slug="${item.slug||item.id}">
-          <div>
-            <h1>${item.title}</h1>
-            ${headerMeta}
-            <div style="margin:6px 0 12px">${(item.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
-            ${getAnno(item) ? `<details class="anno-dtl anno-box"><summary><strong>Аннотация</strong></summary><div style="margin-top:8px">${getAnno(item)}</div></details>` : ''}
-            ${parseText(item.text)}
-            ${navHtml}
-          </div>
-          <aside class="margin-notes">${(Array.isArray(item.margin)?item.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-        </article>
-        <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
-
-      mountComments(`${type}:${item.slug||item.id}`);
-      setTimeout(restoreScroll, 0);
-      adminDockFor(type, item.slug || item.id);
+  function renderArcs(){
+    app.innerHTML=`<section class="card"><h1>Ветки</h1>
+    <div class="list">${arcs.map(a=>`
+      <div class="story-item"><a href="#/arc/${a.id}">
+        <div class="title">✶ ${a.title}</div>
+        <div class="muted">${a.order.length} текст(а)</div>
+        <div>${a.desc}</div>
+      </a></div>`).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПЕРГАМЕНТ (ВНУТРИМИРОВОЙ) ===== */
-  const seriesKey = (sc) => sc.series || (sc.id || '').replace(/-?\d+$/, '') || sc.title;
-  
-  function renderScrolls() {
-    app.innerHTML = `<section class="card">
-      <h1>Пергамент</h1>
-      <div class="muted">Внутримировые документы, хроники и свидетельства.</div>
-      <div class="list" style="margin-top:12px">
-        ${(scrolls || []).map(sc => `
-          <div class="story-item">
-            <a href="#/scroll/${sc.id}">
-              <div class="title">${sc.protected ? '🔒' : '📜'} ${sc.title} — <i>${sc.edition}</i></div>
-              <div class="muted">${fmtDate(sc.date)} · ${sc.chronicler || ''}</div>
-              ${sc.annotation ? `<div class="anno">${sc.annotation}</div>` : ''}
-            </a>
-          </div>`).join('')}
+  function renderArc(id){
+    const a=arcById(id);
+    const arr=a.order.map(i=>stories.find(s=>s.id===i||s.slug===i)).filter(Boolean);
+    app.innerHTML=`<section class="card">
+      <a class="back" href="#/arcs">← Ко всем веткам</a>
+      <h1>${a.title}</h1><div class="muted">${a.desc}</div>
+      <ol class="list" style="margin-top:10px">${arr.map((s,i)=>`
+        <li class="story-item">
+          <a href="#/read/${s.id}">
+            <div class="title">✶ ${i+1}. ${s.title}</div>
+            <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
+          </a>
+          ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+        </li>`).join('')}
+      </ol></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  function renderNotes(){
+    app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
+    <div class="list">${(notes||[]).map(n=>`
+      <div class="story-item"><a href="#/note/${n.id}">
+        <div class="title">✶ ${n.title}</div>
+        <div class="muted">${fmtDate(n.date)}</div>
+      </a></div>`).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  function renderNote(id){
+    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
+    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
+    <article class="prose" data-id="${n.id}" data-slug="${n.slug||n.id}">
+      <h1>${n.title}</h1>
+      <div class="muted">${fmtDate(n.date)}</div>
+      ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+    </article>
+    <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
+    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0);
+    adminDockFor('note', n.slug||n.id); ensureAdminUI();
+  }
+
+  function renderAbout(){
+    app.innerHTML=`<section class="card">
+      <h1>О мире «Кайрнакс»</h1>
+      <div class="prose">
+        <p><em>«На поверхности есть сказка — сказка про человека, который однажды убил бога, которому клялся служить. Звали этого человека Каин, и грех его — первородным.</em></p>
+        <p><em>Но Воздвиженцы не клялись в верности ни одним богам.</em><br><em>Они ушли из-под неприветливых божественных крыльев, где вместо перьев был частокол забора, и назвали себя — нацией Каина, Каин-нацией.</em></p>
+        <p><em>Подземная жизнь, суровая и неприхотливая, обточила это имя, и придала ему звучание, какое не могло родиться на поверхности.</em><br><em>Кайнракс.</em><br><em>И имя первого человеческого грешника — человека, который убил бога, который отказался считать себя недостойным божественных стоп, — мы носим с гордостью».</em></p>
+        <p class="muted">Первая редакция; 67г от Воздвижения; Элиара, Второй Хроникёр.</p>
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+        <p><em>«Древние сказки Поверхности говорят о грешнике, что поднял руку на своего брата из зависти, и звали его Каин. Но мы, дети Первого Света, знаем истину, которую они забыли! … Кайн-ракс … клятва вечно нести свет разума во тьму слепой веры…»</em></p>
+        <p class="muted">Седьмая редакция; 180г от Воздвижения; Элиара, Второй Хроникёр.</p>
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+        <p><em>«…Воздвиженцы были прагматиками. "Убийство бога" — удаление повреждённого модуля ради стабильности системы. Имя Каина — напоминание о цене контроля».</em></p>
+        <p class="muted">Двадцать третья редакция; 250г; Итур, Четвёртый Хроникёр.</p>
       </div>
     </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  async function renderScroll(id) {
-    const sc = (scrolls || []).find(x => x.id === id || x.slug === id);
-    if (!sc) { location.hash = '#/scrolls'; return; }
+  function renderProject(){
+    const wip = (notes||[])
+      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
+      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
 
-    if (sc.protected) {
-      const key = 'scroll:' + sc.id + ':ok';
-      if (localStorage.getItem(key) !== '1') {
-        const pass = await showAccessModal(sc);
-        if (pass) {
-          localStorage.setItem(key, '1');
-        } else {
-          location.hash = '#/scrolls';
-          return;
-        }
-      }
-    }
+    app.innerHTML=`<section class="card">
+      <h1>О проекте | планы</h1>
+      <div class="prose">
+        <p>Последние пару лет меня не отпускает идея мира, где магия — ограниченно контролируемый сбой в физике, где боги — сломанный ИИ, а люди на фоне больших событий живут свои маленькие жизни.</p>
+        <p>Так родилась Кайнракс — цивилизация, построенная на костях убитых богов. Нация Каина, нация гениев и обычных людей, живущая под землёй в вечном стремлении исправить ошибки.</p>
+        <p>Здесь я буду писать её. Канальчик-творческая лаборатория, где я буду выкладывать сперва рассказы, картинки, наработки, а потом — эпический роман, уже наполовину готовый, но всё ещё полируемый.</p>
+        <p><strong>Добро пожаловать.</strong></p>
+        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
+      </div>
+    </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
 
-    let body = '';
-    try { body = await fetch(sc.file, { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject()); }
-    catch (_) { body = '(не удалось загрузить текст)'; }
+  function renderArticle(id){
+    const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;}
+    const a=arcById(s.arc);
+    const order=a.order.map(i=>stories.find(st=>st.id===i||st.slug===i)).filter(Boolean);
+    const pos=Math.max(0, order.findIndex(v=>v.id===s.id||v.slug===s.slug));
+    const prev=order[pos-1], next=order[pos+1];
 
-    const same = scrolls.filter(x => seriesKey(x) === seriesKey(sc));
-    same.sort((a, b) => (new Date(a.date || 0)) - (new Date(b.date || 0)));
-    const i = Math.max(0, same.findIndex(x => x.id === sc.id));
-    const prev = same[i - 1], next = same[i + 1];
+    app.innerHTML=`
+      <a class="back" href="#/">← К списку</a>
+      <article class="prose" data-id="${s.id}" data-slug="${s.slug||s.id}">
+        <h1>${s.title}</h1>
+        <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: <a href="#/arc/${a.id}">${a.title}</a> (${pos+1}/${order.length})</div>
+        <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
 
-    app.innerHTML = `
-      <a class="back" href="#/scrolls">← К «Пергаменту»</a>
-      <article class="prose parchment" data-id="${sc.id}">
-        <h1>${sc.title}</h1>
-        <h2>${sc.edition}</h2>
-        <div class="muted">${fmtDate(sc.date)} · ${sc.chronicler || ''}</div>
-        
-        <nav style="display:flex;gap:8px;justify-content:space-between;margin:12px 0">
-          ${prev ? `<a class="btn" href="#/scroll/${prev.id}">← ${prev.edition}</a>` : '<span></span>'}
-          ${next ? `<a class="btn" href="#/scroll/${next.id}">${next.edition} →</a>` : '<span></span>'}
-        </nav>
+        ${getAnno(s) ? `
+          <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
+            <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
+            <div style="margin-top:8px">${getAnno(s)}</div>
+          </details>
+        ` : ``}
 
-        ${sc.annotation ? `<details class="anno-dtl" open><summary><strong>Аннотация</strong></summary><div style="margin-top:8px">${sc.annotation}</div></details>` : ''}
-        
-        <div class="scroll-body" style="margin-top:1em">${parseText(body)}</div>
+        ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+        <div style="display:flex;justify-content:space-between;gap:10px">
+          ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
+          ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
+        </div>
       </article>
 
-      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
-    mountComments('scroll:' + sc.id); setTimeout(restoreScroll, 0);
-    adminDockFor('scroll', sc.slug || sc.id);
-  }
-
-  async function sha256Hex(text){
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-  async function checkCode(input, codeHash){
-    if(!codeHash) return true;
-    const [alg, hex] = codeHash.split(':');
-    if((alg||'sha256')!=='sha256') return false;
-    return (await sha256Hex((input||'').trim())).toLowerCase()===hex.toLowerCase();
-  }
-  function showAccessModal(cfg){
-    return new Promise(resolve=>{
-      const wrap=document.createElement('div');
-      wrap.className='modal';
-      wrap.innerHTML=`<div class="box">
-        <h3>Доступ ограничен</h3>
-        <p class="muted">${cfg.codeHint||'Введите код доступа.'}</p>
-        <input id="codeIn" type="password" placeholder="КОД" />
-        <div class="denied-text">ОТКАЗАНО В ДОСТУПЕ</div>
-        <div style="display:flex; gap:8px; margin-top:16px">
-          <button class="btn" id="okBtn" style="flex:1;">Подтвердить</button>
-          <button class="btn" id="cancelBtn" style="background:transparent">Отмена</button>
-        </div>
-      </div>`;
-      document.body.appendChild(wrap);
-      const box = wrap.querySelector('.box'); const codeIn=wrap.querySelector('#codeIn'); const ok=wrap.querySelector('#okBtn'); const cancel=wrap.querySelector('#cancelBtn'); const err=wrap.querySelector('.denied-text');
-      
-      function close(result) { wrap.remove(); resolve(result); }
-      cancel.onclick=()=>close(false);
-      ok.onclick=async()=>{
-        const pass = await checkCode(codeIn.value, cfg.codeHash);
-        if(pass){ close(true); } 
-        else { 
-          err.style.display='block';
-          box.classList.add('shake');
-          setTimeout(() => box.classList.remove('shake'), 820);
-          codeIn.select(); 
-        }
-      };
-      codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
-      setTimeout(()=>codeIn.focus(),0);
-    });
-  }
-
-
-  /* ===== ДРУГИЕ СТРАНИЦЫ ===== */
-  const renderPage = (title, collection, backUrl, type, renderFunc) => {
-    app.innerHTML=`<section class="card"><h1>${title}</h1><div class="list">${collection.map(item => renderItem(item, type)).join('')}</div></section>`;
-    adminDockHide();
-  };
-
-  function renderProject() {
-    const src = (pergaments || []).concat(notes || []);
-    const wips = src.filter(n => /\b(wip|планы|в работе|work|writing)\b/i.test((n.tags || []).join(' ')))
-                    .sort((a, b) => (new Date(b.date || 0)) - (new Date(a.date || 0)));
-    const wip = wips[0] || null;
-    let wipHtml = `<div class="muted">Нет активной работы с тегом «в работе».</div>`;
-    if (wip) {
-      const isPerg = pergaments.includes(wip);
-      wipHtml = renderItem(wip, isPerg ? 'perg' : 'note');
-    }
-    app.innerHTML = `<section class="card">
-        <h1>О проекте</h1>
-        <div class="prose"><p>«Кайнракс» — это сборник научно-фантастических рассказов. Новые тексты выходят еженедельно.</p></div>
-        <h3 style="margin-top:1.5em">Прямо сейчас пишется</h3>
-        ${wipHtml}
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3>
+        <section id="comments"></section>
       </section>`;
-    adminDockHide();
-  }
-  
-  function renderTag(tag) {
-    const all = [...stories.map(s=>({...s,type:'story'})),...notes.map(n=>({...n,type:'note'})),...pergaments.map(p=>({...p,type:'perg'}))];
-    const items = all.filter(s => (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
-    app.innerHTML=`<section class="card">
-      <a class="back" href="#/">← На главную</a><h1>#${tag}</h1>
-      <div class="list">${items.map(item => renderItem(item, item.type)).join('')}</div></section>`;
-    adminDockHide();
+    mountComments('story:'+(s.slug||s.id)); setTimeout(restoreScroll,0);
+    adminDockFor('story', s.slug||s.id); ensureAdminUI();
   }
 
-  /* ===== КОММЕНТЫ И ПРОЧЕЕ ===== */
-  function mountComments(term){/*...omitted for brevity, same as before...*/}; function setUtterancesTheme(t){/*...*/}; function setCusdisTheme(){/*...*/};
-  const adminDock=document.getElementById('adminDock'), editThisBtn=document.getElementById('editThisBtn');
-  function adminDockHide(){adminDock.style.display='none';}
+  function renderTag(tag){
+    const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
+    app.innerHTML=`<section class="card">
+      <a class="back" href="#/">← На главную</a>
+      <h1>#${tag}</h1>
+      <div class="list">${items.map(s=>`
+        <div class="story-item"><a href="#/read/${s.id}">
+          <div class="title">✶ ${s.title}</div>
+          <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
+        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  /* ===== КОММЕНТЫ (лениво) ===== */
+  function mountComments(term){
+    const wrap=document.getElementById('comments'); if(!wrap) return;
+    wrap.innerHTML=`
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn" id="tab-gh">GitHub</button>
+        <button class="btn" id="tab-anon">Анонимно</button>
+      </div>
+      <div id="c-gh"></div>
+      <div id="c-anon" style="display:none;min-height:300px"></div>`;
+    const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon');
+    let ghLoaded=false, anonLoaded=false;
+
+    function loadGH(){
+      if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML='';
+      const s=document.createElement('script');
+      s.src='https://utteranc.es/client.js';
+      s.setAttribute('repo','sviam-byte/kainrax-site');
+      s.setAttribute('issue-term', term || 'home');
+      s.setAttribute('label','comments');
+      s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
+      s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s);
+    }
+    function loadAnon(){
+      if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML='';
+      const t=document.createElement('div');
+      t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID;
+      t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title;
+      t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
+      anonBox.appendChild(t);
+      if (!window.__cusdisLoaded){
+        const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
+        s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} };
+        document.body.appendChild(s);
+      } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
+    }
+    function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
+    function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
+    wrap.querySelector('#tab-gh').onclick=showGH;
+    wrap.querySelector('#tab-anon').onclick=showAnon;
+
+    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'});
+    io.observe(wrap);
+  }
+  function setUtterancesTheme(theme){
+    const iframe=document.querySelector('iframe.utterances-frame');
+    if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
+  }
+  function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
+
+  /* ===== АДМИН ПЛАВАЮЩАЯ КНОПКА ===== */
+  const adminDock=document.getElementById('adminDock');
+  const editThisBtn=document.getElementById('editThisBtn');
+  function adminDockHide(){ adminDock.style.display='none'; }
   function adminDockFor(kind, slug){
-    if(!isAdmin)return; let p='';
-    if(kind==='story')p='stories';else if(kind==='note')p='notes';else if(kind==='perg')p='pergament';else if(kind==='scroll')p='scrolls';
-    if(p)editThisBtn.href=`/admin/#/collections/${p}/entries/${slug||''}`; else return;
+    if (!isAdmin) return adminDockHide();
+    if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
+    else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
     adminDock.style.display='block';
   }
-  const progress=document.getElementById('progress');let ticking=false;
-  function onScroll(){if(ticking)return;ticking=true;requestAnimationFrame(()=>{const a=document.querySelector('article.prose');if(!a){progress.style.width='0%';ticking=false;return;}const t=a.scrollHeight-window.innerHeight+1;const p=Math.min(100,Math.max(0,((window.scrollY-a.offsetTop)/t)*100));progress.style.width=(isFinite(p)?p:0)+'%';const i=a.dataset.slug||a.dataset.id;if(i)localStorage.setItem('read:'+i,window.scrollY);ticking=false;});}
-  addEventListener('scroll', onScroll,{passive:true});
-  function restoreScroll(){const a=document.querySelector('article.prose');if(!a)return;const i=a.dataset.slug||a.dataset.id;const y=+localStorage.getItem('read:'+i)||0;if(y>0)setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);}
-  const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let W,H,starsArr=[],running=true;
-  const p=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  function R(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;M();if(p)D(0,true);}
-  addEventListener('resize',R);function M(){const b=document.documentElement.getAttribute('data-theme')==='light'?60:120;const k=(W*H)/30000;const c=Math.floor(b+k);starsArr=Array.from({length:c},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+0.3,s:Math.random()*0.5+0.2}));}
-  function D(t,o=false){if(!ctx)return;ctx.clearRect(0,0,W,H);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--star').trim()||'rgba(255,255,255,.9)';for(const s of starsArr){const a=o?0.7:0.5+Math.sin((t/1200)*s.s+s.x*0.002)*0.4;ctx.globalAlpha=a;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}if(!o&&!p&&running)requestAnimationFrame(D);}
-  document.addEventListener('visibilitychange',()=>{running=document.visibilityState==='visible';if(running&&!p)requestAnimationFrame(D);});
 
-  /* ===== ГЛАВНЫЙ РОУТЕР ===== */
-  function render(){
-    app.innerHTML = '<div class="muted" style="text-align:center;padding:40px 0;">Загрузка...</div>';
-    document.title = 'Кайнракс';
-    const r=state.route || '/';
-    if (state.q) { renderList(); return; }
-
-    const routes = {
-      '/': renderList,
-      '/arcs': () => renderPage('Ветки', buildArcs(), '#/', 'arc'),
-      '/notes': () => renderPage('Заметки', notes, '#/notes', 'note'),
-      '/perg': () => renderPage('Планы', pergaments, '#/perg', 'perg'),
-      '/scrolls': renderScrolls,
-      '/project': renderProject,
-    };
-    const routeAction = routes[r];
-    if (routeAction) { routeAction(); return; }
-    
-    const patterns = [
-      [/^\/read\/(.+)$/, (id) => renderArticle(id, stories, '#/', 'story')],
-      [/^\/note\/(.+)$/, (id) => renderArticle(id, notes, '#/notes', 'note')],
-      [/^\/perg\/(.+)$/, (id) => renderArticle(id, pergaments, '#/perg', 'perg')],
-      [/^\/scroll\/(.+)$/, renderScroll],
-      [/^\/arc\/(.+)$/, (id) => renderPage(arcMeta[id]?.title, buildArcs().find(a=>a.id===id)?.items || [], '#/arcs', 'story')],
-      [/^\/tag\/(.+)$/, (tag) => renderTag(decodeURIComponent(tag))]
-    ];
-
-    for (const [pattern, action] of patterns) {
-        const match = r.match(pattern);
-        if (match) { action(match[1]); return; }
-    }
-    
-    renderList(); // Fallback
+  /* ===== ПРОГРЕСС + ВОССТ.СКРОЛЛ ===== */
+  const progress=document.getElementById('progress'); let ticking=false;
+  function onScroll(){
+    if(ticking) return; ticking=true; requestAnimationFrame(()=>{
+      const art=document.querySelector('article');
+      if(!art){progress.style.width='0%'; ticking=false; return;}
+      const total=art.scrollHeight - window.innerHeight + 1;
+      const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
+      progress.style.width=(isFinite(pct)?pct:0)+'%';
+      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      ticking=false;
+    });
+  }
+  addEventListener('scroll', onScroll, {passive:true});
+  function restoreScroll(){
+    const art=document.querySelector('article'); if(!art) return;
+    const id=art.dataset.slug||art.dataset.id;
+    const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); R(); if(!p) requestAnimationFrame(D); });
+  /* ===== ЗВЁЗДЫ ===== */
+  const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d', { alpha:true });
+  let W,H,starsArr=[], running=true;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
+  addEventListener('resize', resize);
+  function makeStars(){
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120;
+    const k = (W*H)/30000; const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2 }));
+  }
+  function drawStars(ts, once=false){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
+    for(const st of starsArr){
+      const a = once ? 0.7 : 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
+      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
+    }
+    if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
+  }
+  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
+
+  /* ===== ЛЁГКИЕ «падающие звёзды» ===== */
+  let lastMeteor=0; const meteors=[];
+  function spawnMeteor(ts){
+    if (prefersReduced) return;
+    if (ts - lastMeteor < 9000 + Math.random()*6000) return; // не чаще, экономим батарейку
+    lastMeteor=ts; const y = Math.random()*H*0.5 + 40; const len = 120 + Math.random()*120;
+    meteors.push({x:-100,y, len, life:0});
+  }
+  function drawMeteors(ts){
+    spawnMeteor(ts);
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    for(const m of meteors){
+      m.life += 12; m.x += 10; m.y += 2.6;
+      const g = ctx.createLinearGradient(m.x, m.y, m.x-m.len, m.y-m.len*0.26);
+      g.addColorStop(0,'rgba(255,255,255,.85)');
+      g.addColorStop(1,'rgba(147,197,253,0)');
+      ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x-m.len, m.y-m.len*0.26); ctx.stroke();
+    }
+    // чистим
+    for(let i=meteors.length-1;i>=0;i--){ if(meteors[i].x>W+200||meteors[i].y>H+200) meteors.splice(i,1); }
+    ctx.restore();
+  }
+  // объединяем рендер
+  (function loop(ts){ if(!prefersReduced){ drawStars(ts); drawMeteors(ts); } requestAnimationFrame(loop); })(0);
+
+  /* ===== ПАСХАЛКА: Разрушенный бог ===== */
+  const brokenGod = document.getElementById('brokenGod');
+  const eggHint = document.getElementById('eggHint');
+  let eggVisible=false; let brandClicks=0; let hintTimer;
+
+  function toggleGod(show){
+    eggVisible = (show===undefined)? !eggVisible : show;
+    brokenGod.style.display = eggVisible ? 'block' : 'none';
+    eggHint.style.display = eggVisible ? 'none' : 'block';
+    clearTimeout(hintTimer);
+    if (!eggVisible){ hintTimer=setTimeout(()=> eggHint.style.display='none', 6000); }
+  }
+
+  // Консольная подсказка для любопытных
+  setTimeout(()=>{ eggHint.style.display='block'; hintTimer=setTimeout(()=> eggHint.style.display='none', 6000); }, 3000);
+
+  // Тройной клик по логотипу
+  document.getElementById('brandLink').addEventListener('click',()=>{
+    brandClicks++; if(brandClicks>=3){ toggleGod(true); brandClicks=0; setTimeout(()=>toggleGod(false), 10000); }
+    setTimeout(()=>brandClicks=0,800);
+  });
+
+  // Конами
+  const KONAMI=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  const buf=[]; addEventListener('keydown',e=>{ buf.push(e.key); if(buf.length>10) buf.shift(); if(KONAMI.every((k,i)=>buf[i]?.toLowerCase()===k.toLowerCase())){ toggleGod(true); setTimeout(()=>toggleGod(false), 12000); buf.length=0; } });
+
+  // Горячая клавиша (альт+shift+b) — на всякий случай
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='b'){ toggleGod(); }});
+
+  /* ===== РЕНДЕР ===== */
+  function render(){
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/about'){ renderAbout(); return; }
+    if(r==='/project'){ renderProject(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
+    const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
+    const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
+    renderList();
+  }
+
+  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); });
   </script>
 </body>
 </html>
