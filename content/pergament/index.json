@@ -1,0 +1,31 @@
+[
+  {
+    "id": "nastavlenie-molodym",
+    "title": "Наставление к молодым",
+    "annotation": "Три редакции «Наставления к молодым»: от героического мифа к прагматичному протоколу.",
+    "margin": ["1-я редакция зафиксирована после Воздвижения."],
+    "editions": [
+      {
+        "id": "e1",
+        "title": "Первая редакция",
+        "date": "0067-01-01",
+        "file": "content/pergament/nastavlenie-molodym/e1.txt"
+      },
+      {
+        "id": "e7",
+        "title": "Седьмая редакция",
+        "date": "0180-01-01",
+        "file": "content/pergament/nastavlenie-molodym/e7.txt"
+      },
+      {
+        "id": "e23",
+        "title": "Двадцать третья редакция",
+        "date": "0250-01-01",
+        "file": "content/pergament/nastavlenie-molodym/e23.txt",
+        "protected": true,
+        "codeHash": "sha256:e14dcd50994c1f1e8931b86df0047daa07d2336c3ec43e885b30d3ae921413e0",
+        "codeHint": "доступ: хроникёр и год"
+      }
+    ]
+  }
+]
