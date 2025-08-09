@@ -4,11 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Кайрнакс — рассказы</title>
-  <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
+  <meta name="description" content="Короткая НФ без лорового барьера. Ветки, теги, заметки, Пергамент." />
   <meta name="theme-color" content="#0b0f14" />
-  <!-- простая «искра» как favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
-
   <style>
   :root{
     --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
@@ -29,17 +27,13 @@
     --accent:#ff3ea5; --accent2:#07f49e; --link:#7c00ff;
     --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb; --star:rgba(0,0,0,.75);
   }
-
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
-  a{color:var(--link)}
-  h1{margin:6px 0 10px;font-size:28px}
-  .muted{color:var(--muted)}
-  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
+  a{color:var(--link)} h1{margin:6px 0 10px;font-size:28px}
+  .muted{color:var(--muted)} .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
-
   header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.9), rgba(15,21,32,.65));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
   [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
@@ -47,7 +41,6 @@
   .brand{font-weight:800;letter-spacing:.2px}
   .brand a{color:var(--fg);text-decoration:none}
   .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-
   main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:900px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
@@ -57,19 +50,15 @@
   .title{font-weight:700}
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
   .tag:before{content:"✶";color:var(--muted)}
-  [data-theme="light"] .tag:before{content:"#";}
+  [data-theme="light"] .tag:before{content:"#"}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
-
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
-
-  /* аннотация */
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
   .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
   [data-theme="light"] .anno-box{background:rgba(14,165,233,.08)}
   [data-theme="cringe"] .anno-box{background:rgba(255,62,165,.08)}
   details.anno-dtl summary{cursor:pointer;user-select:none}
-
-  /* фон: звёзды + «горы» сверху/снизу (подземный свод) */
+  /* фон */
   #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
   #ceiling{position:fixed;left:0;right:0;top:0;height:18vh;z-index:0;pointer-events:none;opacity:.95}
   #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)}
@@ -77,8 +66,20 @@
   #mountains{position:fixed;left:0;right:0;bottom:0;height:28vh;z-index:0;pointer-events:none;opacity:.92}
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
-
-  /* админ-панель скрыта */
+  /* Пергамент */
+  .parchment{
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%),
+                linear-gradient(#f6efe1, #efe6d3);
+    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+  [data-theme="dark"] .parchment{
+    background: radial-gradient(120% 120% at 50% 0%, rgba(90,70,40,.25), transparent 60%),
+                linear-gradient(#2d261b, #201a12);
+    color:#efe7d6; border-color:#5a4a35;
+  }
+  .parchment h1{ font-family: Georgia, 'Times New Roman', serif; letter-spacing:.3px }
+  .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
+  /* админ-панель */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminBtns{display:none}
   </style>
@@ -115,61 +116,59 @@
 
   <script>
   /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
-
+  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369"; // если нужно — замени/удали
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
-  /* ===== ВЕТКИ ===== */
-  // Больше НЕТ ручного order. Список внутри ветки строится автоматически по stories.
+  /* ===== ВЕТКИ (метаданные только) ===== */
   const arcs=[
     { id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.' },
-    { id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести, действие в которых происходит внутри Кайнракс.' },
-    { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.' }
+    { id:'kainrax', title:'Кайнракс',    desc:'Рассказы и повести, действие которых происходит внутри Кайнракс.' },
+    { id:'ibut',    title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.' }
   ];
-  const arcById=id=>arcs.find(a=>a.id===id)||{id, title:'Ветка', desc:'', order:[]};
+  const arcById=id=>arcs.find(a=>a.id===id)||{id, title:'Ветка', desc:''};
   const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
   const getAnno = (s) => {
     const a = (s.annotation || s.anno || s.summary || '').trim();
     if (a) return a;
     const txt = (s.text || '').replace(/\s+/g, ' ').trim();
     if (!txt) return '';
-    const cut = 180;
-    return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
+    const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
-  function storiesByArc(arcId){
-    // Автоподбор: все stories с совпадающим arc. Сортировка: сначала по числовому s.order (если есть), затем по дате.
-    return stories
-      .filter(s=> (s.arc||'').toLowerCase() === (arcId||'').toLowerCase())
-      .slice()
-      .sort((a,b)=>{
-        const ao = (a.order??Number.POSITIVE_INFINITY), bo=(b.order??Number.POSITIVE_INFINITY);
-        if (ao!==bo) return ao-bo;
-        return (new Date(a.date||0)) - (new Date(b.date||0)); // старые раньше, для естественного чтения
-      });
-  }
+  const estMinutes = (s) => {
+    if (s.minutes) return s.minutes;
+    const chars = (s.text||'').length; // грубо по знакам
+    const m = Math.max(3, Math.min(60, Math.ceil(chars/1100))); // ~1100 зн/мин
+    return m;
+  };
 
-  /* ===== ДАННЫЕ + НАДЁЖНАЯ ЗАГРУЗКА ===== */
-  let stories=[], notes=[], scrolls=[]; // scrolls = «Пергамент»
+  /* ===== ДАННЫЕ ===== */
+  let stories=[], notes=[], scrolls=[]; // scrolls — из content/scrolls/index.json
+
   async function loadContent(){
+    // Путь 1: общий индекс
     try{
       const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject());
-      if(Array.isArray(j.stories)) stories=j.stories;
-      if(Array.isArray(j.notes))   notes=j.notes;
-      if(Array.isArray(j.scrolls)) scrolls=j.scrolls; // поддержка content/index.json: { scrolls: [...] }
+      if(Array.isArray(j.stories)) stories=j.stories; else stories=[];
+      if(Array.isArray(j.notes))   notes=j.notes;   else notes=[];
+      if(Array.isArray(j.scrolls)) scrolls=j.scrolls; // опционально, если хочешь держать тут
     }catch(e){
+      // Путь 2: старый раздельный формат
       try{
-        const [sj,nj,pj]=await Promise.all([
+        const [sj,nj]=await Promise.all([
           fetch('content/stories.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]),
-          fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]),
-          fetch('content/scrolls.json',{cache:'no-store'}).then(r=>r.ok?r.json():[])
+          fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():[])
         ]);
-        stories = Array.isArray(sj)?sj:[]; 
-        notes   = Array.isArray(nj)?nj:[];
-        scrolls = Array.isArray(pj)?pj:[];
-      }catch(_){ }
+        stories = Array.isArray(sj)?sj:[]; notes = Array.isArray(nj)?nj:[];
+      }catch(_){ stories=[]; notes=[]; }
     }
+    // Отдельный манифест Пергамента (папка content/scrolls)
+    try{
+      const pj = await fetch('content/scrolls/index.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]);
+      if(Array.isArray(pj)) scrolls = pj;
+    }catch(_){ /* ок */ }
+
     // сортировки
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
     notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
@@ -180,9 +179,7 @@
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
-    setUtterancesTheme(state.theme);
-    setCusdisTheme();
-    // подкраска favicon
+    setUtterancesTheme(state.theme); setCusdisTheme();
     const el=document.getElementById('favicon');
     const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
     el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
@@ -203,6 +200,15 @@
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
+  /* ===== ХЕЛПЕРЫ ПО ВЕТКАМ ===== */
+  const storiesByArc = (id) => stories
+    .filter(s=> (s.arc||'').toLowerCase() === (id||'').toLowerCase())
+    .sort((a,b)=>{
+      const ao = (a.order??Infinity), bo=(b.order??Infinity);
+      if(ao!==bo) return ao-bo;
+      return (new Date(a.date||0)) - (new Date(b.date||0)); // старые раньше — для чтения подряд
+    });
+
   /* ===== ВЬЮХИ ===== */
   function renderList(){
     const q=state.q;
@@ -217,7 +223,7 @@
               <div class="story-item">
                 <a href="#/read/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
-                  <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин чтения · ветка: ${arcById(s.arc).title}</div>
+                  <div class="muted">${fmtDate(s.date)} · ${estMinutes(s)} мин чтения · ветка: ${arcById(s.arc).title}</div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
               </div>`).join(''):`<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>`}
@@ -236,7 +242,8 @@
                   <div class="muted">${count} текст(а)</div>
                   <div>${a.desc}</div>
                 </a>
-              </div>`;}).join('')}
+              </div>`;
+            }).join('')}
           </div>
           <h3 style="margin-top:14px">Подписка</h3>
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
@@ -248,19 +255,19 @@
   function renderArcs(){
     app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>{
-      const count=storiesByArc(a.id).length;
+      const count = storiesByArc(a.id).length;
       return `
       <div class="story-item"><a href="#/arc/${a.id}">
         <div class="title">✶ ${a.title}</div>
         <div class="muted">${count} текст(а)</div>
         <div>${a.desc}</div>
-      </a></div>`}).join('')}</div></section>`;
+      </a></div>`;}).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
   function renderArc(id){
     const a=arcById(id);
-    const arr=storiesByArc(a.id);
+    const arr = storiesByArc(id);
     app.innerHTML=`<section class="card">
       <a class="back" href="#/arcs">← Ко всем веткам</a>
       <h1>${a.title}</h1><div class="muted">${a.desc}</div>
@@ -268,7 +275,7 @@
         <li class="story-item">
           <a href="#/read/${s.id}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
-            <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин</div>
+            <div class="muted">${fmtDate(s.date)} · ${estMinutes(s)} мин</div>
           </a>
           ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
         </li>`).join('')}
@@ -299,29 +306,6 @@
     adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
-  /* ===== ПЕРГАМЕНТ ===== */
-  function renderScrolls(){
-    app.innerHTML=`<section class="card"><h1>Пергамент</h1>
-    <div class="list">${(scrolls||[]).map(sc=>`
-      <div class="story-item"><a href="#/scroll/${sc.id}">
-        <div class="title">✶ ${sc.title}</div>
-        <div class="muted">${fmtDate(sc.date)}${(Array.isArray(sc.tags)&&sc.tags.length)?' · '+sc.tags.map(t=>`#${t}`).join(' '):''}</div>
-      </a>${getAnno(sc)?`<div class="anno">${getAnno(sc)}</div>`:''}</div>`).join('')}</div></section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-  function renderScroll(id){
-    const sc=(scrolls||[]).find(x=>x.id===id||x.slug===id); if(!sc){location.hash='#/scrolls';return;}
-    app.innerHTML=`<a class="back" href="#/scrolls">← К «Пергаменту»</a>
-    <article class="prose" data-id="${sc.id}" data-slug="${sc.slug||sc.id}">
-      <h1>${sc.title}</h1>
-      <div class="muted">${fmtDate(sc.date)}</div>
-      ${(sc.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-    </article>
-    <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('scroll:'+(sc.slug||sc.id)); setTimeout(restoreScroll,0);
-    adminDockFor('scroll', sc.slug||sc.id); ensureAdminUI();
-  }
-
   function renderProject(){
     const wip = (notes||[])
       .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
@@ -332,7 +316,7 @@
       <div class="prose">
         <p>Последние пару лет меня не отпускает идея мира, где магия — ограниченно контролируемый сбой в физике, где боги — сломанный ИИ, а люди на фоне больших событий живут свои маленькие жизни.</p>
         <p>Так родилась Кайнракс — цивилизация, построенная на костях убитых богов. Нация Каина, нация гениев и обычных людей, живущая под землёй в вечном стремлении исправить ошибки.</p>
-        <p>Здесь я буду писать её. Канальчик-творческая лаборатория, где я буду выкладывать сперва рассказы, картинки, наработки, а потом — эпический роман, уже наполовину готовый, но всё ещё полируемый.</p>
+        <p>Здесь я буду писать её. Канальчик-творческая лаборатория, где я буду выкладывать сперва рассказы, картинки, наработки, а потом — эпический роман.</p>
         <p><strong>Добро пожаловать.</strong></p>
         <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
       </div>
@@ -343,33 +327,28 @@
   function renderArticle(id){
     const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;}
     const a=arcById(s.arc);
-    const order=storiesByArc(a.id);
-    const pos=Math.max(0, order.findIndex(v=>v.id===s.id||v.slug===s.slug));
+    const order = storiesByArc(a.id);
+    const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug&&v.slug===s.slug)));
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
       <article class="prose" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <h1>${s.title}</h1>
-        <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: <a href="#/arc/${a.id}">${a.title}</a> (${pos+1}/${order.length})</div>
+        <div class="muted">${fmtDate(s.date)} · ${estMinutes(s)} мин · ветка: <a href="#/arc/${a.id}">${a.title}</a> (${pos+1}/${order.length})</div>
         <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
-
         ${getAnno(s) ? `
           <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
             <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
             <div style="margin-top:8px">${getAnno(s)}</div>
-          </details>
-        ` : ``}
-
+          </details>` : ``}
         ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-
         <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
         <div style="display:flex;justify-content:space-between;gap:10px">
           ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
           ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
         </div>
       </article>
-
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3>
         <section id="comments"></section>
@@ -386,12 +365,80 @@
       <div class="list">${items.map(s=>`
         <div class="story-item"><a href="#/read/${s.id}">
           <div class="title">✶ ${s.title}</div>
-          <div class="muted">${fmtDate(s.date)} · ${s.minutes||8} мин · ветка: ${arcById(s.arc).title}</div>
+          <div class="muted">${fmtDate(s.date)} · ${estMinutes(s)} мин · ветка: ${arcById(s.arc).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== КОММЕНТЫ (лениво) ===== */
+  /* ===== Пергамент (scrolls) ===== */
+  function renderScrolls(){
+    app.innerHTML = `<section class="card">
+      <h1>Пергамент</h1>
+      <div class="list">
+        ${(scrolls||[]).map(sc=>`
+          <div class="story-item">
+            <a href="#/scroll/${sc.id}">
+              <div class="title">📜 ${sc.title}</div>
+              <div class="muted">${fmtDate(sc.date)}${sc.protected?' · 🔒 доступ по коду':''}</div>
+            </a>
+            ${getAnno(sc)?`<div class="anno">${getAnno(sc)}</div>`:''}
+          </div>`).join('')}
+      </div>
+    </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  async function renderScroll(id){
+    const sc = (scrolls||[]).find(x=>x.id===id || x.slug===id);
+    if(!sc){ location.hash='#/scrolls'; return; }
+
+    // защита по коду (клиентская)
+    if(sc.protected){
+      const key = 'scroll:'+sc.id+':ok';
+      const ok  = localStorage.getItem(key)==='1';
+      if(!ok){
+        const hint = sc.codeHint ? `\nПодсказка: ${sc.codeHint}` : '';
+        let input = prompt(`Доступ к «${sc.title}». Введите код:${hint}`) || '';
+        input = input.trim();
+        const pass = await checkCode(input, sc.codeHash);
+        if(!pass){ alert('Неверный код.'); location.hash='#/scrolls'; return; }
+        localStorage.setItem(key,'1');
+      }
+    }
+
+    // подтянуть тело из файла
+    let body = '';
+    try{ body = await fetch(sc.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
+    catch(_){ body = '(не удалось загрузить текст)'; }
+
+    app.innerHTML = `
+      <a class="back" href="#/scrolls">← К «Пергаменту»</a>
+      <article class="prose parchment" data-id="${sc.id}">
+        <h1>📜 ${sc.title}</h1>
+        <div class="muted">${fmtDate(sc.date)} ${(sc.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="scroll-body">${body.split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>
+      </article>
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3><section id="comments"></section>
+      </section>`;
+    mountComments('scroll:'+sc.id); setTimeout(restoreScroll,0);
+    adminDockHide(); ensureAdminUI();
+  }
+
+  async function sha256Hex(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  async function checkCode(input, codeHash){
+    if(!codeHash) return true;
+    const [alg, hex] = codeHash.split(':');
+    if((alg||'sha256')!=='sha256') return false;
+    const got = await sha256Hex(input);
+    return got.toLowerCase()===hex.toLowerCase();
+  }
+
+  /* ===== КОММЕНТЫ (ленивые вкладки) ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -403,36 +450,27 @@
       <div id="c-anon" style="display:none;min-height:300px"></div>`;
     const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon');
     let ghLoaded=false, anonLoaded=false;
-
-    function loadGH(){
-      if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML='';
-      const s=document.createElement('script');
-      s.src='https://utteranc.es/client.js';
+    function loadGH(){ if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML='';
+      const s=document.createElement('script'); s.src='https://utteranc.es/client.js';
       s.setAttribute('repo','sviam-byte/kainrax-site');
-      s.setAttribute('issue-term', term || 'home');
-      s.setAttribute('label','comments');
+      s.setAttribute('issue-term', term || 'home'); s.setAttribute('label','comments');
       s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
       s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s);
     }
-    function loadAnon(){
-      if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+    function loadAnon(){ if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
       if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML='';
-      const t=document.createElement('div');
-      t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID;
+      const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID;
       t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title;
       t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
       anonBox.appendChild(t);
-      if (!window.__cusdisLoaded){
-        const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
+      if (!window.__cusdisLoaded){ const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
         s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} };
         document.body.appendChild(s);
       } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
     }
     function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
     function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
-    wrap.querySelector('#tab-gh').onclick=showGH;
-    wrap.querySelector('#tab-anon').onclick=showAnon;
-
+    wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
     const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'});
     io.observe(wrap);
   }
@@ -461,7 +499,8 @@
       const art=document.querySelector('article');
       if(!art){progress.style.width='0%'; ticking=false; return;}
       const total=art.scrollHeight - window.innerHeight + 1;
-      const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
+      const top = Math.max(0, window.scrollY - (art.getBoundingClientRect().top + window.scrollY));
+      const pct=Math.min(100, Math.max(0, (top / total)*100));
       progress.style.width=(isFinite(pct)?pct:0)+'%';
       const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
       ticking=false;
@@ -476,8 +515,7 @@
 
   /* ===== ЗВЁЗДЫ ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
-  let W,H,starsArr=[], running=true;
-  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W,H,starsArr=[], running=true; const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
   addEventListener('resize', resize);
   function makeStars(){
@@ -488,15 +526,13 @@
   function drawStars(ts, once=false){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
-    for(const st of starsArr){
-      const a = once ? 0.7 : 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
-      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
-    }
+    for(const st of starsArr){ const a = once ? 0.7 : 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
+      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill(); }
     if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
   }
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
-  /* ===== РЕНДЕР ===== */
+  /* ===== РОУТЕР ===== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -504,7 +540,6 @@
     if(r==='/arcs'){ renderArcs(); return; }
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/scrolls'){ renderScrolls(); return; }
-    if(r==='/about'){ location.hash = '#/scrolls'; return; } // backward compatible
     const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
