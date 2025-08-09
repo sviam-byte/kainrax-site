@@ -138,6 +138,19 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
+  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ =====
+     Варианты:
+       1) ЯВНЫЙ КОД:   PERG.CODE = 'Chronicle'
+       2) ХЭШ КОДА:    PERG.CODE_HASH = 'sha256:....hex'
+     Приоритет: CODE_HASH > CODE. Последняя редакция ВСЕГДА открыта.
+     Можно переопределить на уровне конкретной редакции в манифесте:
+       { protected:true, code:"..." }  или  { protected:true, codeHash:"sha256:..." }
+  */
+  const PERG = {
+    CODE: 'Chronicle',           // <<<< тут задаётся ЯВНЫЙ КОД
+    CODE_HASH: null              // например: 'sha256:e14dcd50....'; если задан, перекрывает CODE
+  };
+
   /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
@@ -146,7 +159,18 @@
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
   /* ===== УТИЛЫ ===== */
-  const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
+  const fmtHumanDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
+
+  // Формат «N-й день M-го года.» для строк вида YYYY-DOY (например, "0430-349")
+  function fmtPergDayYear(s){
+    if(typeof s!== 'string') return String(s||'');
+    const m = s.match(/^(\d{4})-(\d{3})$/); // YYYY-DOY
+    if(!m) return fmtHumanDate(s);
+    const year = Number(m[1]);
+    const day  = Number(m[2]);
+    return `${day}-й день ${year}-го года.`;
+  }
+
   const getAnno = (s) => {
     const a = (s.annotation || s.anno || s.summary || '').trim();
     if (a) return a;
@@ -169,12 +193,12 @@
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
     notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
 
-    // сортируем Пергамент по последней по дате редакции
-    pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> (new Date(a.date||0))-(new Date(b.date||0))); });
+    // сортируем Пергамент по последней по дате редакции (по исходной строке даты не сортируем; если YYYY-DOY — сложный случай, но relative сравнение по строке YYYY-DOY ок)
+    pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
       const ad=(a.editions||[]); const bd=(b.editions||[]);
-      const al=ad[ad.length-1]?.date||0; const bl=bd[bd.length-1]?.date||0;
-      return (new Date(bl))-(new Date(al));
+      const al=ad[ad.length-1]?.date||''; const bl=bd[bd.length-1]?.date||'';
+      return String(bl).localeCompare(String(al));
     });
   }
 
@@ -230,7 +254,7 @@
               <div class="story-item">
                 <a href="#/read/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
-                  <div class="muted">${fmtDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+                  <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
               </div>`).join(''):`<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>`}
@@ -269,7 +293,7 @@
         <li class="story-item">
           <a href="#/read/${s.id}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
-            <div class="muted">${fmtDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
+            <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
           ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
         </li>`).join('')}
@@ -279,7 +303,7 @@
       <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <div class="prose readbox">
           <h1>${s.title}</h1>
-          <div class="muted">${fmtDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a> (${pos+1}/${order.length})</div>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a> (${pos+1}/${order.length})</div>
           <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
 
           ${getAnno(s) ? `
@@ -310,41 +334,16 @@
       <div class="list">${items.map(s=>`
         <div class="story-item"><a href="#/read/${s.id}">
           <div class="title">✶ ${s.title}</div>
-          <div class="muted">${fmtDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
 
   /* ===== ПЕРГАМЕНТ ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-  function getYear(ed){ if (ed?.year) return ed.year; if (ed?.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4); return ''; }
-
-  function getAccessMeta(ed, lastEd){
-    // 1) собственные поля редакции
-    if (ed && (ed.codeHash || (ed.access && ed.access.enabled))) {
-      return { codeHash: ed.codeHash||null, access: ed.access||null, hint: ed.codeHint || (ed.access&&ed.access.hint) || null };
-    }
-    // 2) иначе — конфиг последней редакции (общий код для документа)
-    if (lastEd && (lastEd.codeHash || (lastEd.access && lastEd.access.enabled))) {
-      return { codeHash: lastEd.codeHash||null, access: lastEd.access||null, hint: lastEd.codeHint || (lastEd.access&&lastEd.access.hint) || null };
-    }
-    // 3) нет конфига — пусто (в этом случае доступ к прошлым версиям будет запрещён)
-    return { codeHash:null, access:null, hint:null };
-  }
-
-  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
-  async function checkCodeWithMeta(input, meta){
-    const pass=(input||'').trim();
-    if(!pass) return false;
-    if(meta.codeHash){
-      const [alg, hex] = meta.codeHash.split(':');
-      if((alg||'sha256').toLowerCase()!=='sha256') return false;
-      const got = await sha256Hex(pass);
-      return got.toLowerCase()===String(hex||'').toLowerCase();
-    }
-    if(meta.access && meta.access.enabled){
-      const expected = (meta.access.code||'').trim();
-      return expected && pass===expected;
-    }
-    return false; // нет настроек — нет доступа
+  function isProtected(ed){ return !!(ed && (ed.protected || ed.code || ed.codeHash || (ed.access && ed.access.enabled))); }
+  function pergPrevYear(ed){ // пригодится для «предыдущая редакция»
+    if(ed?.year) return ed.year;
+    if (ed?.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4);
+    return '';
   }
 
   function renderPergList(){
@@ -352,12 +351,10 @@
     app.innerHTML = `<section class="card"><h1>Пергамент</h1>
       <div class="list">${items.map(d=>{
         const e=lastEdition(d)||{};
-        // Пишем понятнее: прошлые редакции закрыты, последняя — открыта
-        const lock = (d.editions||[]).length>1 ? ' · 🔒 прошлые редакции по коду' : '';
         return `<div class="story-item">
           <a href="#/perg/${encodeURIComponent(d.id)}">
             <div class="title">📜 ${d.title}</div>
-            <div class="muted">последняя ред.: ${fmtDate(e.date||d.date||'')}${lock}</div>
+            <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
           </a>
           ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
         </div>`; }).join('')}</div></section>`;
@@ -372,36 +369,27 @@
   }
 
   async function renderPerg(rawId){
-    // страховка: отрезаем query, даже если роутер не вычистил
     const id = (rawId||'').split('?')[0];
-
     const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
     if(!d){ location.hash = '#/perg'; return; }
 
     const editions = (d.editions||[]);
     if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
 
-    // выбранная редакция: по ?e=..., иначе последняя
     const q = parseHashQuery();
     const chosenId = q.e || editions[editions.length-1].id;
     let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // === Гейт: все НЕ-последние требуют код ===
+    // === Доступ: последняя редакция ВСЕГДА открыта; остальные — только по коду ===
     async function ensureAccessForNonLast(ed){
-      if(isLast) return true; // последняя всегда открыта
-      const meta = getAccessMeta(ed, lastEd);
+      if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
       if(localStorage.getItem(key)==='1') return true;
-      if(!meta.codeHash && !(meta.access && meta.access.enabled)){
-        // нет настроек для доступа — запрещаем
-        alert('Эта редакция доступна только по коду, но код не задан. Обратитесь к автору.');
-        return false;
-      }
       const ok = await showAccessModal(
-        { message:'Подтвердите доступ', codeHint: meta.hint },
-        (input)=> checkCodeWithMeta(input, meta)
+        { message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access&&ed.access.hint) || 'хроникёр и год' },
+        (input)=> checkPergCode(input, ed)
       );
       if(ok){ localStorage.setItem(key,'1'); return true; }
       return false;
@@ -416,17 +404,15 @@
     catch(_){ body = '(не удалось загрузить текст)'; }
 
     // селектор редакций
-    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtDate(x.date||'')}</option>`).join('');
+    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
 
     // плашка «предыдущая редакция …» (всегда по коду)
     let prevBlock = '';
     if (isLast && editions.length > 1){
       const prev = editions[editions.length-2];
-      const prevYear = getYear(prev);
-      prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${prevYear} — доступ по коду</div>`;
+      prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prev.date||'')} — доступ по коду</div>`;
     }
 
-    // UI
     app.innerHTML = `
       <a class="back" href="#/perg">← К «Пергаменту»</a>
       <article class="with-margin" data-id="${d.id}">
@@ -452,7 +438,39 @@
     mountComments('perg:'+(d.slug||d.id)+':'+(e.id||'')); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
   }
 
-  /* ===== Доступ: модалка (возвращает true/false) ===== */
+  /* ===== ДОСТУП: проверка кода ===== */
+  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+  async function checkPergCode(input, ed){
+    const pass = (input||'').trim();
+    if(!pass) return false;
+
+    // 1) приоритет: редакционный codeHash / code
+    if(ed && ed.codeHash){
+      const [alg, hex] = String(ed.codeHash).split(':');
+      if((alg||'sha256').toLowerCase()==='sha256'){
+        const got = await sha256Hex(pass);
+        return got.toLowerCase() === String(hex||'').toLowerCase();
+      }
+    }
+    if(ed && ed.code){
+      return pass === String(ed.code).trim();
+    }
+
+    // 2) глобальные настройки PERG: CODE_HASH > CODE
+    if(PERG.CODE_HASH){
+      const [alg, hex] = String(PERG.CODE_HASH).split(':');
+      if((alg||'sha256').toLowerCase()==='sha256'){
+        const got = await sha256Hex(pass);
+        return got.toLowerCase() === String(hex||'').toLowerCase();
+      }
+    }
+    if(PERG.CODE){
+      return pass === String(PERG.CODE).trim();
+    }
+
+    return false;
+  }
+
   function showAccessModal(cfg, verify){
     return new Promise(resolve=>{
       const wrap=document.createElement('div'); wrap.className='modal';
@@ -486,6 +504,43 @@
       codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
       setTimeout(()=>codeIn.focus(),0);
     });
+  }
+
+  /* ===== ЗАМЕТКИ/PROJECT ===== */
+  function renderNotes(){ app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
+    <div class="list">${(notes||[]).map(n=>`
+      <div class="story-item"><a href="#/note/${n.id}">
+        <div class="title">✶ ${n.title}</div>
+        <div class="muted">${fmtHumanDate(n.date)}</div>
+      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+  function renderNote(id){ const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;} app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
+    <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
+      <div>
+        <h1>${n.title}</h1>
+        <div class="muted">${fmtHumanDate(n.date)}</div>
+        ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+      </div>
+      <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
+    </article>
+    <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`; mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI(); }
+
+  function renderProject(){
+    const wip = (notes||[])
+      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
+      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
+
+    app.innerHTML=`<section class="card">
+      <h1>О проекте | планы</h1>
+      <div class="prose">
+        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
+        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
+        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
+        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
+        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
+      </div>
+    </section>`;
+    adminDockHide(); ensureAdminUI();
   }
 
   /* ===== КОММЕНТЫ ===== */
