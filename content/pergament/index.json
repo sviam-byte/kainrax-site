@@ -9,18 +9,18 @@
         "id": "e1",
         "title": "Первая редакция",
         "date": "0067-072",
-        "file": "content/pergament/nastavlenie-molodym/e1.txt"
+        "file": "content/pergament/nastavlenie-molodym/e1.txt",
         "protected": true,
-        "codeHash": "sha256:e14dcd50994c1f1e8931b86df0047daa07d2336c3ec43e885b30d3ae921413e0",
+        "code": "Chronicle",            // ← можно и тут явный
         "codeHint": "доступ: хроникёр и год"
       },
       {
         "id": "e7",
         "title": "Седьмая редакция",
         "date": "0180-001",
-        "file": "content/pergament/nastavlenie-molodym/e7.txt"
+        "file": "content/pergament/nastavlenie-molodym/e7.txt",
         "protected": true,
-        "codeHash": "sha256:e14dcd50994c1f1e8931b86df0047daa07d2336c3ec43e885b30d3ae921413e0",
+        "code": "Chronicle",            // ← можно и тут явный
         "codeHint": "доступ: хроникёр и год"
       },
       {
@@ -29,15 +29,16 @@
         "date": "0250-342",
         "file": "content/pergament/nastavlenie-molodym/e23.txt",
         "protected": true,
-        "codeHash": "sha256:e14dcd50994c1f1e8931b86df0047daa07d2336c3ec43e885b30d3ae921413e0",
+        "code": "Chronicle",            // ← можно и тут явный
         "codeHint": "доступ: хроникёр и год"
-      }
+      },
       {
         "id": "e47",
         "title": "Последняя редакция",
         "date": "0430-349",
-        "file": "content/pergament/nastavlenie-molodym/e1.txt"
-      },
+        "file": "content/pergament/nastavlenie-molodym/e47.txt"
+        /* без protected/code — последняя всегда открыта */
+      }
     ]
   }
 ]
