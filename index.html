@@ -97,13 +97,14 @@
         <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
         <a class="btn" href="#/arcs">Ветки</a>
         <a class="btn" href="#/notes">Заметки</a>
-        <a class="btn" href="#/about">О мире</a>
+        <a class="btn" href="#/scrolls">Пергамент</a>
         <a class="btn" href="#/project">О проекте | планы</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
         <span id="adminBtns">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
           <a class="btn" id="newNoteBtn"  href="/admin/#/collections/notes/new"  target="_blank" rel="noopener">+ Заметка</a>
+          <a class="btn" id="newScrollBtn" href="/admin/#/collections/scrolls/new" target="_blank" rel="noopener">+ Пергамент</a>
         </span>
       </div>
     </div>
@@ -114,7 +115,6 @@
 
   <script>
   /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
-  // Для анонимных комментов — поставь App ID и добавь домены в Cusdis (Settings → Allowed Domains).
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
   const app=document.getElementById('app');
@@ -122,12 +122,13 @@
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
   /* ===== ВЕТКИ ===== */
+  // Больше НЕТ ручного order. Список внутри ветки строится автоматически по stories.
   const arcs=[
-    { id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.', order:['epitimya','tsvetok'] },
-    { id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести, действие в которых происходит внутри Кайнракс.', order:['dorogovato','chelovecheskiy-faktor'] },
-    { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.', order:['ibut-g1','ibut-g2'] }
+    { id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.' },
+    { id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести, действие в которых происходит внутри Кайнракс.' },
+    { id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.' }
   ];
-  const arcById=id=>arcs.find(a=>a.id===id)||{title:'Ветка',order:[]};
+  const arcById=id=>arcs.find(a=>a.id===id)||{id, title:'Ветка', desc:'', order:[]};
   const fmtDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
   const getAnno = (s) => {
     const a = (s.annotation || s.anno || s.summary || '').trim();
@@ -137,27 +138,42 @@
     const cut = 180;
     return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
+  function storiesByArc(arcId){
+    // Автоподбор: все stories с совпадающим arc. Сортировка: сначала по числовому s.order (если есть), затем по дате.
+    return stories
+      .filter(s=> (s.arc||'').toLowerCase() === (arcId||'').toLowerCase())
+      .slice()
+      .sort((a,b)=>{
+        const ao = (a.order??Number.POSITIVE_INFINITY), bo=(b.order??Number.POSITIVE_INFINITY);
+        if (ao!==bo) return ao-bo;
+        return (new Date(a.date||0)) - (new Date(b.date||0)); // старые раньше, для естественного чтения
+      });
+  }
 
   /* ===== ДАННЫЕ + НАДЁЖНАЯ ЗАГРУЗКА ===== */
-  let stories=[], notes=[];
+  let stories=[], notes=[], scrolls=[]; // scrolls = «Пергамент»
   async function loadContent(){
-    // Путь 1: общая выборка
     try{
       const j=await fetch('content/index.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject());
       if(Array.isArray(j.stories)) stories=j.stories;
       if(Array.isArray(j.notes))   notes=j.notes;
+      if(Array.isArray(j.scrolls)) scrolls=j.scrolls; // поддержка content/index.json: { scrolls: [...] }
     }catch(e){
-      // Путь 2: раздельные файлы (старый формат)
       try{
-        const [sj,nj]=await Promise.all([
+        const [sj,nj,pj]=await Promise.all([
           fetch('content/stories.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]),
-          fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():[])
+          fetch('content/notes.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]),
+          fetch('content/scrolls.json',{cache:'no-store'}).then(r=>r.ok?r.json():[])
         ]);
-        stories = Array.isArray(sj)?sj:[]; notes = Array.isArray(nj)?nj:[];
-      }catch(_){}
+        stories = Array.isArray(sj)?sj:[]; 
+        notes   = Array.isArray(nj)?nj:[];
+        scrolls = Array.isArray(pj)?pj:[];
+      }catch(_){ }
     }
-    // сортировка по дате у списка
+    // сортировки
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
+    notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
+    scrolls.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
   }
 
   /* ===== ТЕМА ===== */
@@ -211,14 +227,16 @@
         <aside class="card">
           <h2>Ветки</h2>
           <div class="list">
-            ${arcs.map(a=>`
+            ${arcs.map(a=>{
+              const count = storiesByArc(a.id).length;
+              return `
               <div class="story-item">
                 <a href="#/arc/${a.id}">
                   <div class="title">✶ ${a.title}</div>
-                  <div class="muted">${a.order.length} текст(а)</div>
+                  <div class="muted">${count} текст(а)</div>
                   <div>${a.desc}</div>
                 </a>
-              </div>`).join('')}
+              </div>`;}).join('')}
           </div>
           <h3 style="margin-top:14px">Подписка</h3>
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
@@ -229,18 +247,20 @@
 
   function renderArcs(){
     app.innerHTML=`<section class="card"><h1>Ветки</h1>
-    <div class="list">${arcs.map(a=>`
+    <div class="list">${arcs.map(a=>{
+      const count=storiesByArc(a.id).length;
+      return `
       <div class="story-item"><a href="#/arc/${a.id}">
         <div class="title">✶ ${a.title}</div>
-        <div class="muted">${a.order.length} текст(а)</div>
+        <div class="muted">${count} текст(а)</div>
         <div>${a.desc}</div>
-      </a></div>`).join('')}</div></section>`;
+      </a></div>`}).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
   function renderArc(id){
     const a=arcById(id);
-    const arr=a.order.map(i=>stories.find(s=>s.id===i||s.slug===i)).filter(Boolean);
+    const arr=storiesByArc(a.id);
     app.innerHTML=`<section class="card">
       <a class="back" href="#/arcs">← Ко всем веткам</a>
       <h1>${a.title}</h1><div class="muted">${a.desc}</div>
@@ -279,27 +299,30 @@
     adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
-  function renderAbout(){
-    app.innerHTML=`<section class="card">
-      <h1>О мире «Кайрнакс»</h1>
-      <div class="prose">
-        <p><em>«На поверхности есть сказка — сказка про человека, который однажды убил бога, которому клялся служить. Звали этого человека Каин, и грех его — первородным.</em></p>
-        <p><em>Но Воздвиженцы не клялись в верности ни одним богам.</em><br><em>Они ушли из-под неприветливых божественных крыльев, где вместо перьев был частокол забора, и назвали себя — нацией Каина, Каин-нацией.</em></p>
-        <p><em>Подземная жизнь, суровая и неприхотливая, обточила это имя, и придала ему звучание, какое не могло родиться на поверхности.</em><br><em>Кайнракс.</em><br><em>И имя первого человеческого грешника — человека, который убил бога, который отказался считать себя недостойным божественных стоп, — мы носим с гордостью».</em></p>
-        <p class="muted">Первая редакция; 67г от Воздвижения; Элиара, Второй Хроникёр.</p>
-        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-        <p><em>«Древние сказки Поверхности говорят о грешнике, что поднял руку на своего брата из зависти, и звали его Каин. Но мы, дети Первого Света, знаем истину, которую они забыли! … Кайн-ракс … клятва вечно нести свет разума во тьму слепой веры…»</em></p>
-        <p class="muted">Седьмая редакция; 180г от Воздвижения; Элиара, Второй Хроникёр.</p>
-        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-        <p><em>«…Воздвиженцы были прагматиками. "Убийство бога" — удаление повреждённого модуля ради стабильности системы. Имя Каина — напоминание о цене контроля».</em></p>
-        <p class="muted">Двадцать третья редакция; 250г; Итур, Четвёртый Хроникёр.</p>
-      </div>
-    </section>`;
+  /* ===== ПЕРГАМЕНТ ===== */
+  function renderScrolls(){
+    app.innerHTML=`<section class="card"><h1>Пергамент</h1>
+    <div class="list">${(scrolls||[]).map(sc=>`
+      <div class="story-item"><a href="#/scroll/${sc.id}">
+        <div class="title">✶ ${sc.title}</div>
+        <div class="muted">${fmtDate(sc.date)}${(Array.isArray(sc.tags)&&sc.tags.length)?' · '+sc.tags.map(t=>`#${t}`).join(' '):''}</div>
+      </a>${getAnno(sc)?`<div class="anno">${getAnno(sc)}</div>`:''}</div>`).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
+  }
+  function renderScroll(id){
+    const sc=(scrolls||[]).find(x=>x.id===id||x.slug===id); if(!sc){location.hash='#/scrolls';return;}
+    app.innerHTML=`<a class="back" href="#/scrolls">← К «Пергаменту»</a>
+    <article class="prose" data-id="${sc.id}" data-slug="${sc.slug||sc.id}">
+      <h1>${sc.title}</h1>
+      <div class="muted">${fmtDate(sc.date)}</div>
+      ${(sc.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+    </article>
+    <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
+    mountComments('scroll:'+(sc.slug||sc.id)); setTimeout(restoreScroll,0);
+    adminDockFor('scroll', sc.slug||sc.id); ensureAdminUI();
   }
 
   function renderProject(){
-    // найдём самую свежую заметку с тэгом WIP/планы/в работе для «Прямо сейчас пишется»
     const wip = (notes||[])
       .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
       .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
@@ -320,7 +343,7 @@
   function renderArticle(id){
     const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;}
     const a=arcById(s.arc);
-    const order=a.order.map(i=>stories.find(st=>st.id===i||st.slug===i)).filter(Boolean);
+    const order=storiesByArc(a.id);
     const pos=Math.max(0, order.findIndex(v=>v.id===s.id||v.slug===s.slug));
     const prev=order[pos-1], next=order[pos+1];
 
@@ -385,8 +408,8 @@
       if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML='';
       const s=document.createElement('script');
       s.src='https://utteranc.es/client.js';
-      s.setAttribute('repo','sviam-byte/kainrax-site');      // Issues ON
-      s.setAttribute('issue-term', term || 'home');          // уникальный ключ
+      s.setAttribute('repo','sviam-byte/kainrax-site');
+      s.setAttribute('issue-term', term || 'home');
       s.setAttribute('label','comments');
       s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
       s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s);
@@ -427,6 +450,7 @@
     if (!isAdmin) return adminDockHide();
     if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
     else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
+    else if(kind==='scroll') editThisBtn.href=`/admin/#/collections/scrolls/entries/${slug}`;
     adminDock.style.display='block';
   }
 
@@ -476,14 +500,16 @@
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
-    if(r==='/about'){ renderAbout(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
     if(r==='/notes'){ renderNotes(); return; }
+    if(r==='/scrolls'){ renderScrolls(); return; }
+    if(r==='/about'){ location.hash = '#/scrolls'; return; } // backward compatible
     const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
     const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
+    const mScroll=r.match(/^\/scroll\/(.+)$/); if(mScroll){ renderScroll(mScroll[1]); return; }
     renderList();
   }
 
