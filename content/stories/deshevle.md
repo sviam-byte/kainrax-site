@@ -1,7 +1,7 @@
 ---
 title: 'Дешевле'
 date: 2025-08-09
-minutes: 7
+minutes: 9
 arc: kainrax
 tags: ['Кайнракс', 'эпоха Воздвиженцев', 'миростроение' ]
 annotation: |
