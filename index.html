@@ -313,77 +313,117 @@
           <div class="muted">${fmtDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
 
-  /* ===== ПЕРГАМЕНТ: список/деталь + доступ по коду ===== */
+  /* ===== ПЕРГАМЕНТ ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-  function isProtected(ed){
-    // Поддерживаем два формата
-    if (ed.protected) return true;
-    if (ed.access && ed.access.enabled) return true;
-    if (ed.codeHash) return true;
-    return false;
+  function getYear(ed){ if (ed?.year) return ed.year; if (ed?.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4); return ''; }
+
+  function getAccessMeta(ed, lastEd){
+    // 1) собственные поля редакции
+    if (ed && (ed.codeHash || (ed.access && ed.access.enabled))) {
+      return { codeHash: ed.codeHash||null, access: ed.access||null, hint: ed.codeHint || (ed.access&&ed.access.hint) || null };
+    }
+    // 2) иначе — конфиг последней редакции (общий код для документа)
+    if (lastEd && (lastEd.codeHash || (lastEd.access && lastEd.access.enabled))) {
+      return { codeHash: lastEd.codeHash||null, access: lastEd.access||null, hint: lastEd.codeHint || (lastEd.access&&lastEd.access.hint) || null };
+    }
+    // 3) нет конфига — пусто (в этом случае доступ к прошлым версиям будет запрещён)
+    return { codeHash:null, access:null, hint:null };
   }
-  function getYear(ed){
-    if (ed.year) return ed.year;
-    if (ed.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4);
-    return '';
+
+  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+  async function checkCodeWithMeta(input, meta){
+    const pass=(input||'').trim();
+    if(!pass) return false;
+    if(meta.codeHash){
+      const [alg, hex] = meta.codeHash.split(':');
+      if((alg||'sha256').toLowerCase()!=='sha256') return false;
+      const got = await sha256Hex(pass);
+      return got.toLowerCase()===String(hex||'').toLowerCase();
+    }
+    if(meta.access && meta.access.enabled){
+      const expected = (meta.access.code||'').trim();
+      return expected && pass===expected;
+    }
+    return false; // нет настроек — нет доступа
   }
 
   function renderPergList(){
     const items = pergDocs;
     app.innerHTML = `<section class="card"><h1>Пергамент</h1>
       <div class="list">${items.map(d=>{
-        const e=lastEdition(d)||{}; const lock=(isProtected(e)? ' · 🔒 последняя ред. закрыта' : '');
+        const e=lastEdition(d)||{};
+        // Пишем понятнее: прошлые редакции закрыты, последняя — открыта
+        const lock = (d.editions||[]).length>1 ? ' · 🔒 прошлые редакции по коду' : '';
         return `<div class="story-item">
           <a href="#/perg/${encodeURIComponent(d.id)}">
             <div class="title">📜 ${d.title}</div>
-            <div class="muted">последняя ред.: ${fmtDate(e.date||d.date||'')} ${lock}</div>
+            <div class="muted">последняя ред.: ${fmtDate(e.date||d.date||'')}${lock}</div>
           </a>
           ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
         </div>`; }).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  async function renderPerg(id){
+  function parseHashQuery(){
+    const h = location.hash.split('?')[1]||'';
+    const out={};
+    h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); });
+    return out;
+  }
+
+  async function renderPerg(rawId){
+    // страховка: отрезаем query, даже если роутер не вычистил
+    const id = (rawId||'').split('?')[0];
+
     const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
     if(!d){ location.hash = '#/perg'; return; }
 
     const editions = (d.editions||[]);
     if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
 
-    // выбранная редакция (по hash-параметру ?e=ID, иначе последняя)
-    const eParam = (location.hash.split('?')[1]||'').split('&').find(x=>x.startsWith('e='));
-    const chosenId = eParam ? decodeURIComponent(eParam.split('=')[1]) : editions[editions.length-1].id;
+    // выбранная редакция: по ?e=..., иначе последняя
+    const q = parseHashQuery();
+    const chosenId = q.e || editions[editions.length-1].id;
     let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // проверка доступа — НИКОГДА не спрашиваем код для последней редакции
-    async function ensureAccess(ed){
-      if(!isProtected(ed)) return true;
+    // === Гейт: все НЕ-последние требуют код ===
+    async function ensureAccessForNonLast(ed){
+      if(isLast) return true; // последняя всегда открыта
+      const meta = getAccessMeta(ed, lastEd);
       const key = 'perg:'+d.id+':'+ed.id+':ok';
-      const ok  = localStorage.getItem(key)==='1';
-      if(ok) return true;
-      await showAccessModal({message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access && ed.access.hint)}, async (input)=> checkCode(input, ed));
-      localStorage.setItem(key,'1');
-      return true;
+      if(localStorage.getItem(key)==='1') return true;
+      if(!meta.codeHash && !(meta.access && meta.access.enabled)){
+        // нет настроек для доступа — запрещаем
+        alert('Эта редакция доступна только по коду, но код не задан. Обратитесь к автору.');
+        return false;
+      }
+      const ok = await showAccessModal(
+        { message:'Подтвердите доступ', codeHint: meta.hint },
+        (input)=> checkCodeWithMeta(input, meta)
+      );
+      if(ok){ localStorage.setItem(key,'1'); return true; }
+      return false;
     }
-    if(!isLast){ await ensureAccess(e); }
+
+    const canOpen = await ensureAccessForNonLast(e);
+    if(!canOpen){ location.hash = '#/perg'; return; }
 
     // загрузка тела
     let body = '';
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
-    // Опции селектора редакций
+    // селектор редакций
     const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtDate(x.date||'')}</option>`).join('');
 
-    // Плашка «предыдущая редакция …»
+    // плашка «предыдущая редакция …» (всегда по коду)
     let prevBlock = '';
     if (isLast && editions.length > 1){
       const prev = editions[editions.length-2];
       const prevYear = getYear(prev);
-      const lock = isProtected(prev) ? ' — доступ по коду' : '';
-      prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${prevYear}${lock}</div>`;
+      prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${prevYear} — доступ по коду</div>`;
     }
 
     // UI
@@ -392,7 +432,7 @@
       <article class="with-margin" data-id="${d.id}">
         <div class="prose parchment readbox">
           <h1>📜 ${d.title}</h1>
-          <div class="muted">Редакции: 
+          <div class="muted">Редакции:
             <select id="edSel" class="btn" style="padding:6px 10px">${options}</select>
           </div>
           ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
@@ -406,32 +446,17 @@
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
 
-    // обработчик выбора редакции (перерендер с тем же документом)
     const sel=document.getElementById('edSel');
     if(sel){ sel.onchange=()=>{ const nv=sel.value; const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); } }
 
     mountComments('perg:'+(d.slug||d.id)+':'+(e.id||'')); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
   }
 
-  /* ===== Доступ: проверка кода (codeHash ИЛИ access.code) ===== */
-  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
-  async function checkCode(input, ed){
-    const pass = (input||'').trim();
-    // Приоритет: codeHash -> access.code -> нет защиты
-    if(ed.codeHash){
-      const [alg, hex] = ed.codeHash.split(':');
-      if((alg||'sha256').toLowerCase()!=='sha256') return false;
-      const got = await sha256Hex(pass);
-      return got.toLowerCase()===hex.toLowerCase();
-    }
-    if(ed.access && ed.access.enabled){
-      const expected = (ed.access.code||'').trim();
-      // если не хочешь хранить явный код — убери эту ветку и оставь только codeHash
-      return expected && pass===expected;
-    }
-    return true;
-  }
-  function showAccessModal(cfg, verify){ return new Promise(resolve=>{ const wrap=document.createElement('div'); wrap.className='modal'; wrap.innerHTML=`<div class="box">
+  /* ===== Доступ: модалка (возвращает true/false) ===== */
+  function showAccessModal(cfg, verify){
+    return new Promise(resolve=>{
+      const wrap=document.createElement('div'); wrap.className='modal';
+      wrap.innerHTML=`<div class="box">
         <div style="display:flex; gap:12px; align-items:center">
           <div class="seal" aria-hidden="true"></div>
           <div>
@@ -445,43 +470,22 @@
           <button class="btn" id="cancelBtn">Отмена</button>
         </div>
         <div class="muted" id="err" style="margin-top:8px;display:none">Неверный код</div>
-      </div>`; document.body.appendChild(wrap); const codeIn=wrap.querySelector('#codeIn'); const ok=wrap.querySelector('#okBtn'); const cancel=wrap.querySelector('#cancelBtn'); const err=wrap.querySelector('#err'); function done(){ document.body.removeChild(wrap); resolve(); } cancel.onclick=done; ok.onclick=async()=>{ const pass = await verify(codeIn.value||''); if(pass){ done(); } else { err.style.display='block'; codeIn.select(); } }; codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); }; setTimeout(()=>codeIn.focus(),0); }); }
-
-  /* ===== ЗАМЕТКИ/PROJECT ===== */
-  function renderNotes(){ app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
-    <div class="list">${(notes||[]).map(n=>`
-      <div class="story-item"><a href="#/note/${n.id}">
-        <div class="title">✶ ${n.title}</div>
-        <div class="muted">${fmtDate(n.date)}</div>
-      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
-  function renderNote(id){ const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;} app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-    <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
-      <div>
-        <h1>${n.title}</h1>
-        <div class="muted">${fmtDate(n.date)}</div>
-        ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-      </div>
-      <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-    </article>
-    <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`; mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI(); }
-
-  function renderProject(){
-    const wip = (notes||[])
-      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
-      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
-
-    app.innerHTML=`<section class="card">
-      <h1>О проекте | планы</h1>
-      <div class="prose">
-        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
-      </div>
-    </section>`;
-    adminDockHide(); ensureAdminUI();
+      </div>`;
+      document.body.appendChild(wrap);
+      const codeIn=wrap.querySelector('#codeIn');
+      const ok=wrap.querySelector('#okBtn');
+      const cancel=wrap.querySelector('#cancelBtn');
+      const err=wrap.querySelector('#err');
+      function close(val){ document.body.removeChild(wrap); resolve(val); }
+      cancel.onclick=()=> close(false);
+      ok.onclick=async()=>{
+        const pass = await verify(codeIn.value||'');
+        if(pass){ close(true); }
+        else { err.style.display='block'; codeIn.select(); }
+      };
+      codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
+      setTimeout(()=>codeIn.focus(),0);
+    });
   }
 
   /* ===== КОММЕНТЫ ===== */
@@ -525,11 +529,11 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
-    const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
-    const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
-    const mPerg=r.match(/^\/perg\/(.+)$/); if(mPerg){ renderPerg(mPerg[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(mRead[1]); return; }
+    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(mPerg[1]); return; }
     renderList();
   }
 
