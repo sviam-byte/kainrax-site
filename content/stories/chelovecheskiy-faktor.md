@@ -1,7 +1,7 @@
 ---
 title: "Человеческий фактор"
 date: "2025-07-23"
-minutes: 10
+minutes: 5
 arc: "kainrax"
 tags:
   - "Кайнракс"
