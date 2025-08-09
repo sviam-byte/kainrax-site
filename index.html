@@ -56,7 +56,7 @@
   .title{font-weight:700}
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
   .tag:before{content:"✶";color:var(--muted)}
-  [data-theme="light"] .tag:before{content:"#"}
+  [data-theme="light"] .tag:before{content:"#" }
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
@@ -79,16 +79,15 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* ЧИТАЕМЫЙ ФОН ДЛЯ ТЕКСТОВ (не ломается в "кринже") */
+  /* ЧИТАЕМЫЙ ФОН ДЛЯ ТЕКСТОВ */
   .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  /* Пергаментный стиль */
+  /* Пергамент */
   .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3); color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18)}
   [data-theme="light"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,250,240,.6), transparent 60%), linear-gradient(#fffaf1, #f5ecda); color:#2b2418; border-color:#e8dcc4}
   [data-theme="cringe"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.85), transparent 60%), linear-gradient(#ffffff, #faf7ef); color:#222; border-color:#e9e1d6}
-  .parchment h1{ font-family: Georgia, 'Times New Roman', serif; letter-spacing:.3px }
   .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
 
   /* Маргиналии */
@@ -116,7 +115,7 @@
 
   <header>
     <div class="head">
-      <div class="brand"><a href="#/">Кайрнакс ✶</a></div>
+      <div class="brand"><a href="#/">Кайнракс ✶</a></div>
       <div class="search" style="max-width:860px">
         <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
         <input id="q" type="search" placeholder="Поиск по рассказам…" aria-label="Поиск" />
@@ -316,13 +315,26 @@
 
   /* ===== ПЕРГАМЕНТ: список/деталь + доступ по коду ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
+  function isProtected(ed){
+    // Поддерживаем два формата
+    if (ed.protected) return true;
+    if (ed.access && ed.access.enabled) return true;
+    if (ed.codeHash) return true;
+    return false;
+  }
+  function getYear(ed){
+    if (ed.year) return ed.year;
+    if (ed.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4);
+    return '';
+  }
+
   function renderPergList(){
     const items = pergDocs;
     app.innerHTML = `<section class="card"><h1>Пергамент</h1>
       <div class="list">${items.map(d=>{
-        const e=lastEdition(d)||{}; const lock=(e.protected? ' · 🔒 доступ по коду' : '');
+        const e=lastEdition(d)||{}; const lock=(isProtected(e)? ' · 🔒 последняя ред. закрыта' : '');
         return `<div class="story-item">
-          <a href="#/perg/${d.id}">
+          <a href="#/perg/${encodeURIComponent(d.id)}">
             <div class="title">📜 ${d.title}</div>
             <div class="muted">последняя ред.: ${fmtDate(e.date||d.date||'')} ${lock}</div>
           </a>
@@ -342,28 +354,39 @@
     const eParam = (location.hash.split('?')[1]||'').split('&').find(x=>x.startsWith('e='));
     const chosenId = eParam ? decodeURIComponent(eParam.split('=')[1]) : editions[editions.length-1].id;
     let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
+    const lastEd = editions[editions.length-1];
+    const isLast = (e===lastEd);
 
-    // проверка доступа
+    // проверка доступа — НИКОГДА не спрашиваем код для последней редакции
     async function ensureAccess(ed){
-      if(!ed.protected) return true;
+      if(!isProtected(ed)) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
       const ok  = localStorage.getItem(key)==='1';
       if(ok) return true;
-      await showAccessModal({message:'Подтвердите доступ', codeHint: ed.codeHint}, async (input)=> checkCode(input, ed.codeHash));
+      await showAccessModal({message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access && ed.access.hint)}, async (input)=> checkCode(input, ed));
       localStorage.setItem(key,'1');
       return true;
     }
-
-    await ensureAccess(e);
+    if(!isLast){ await ensureAccess(e); }
 
     // загрузка тела
     let body = '';
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
-    // UI
+    // Опции селектора редакций
     const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtDate(x.date||'')}</option>`).join('');
 
+    // Плашка «предыдущая редакция …»
+    let prevBlock = '';
+    if (isLast && editions.length > 1){
+      const prev = editions[editions.length-2];
+      const prevYear = getYear(prev);
+      const lock = isProtected(prev) ? ' — доступ по коду' : '';
+      prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${prevYear}${lock}</div>`;
+    }
+
+    // UI
     app.innerHTML = `
       <a class="back" href="#/perg">← К «Пергаменту»</a>
       <article class="with-margin" data-id="${d.id}">
@@ -372,8 +395,8 @@
           <div class="muted">Редакции: 
             <select id="edSel" class="btn" style="padding:6px 10px">${options}</select>
           </div>
-          ${d.annotation?`<div class="anno-box" style="margin-top:10px">${d.annotation}</div>`:''}
-
+          ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
+          ${prevBlock}
           ${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
         </div>
         <aside class="margin-notes">${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
@@ -390,9 +413,24 @@
     mountComments('perg:'+(d.slug||d.id)+':'+(e.id||'')); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
   }
 
-  /* ===== Доступ: модалка + проверка кода ===== */
+  /* ===== Доступ: проверка кода (codeHash ИЛИ access.code) ===== */
   async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
-  async function checkCode(input, codeHash){ if(!codeHash) return true; const [alg, hex] = codeHash.split(':'); if((alg||'sha256')!=='sha256') return false; const got = await sha256Hex((input||'').trim()); return got.toLowerCase()===hex.toLowerCase(); }
+  async function checkCode(input, ed){
+    const pass = (input||'').trim();
+    // Приоритет: codeHash -> access.code -> нет защиты
+    if(ed.codeHash){
+      const [alg, hex] = ed.codeHash.split(':');
+      if((alg||'sha256').toLowerCase()!=='sha256') return false;
+      const got = await sha256Hex(pass);
+      return got.toLowerCase()===hex.toLowerCase();
+    }
+    if(ed.access && ed.access.enabled){
+      const expected = (ed.access.code||'').trim();
+      // если не хочешь хранить явный код — убери эту ветку и оставь только codeHash
+      return expected && pass===expected;
+    }
+    return true;
+  }
   function showAccessModal(cfg, verify){ return new Promise(resolve=>{ const wrap=document.createElement('div'); wrap.className='modal'; wrap.innerHTML=`<div class="box">
         <div style="display:flex; gap:12px; align-items:center">
           <div class="seal" aria-hidden="true"></div>
@@ -428,7 +466,6 @@
     <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`; mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI(); }
 
   function renderProject(){
-    // wip/планы/в работе — как прежде, из notes
     const wip = (notes||[])
       .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
       .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
@@ -481,7 +518,20 @@
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
   /* ===== РЕНДЕР ===== */
-  function render(){ const r=state.route; if(r==='/'||r===''){ renderList(); return; } if(r==='/arcs'){ renderArcs(); return; } if(r==='/notes'){ renderNotes(); return; } if(r==='/project'){ renderProject(); return; } if(r==='/perg'){ renderPergList(); return; } const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; } const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; } const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; } const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; } const mPerg=r.match(/^\/perg\/(.+)$/); if(mPerg){ renderPerg(mPerg[1]); return; } renderList(); }
+  function render(){
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
+    if(r==='/project'){ renderProject(); return; }
+    if(r==='/perg'){ renderPergList(); return; }
+    const mRead=r.match(/^\/read\/(.+)$/); if(mRead){ renderArticle(mRead[1]); return; }
+    const mArc=r.match(/^\/arc\/(.+)$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/(.+)$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mNote=r.match(/^\/note\/(.+)$/); if(mNote){ renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/(.+)$/); if(mPerg){ renderPerg(mPerg[1]); return; }
+    renderList();
+  }
 
   loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); });
   </script>
