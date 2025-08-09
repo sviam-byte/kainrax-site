@@ -11,7 +11,7 @@
         "date": "0067-072",
         "file": "content/pergament/nastavlenie-molodym/e1.txt",
         "protected": true,
-        "code": "Chronicle",            // ← можно и тут явный
+        "code": "Chronicle",            
         "codeHint": "доступ: хроникёр и год"
       },
       {
@@ -20,7 +20,7 @@
         "date": "0180-001",
         "file": "content/pergament/nastavlenie-molodym/e7.txt",
         "protected": true,
-        "code": "Chronicle",            // ← можно и тут явный
+        "code": "Chronicle",            
         "codeHint": "доступ: хроникёр и год"
       },
       {
@@ -29,7 +29,7 @@
         "date": "0250-342",
         "file": "content/pergament/nastavlenie-molodym/e23.txt",
         "protected": true,
-        "code": "Chronicle",            // ← можно и тут явный
+        "code": "Chronicle",         
         "codeHint": "доступ: хроникёр и год"
       },
       {
