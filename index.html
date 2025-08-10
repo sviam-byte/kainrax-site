@@ -23,34 +23,26 @@
     --card:rgba(255,255,255,.97); --line:#e6ecf2;
     --accent:#0ea5e9; --accent2:#7c3aed; --link:#1d4ed8;
     --shadow:0 8px 24px rgba(0,0,0,.08); --code:#f6f8fb; --mountain:#dfe7f3; --star:rgba(10,20,40,.85);
+    --prose-w:68ch;
   }
   [data-theme="cringe"]{
     --bg:linear-gradient(135deg,#ffb6f3,#ffd699 50%,#b3f1ff);
     --fg:#111; --muted:#333; --card:rgba(255,255,255,.9); --line:#ffd1f4;
     --accent:#ff3ea5; --accent2:#07f49e; --link:#7c00ff;
     --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb; --star:rgba(0,0,0,.75);
+    --prose-w:66ch;
   }
 
   html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif; letter-spacing:.1px}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;letter-spacing:.1px}
   a{color:var(--link)}
-  h1{margin:6px 0 10px;font-size:clamp(26px,1.6vw + 18px,34px);font-weight:900}
+  h1{margin:.4rem 0 .2rem;font-size:clamp(26px,1.6vw + 18px,34px);font-weight:900}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{background:linear-gradient(180deg,rgba(16,23,35,.96),rgba(16,23,35,.92));border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
   [data-theme="light"] .card{background:var(--card)}
-  .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow); font-variant-caps: all-small-caps; letter-spacing:.4px}
+  .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow);font-variant-caps:all-small-caps;letter-spacing:.4px}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
-  .title{font-weight:800;font-size:1.05rem}
-  .title:before{
-    content:""; display:inline-block; width:14px; height:14px; margin-right:6px;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%238cc9ff' d='M6 0l2 4 4 2-4 2-2 4-2-4-4-2 4-2z'/%3E%3C/svg%3E") no-repeat center/contain;
-    opacity:.9; vertical-align:-1px;
-  }
-  .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
-  .tag:before{content:"✶";color:var(--muted)}
-  [data-theme="light"] .tag:before{content:"#"}
-  .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
   header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
@@ -65,22 +57,27 @@
   @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
   .list{display:flex;flex-direction:column;gap:12px}
   .story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
-  [data-theme="light"] .story-item{background:linear-gradient(180deg, rgba(14,165,233,.06), transparent);border-color:rgba(14,165,233,.18)}
+  [data-theme="light"] .story-item{background:linear-gradient(180deg, rgba(14,165,233,.08), transparent);border-color:rgba(14,165,233,.22)}
+  .story-item a{color:var(--fg);text-decoration:none}
+  .title{font-weight:800}
+  .title:before{
+    content:""; display:inline-block; width:14px; height:14px; margin-right:6px; vertical-align:-1px; opacity:.9;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%238cc9ff' d='M6 0l2 4 4 2-4 2-2 4-2-4-4-2 4-2z'/%3E%3C/svg%3E") no-repeat center/contain;
+  }
+  .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
+  .tag:before{content:"✶";color:var(--muted)}
+  [data-theme="light"] .tag:before{content:"#"}
+  .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
   .progress{position:fixed;left:0;top:0;height:4px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
-  .progress:after{
-    content:""; position:absolute; inset:0; background: radial-gradient(60% 100% at 0% 50%, rgba(255,255,255,.18), transparent);
-    mix-blend-mode:screen; pointer-events:none;
-  }
+  .progress:after{content:"";position:absolute;inset:0;background:radial-gradient(60% 100% at 0% 50%, rgba(255,255,255,.18), transparent);mix-blend-mode:screen;pointer-events:none}
 
-  /* аннотация */
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
   .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
   [data-theme="light"] .anno-box{background:rgba(14,165,233,.08)}
   [data-theme="cringe"] .anno-box{background:rgba(255,62,165,.08)}
   details.anno-dtl summary{cursor:pointer;user-select:none}
 
-  /* фон: звёзды + «горы». В НЕ-кринже прячем */
   #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
   #ceiling,#mountains{display:none}
   [data-theme="cringe"] #ceiling,[data-theme="cringe"] #mountains{display:block}
@@ -91,53 +88,38 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* ЧИТАЕМЫЙ ФОН ДЛЯ ТЕКСТОВ */
-  .prose.readbox{max-width:var(--prose-w); margin:0 auto}
-  .prose.readbox hr{ border:0; height:1px; background:linear-gradient(90deg,transparent,#2a3a52,transparent) }
-  .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
-  [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
-  [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
+  .prose.readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow); max-width:var(--prose-w); margin:0 auto; line-height:1.75}
+  [data-theme="light"] .prose.readbox{background:#fff; border-color:#e6ecf2}
+  [data-theme="cringe"] .prose.readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
+  .prose.readbox hr{ border:0; height:1px; background:linear-gradient(90deg,transparent,#2a3a52,transparent); margin:18px 0 }
 
-  /* Пергамент */
-  .parchment{
-    --sepia-bg1:#fffaf1; --sepia-bg2:#f5ecda;
-    background:linear-gradient(var(--sepia-bg1),var(--sepia-bg2));
-    color:#2b2418; border:1px solid #e7dcc4; box-shadow:0 8px 28px rgba(0,0,0,.18);
-    line-height:1.75;
-  }
+  .parchment{--sepia-bg1:#fffaf1; --sepia-bg2:#f5ecda;
+    background:linear-gradient(var(--sepia-bg1),var(--sepia-bg2)); color:#2b2418;
+    border:1px solid #e7dcc4; box-shadow:0 8px 28px rgba(0,0,0,.18); max-width:66ch; margin:0 auto}
   .scroll-body p{ text-indent:1.2em; margin:0 0 1.05em }
 
-  /* Маргиналии */
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
   .margin-notes{position:sticky;top:76px;align-self:start}
-  .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px; background:linear-gradient(90deg,rgba(225,213,189,.25),transparent)}
+  .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px; background:linear-gradient(90deg,rgba(225,213,189,.15),transparent)}
 
-  /* «терминальный» мягкий курсор в чтении на десктопе */
-  @media (min-width:700px){
-    .prose.readbox{position:relative}
-    .prose.readbox:after{
-      content:"▍"; position:absolute; right:-16px; top:0;
-      color:var(--accent); animation:blink 1.1s steps(1) infinite;
-    }
-    @keyframes blink{50%{opacity:0}}
-  }
-
-  /* модалка доступа */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:20}
   .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);max-width:440px;width:92%}
   .seal{display:inline-block;min-width:64px;min-height:64px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff6b6b,#c81e1e);box-shadow:0 8px 24px rgba(0,0,0,.3);transform-origin:center;animation:seal 1.4s ease-in-out infinite}
   @keyframes seal{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.06)}}
 
-  /* админ-панель скрыта */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminBtns{display:none}
+
+  /* Мягкий псевдокурсор у чтения на широких экранах */
+  @media (min-width:700px){
+    .prose.readbox{position:relative}
+    .prose.readbox:after{content:"▍"; position:absolute; right:-16px; top:0; color:var(--accent); animation:blink 1.1s steps(1) infinite}
+    @keyframes blink{50%{opacity:0}}
+  }
   </style>
 </head>
 <body>
-  <!-- лёгкий «glitch/halo» доступен без сторонних ассетов -->
-  <svg width="0" height="0" style="position:absolute"><filter id="fx-noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter></svg>
-
   <canvas id="stars" aria-hidden="true"></canvas>
   <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
@@ -167,39 +149,48 @@
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
+  <!-- Фильтр «шум» для мягких эффектов (используется локально в CSS при желании) -->
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="fx-noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" /></filter>
+  </svg>
+
   <script>
-  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ =====
+  /* ===== ДОСТУП К ПЕРГАМЕНТУ: ГЛОБАЛЬНЫЕ НАСТРОЙКИ =====
      Варианты:
        1) ЯВНЫЙ КОД:   PERG.CODE = 'Chronicle'
-       2) ХЭШ КОДА:    PERG.CODE_HASH = 'sha256:....hex'
-     Приоритет: CODE_HASH > CODE. Последняя редакция ВСЕГДА открыта.
-     Можно переопределить на уровне конкретной редакции в манифесте:
+       2) ХЭШ КОДА:    PERG.CODE_HASH = 'sha256:....hex'    (приоритетнее)
+     Последняя редакция ВСЕГДА открыта. Для не-последних можно переопределить в манифесте редакции:
        { protected:true, code:"..." }  или  { protected:true, codeHash:"sha256:..." }
   */
   const PERG = {
-    CODE: 'Chronicle',           // <<<< ЯВНЫЙ КОД (можно сменить)
-    CODE_HASH: null              // например: 'sha256:e14dcd50....'; если задан, перекрывает CODE
+    CODE: 'Chronicle',    // <<<< твой явный код
+    CODE_HASH: null       // например: 'sha256:e14dcd50...'; если задан, перекрывает CODE
   };
 
-  /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
+  /* ===== КОНСТАНТЫ / СОСТОЯНИЕ ===== */
+  // Для анонимных комментариев (Cusdis). Поставь свой ID или оставь пусто, чтобы скрыть вкладку.
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
-  const app=document.getElementById('app');
-  const qEl=document.getElementById('q');
-  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
+  const app = document.getElementById('app');
+  const qEl = document.getElementById('q');
+  const state = {
+    theme: localStorage.getItem('theme') || 'dark',
+    route: location.hash.slice(1) || '/',
+    q: ''
+  };
 
   /* ===== УТИЛЫ ===== */
-  const fmtHumanDate=iso=>{
-    try{
-      const d=new Date(iso);
-      if(!isFinite(d)) return String(iso||'');
+  const fmtHumanDate = iso => {
+    try {
+      const d = new Date(iso);
+      if (!isFinite(d)) return String(iso||'');
       return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});
-    }catch(_){return String(iso||'')}
+    } catch(_){ return String(iso||''); }
   };
 
   // Формат «N-й день M-го года.» для строк вида YYYY-DOY (например, "0430-349")
   function fmtPergDayYear(s){
-    if(typeof s!== 'string') return String(s||'');
+    if(typeof s !== 'string') return String(s||'');
     const m = s.match(/^(\d{4})-(\d{3})$/); // YYYY-DOY
     if(!m) return fmtHumanDate(s);
     const year = Number(m[1]);
@@ -207,29 +198,34 @@
     return `${day}-й день ${year}-го года.`;
   }
 
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
+
   const getAnno = (s) => {
     const a = (s.annotation || s.anno || s.summary || '').trim();
-    if (a) return a;
-    const txt = (s.text || '').replace(/\s+/g, ' ').trim();
+    if (a) return esc(a);
+    const txt = String(s.text || '').replace(/\s+/g, ' ').trim();
     if (!txt) return '';
-    const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
+    const cut = 180; return esc(txt.length > cut ? txt.slice(0, cut) + '…' : txt);
   };
 
   /* ===== ДАННЫЕ ===== */
-  let stories=[], notes=[], pergDocs=[]; // pergDocs: документы с редакциями
-  async function safeJson(url, def){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
+  let stories=[], notes=[], pergDocs=[];
+  async function safeJson(url, def){
+    try{
+      const r = await fetch(url,{cache:'no-store'});
+      if(!r.ok) return def;
+      return await r.json();
+    }catch(_){ return def; }
+  }
   async function loadContent(){
     const j = await safeJson('content/index.json', {});
-    if(Array.isArray(j.stories)) stories=j.stories; else stories=await safeJson('content/stories.json', []);
-    if(Array.isArray(j.notes))   notes=j.notes;   else notes  =await safeJson('content/notes.json',   []);
-
-    // ПЕРГАМЕНТ: отдельный манифест (папка content/pergament/index.json)
-    pergDocs = await safeJson('content/pergament/index.json', []);
+    stories = Array.isArray(j.stories) ? j.stories : await safeJson('content/stories.json', []);
+    notes   = Array.isArray(j.notes)   ? j.notes   : await safeJson('content/notes.json',   []);
+    pergDocs= await safeJson('content/pergament/index.json', []);
 
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
     notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
 
-    // сортируем Пергамент по последней по дате редакции
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
       const ad=(a.editions||[]); const bd=(b.editions||[]);
@@ -254,17 +250,26 @@
     applyTheme();
   };
 
-  /* ===== ADMIN MODE (скрыт) ===== */
+  /* ===== ADMIN MODE (скрытый тумблер Alt+Shift+A) ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  function ensureAdminUI(){ document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none'; if(!isAdmin) adminDockHide(); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
+  if(new URLSearchParams(location.search).has('admin')){
+    localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash);
+  }
+  function ensureAdminUI(){
+    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
+    if(!isAdmin) adminDockHide();
+  }
+  addEventListener('keydown',e=>{
+    if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){
+      isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI();
+    }
+  });
 
   /* ===== ROUTER ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== ВЬЮХИ: ГЛАВНАЯ/ВЕТКИ/СТАТЬИ ===== */
+  /* ===== ВЬЮХИ ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
@@ -272,13 +277,28 @@
   };
   function buildArcs(){
     const map = {};
-    for(const s of stories){ const id=s.arc||'kainrax'; if(!map[id]) map[id]={...(arcMeta[id]||{id,title:id,desc:''}), items:[]}; map[id].items.push(s); }
-    for(const k in map){ map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (new Date(a.date||0))-(new Date(b.date||0)) ); }
+    for(const s of stories){
+      const id=s.arc||'kainrax';
+      if(!map[id]) map[id] = { ...(arcMeta[id]||{id,title:id,desc:''}), items:[] };
+      map[id].items.push(s);
+    }
+    for(const k in map){
+      map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (new Date(a.date||0))-(new Date(b.date||0)) );
+    }
     return Object.values(map);
   }
+
   function renderList(){
     const q=state.q;
-    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+    const items=stories.filter(s=>{
+      if(!q) return true;
+      const hay = [
+        (s.title||''),
+        (s.text||''),
+        (s.tags||[]).join(' ')
+      ].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
     const arcs = buildArcs();
     app.innerHTML = `
       <div class="grid">
@@ -287,16 +307,15 @@
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
           <div class="list">
             ${
-              items.length
-              ? items.map(s=>`
-              <div class="story-item">
-                <a href="#/read/${s.id}">
-                  <div class="title">✶ ${s.title||'Без названия'}</div>
-                  <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
-                </a>
-                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
-              </div>`).join('')
-              : `<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>`
+              items.length ? items.map(s=>`
+                <div class="story-item">
+                  <a href="#/read/${encodeURIComponent(s.id)}">
+                    <div class="title">✶ ${esc(s.title||'Без названия')}</div>
+                    <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round(String(s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+                  </a>
+                  ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+                </div>
+              `).join('') : `<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>`
             }
           </div>
         </section>
@@ -306,12 +325,13 @@
           <div class="list">
             ${arcs.map(a=>`
               <div class="story-item">
-                <a href="#/arc/${a.id}">
-                  <div class="title">✶ ${a.title}</div>
+                <a href="#/arc/${encodeURIComponent(a.id)}">
+                  <div class="title">✶ ${esc(a.title)}</div>
                   <div class="muted">${a.items.length} текст(а)</div>
-                  <div>${a.desc||''}</div>
+                  <div>${esc(a.desc||'')}</div>
                 </a>
-              </div>`).join('')}
+              </div>
+            `).join('')}
           </div>
           <h3 style="margin-top:14px">Подписка</h3>
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
@@ -319,68 +339,75 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
   }
+
   function renderArcs(){
     const arcs=buildArcs();
     app.innerHTML = `
-      <section class="card"><h1>Ветки</h1>
+      <section class="card">
+        <h1>Ветки</h1>
         <div class="list">
           ${arcs.map(a=>`
-            <div class="story-item"><a href="#/arc/${a.id}">
-              <div class="title">✶ ${a.title}</div>
+            <div class="story-item"><a href="#/arc/${encodeURIComponent(a.id)}">
+              <div class="title">✶ ${esc(a.title)}</div>
               <div class="muted">${a.items.length} текст(а)</div>
-              <div>${a.desc||''}</div>
+              <div>${esc(a.desc||'')}</div>
             </a></div>`).join('')}
         </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
+
   function renderArc(id){
-    const arcs=buildArcs(); const a=arcs.find(x=>x.id===id)||{id,title:'Ветка',items:[],desc:''};
+    const arcs=buildArcs();
+    const a=arcs.find(x=>x.id===id)||{id,title:'Ветка',items:[],desc:''};
     app.innerHTML = `
       <section class="card">
         <a class="back" href="#/arcs">← Ко всем веткам</a>
-        <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
+        <h1>${esc(a.title)}</h1><div class="muted">${esc(a.desc||'')}</div>
         <ol class="list" style="margin-top:10px">
           ${a.items.map((s,i)=>`
-            <li class="story-item">
-              <a href="#/read/${s.id}">
-                <div class="title">✶ ${i+1}. ${s.title}</div>
-                <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
-              </a>
-              ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
-            </li>`).join('')}
+          <li class="story-item">
+            <a href="#/read/${encodeURIComponent(s.id)}">
+              <div class="title">✶ ${i+1}. ${esc(s.title)}</div>
+              <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round(String(s.text||'').length/1100))} мин</div>
+            </a>
+            ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+          </li>`).join('')}
         </ol>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
+
   function renderArticle(id){
-    const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;}
-    const arcs=buildArcs(); const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]}; const order=a.items;
-    const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
+    const s=stories.find(x=>x.id===id||x.slug===id);
+    if(!s){location.hash='#/'; return;}
+    const arcs=buildArcs(); const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
     const prev=order[pos-1], next=order[pos+1];
+
+    const tags = (s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${esc(t)}</a>`).join(' ');
+    const body = String(s.text||'').split(/\n\n+/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');
+
     app.innerHTML = `
       <a class="back" href="#/">← К списку</a>
-      <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
+      <article class="with-margin" data-id="${esc(s.id)}" data-slug="${esc(s.slug||s.id)}">
         <div class="prose readbox">
-          <h1>${s.title}</h1>
-          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a> (${pos+1}/${order.length})</div>
-          <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+          <h1>${esc(s.title)}</h1>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round(String(s.text||'').length/1100))} мин · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a> (${pos+1}/${order.length})</div>
+          <div style="margin:6px 0 12px">${tags}</div>
 
-          ${
-            getAnno(s)
-            ? `<details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
-                <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
-                <div style="margin-top:8px">${getAnno(s)}</div>
-              </details>`
-            : ``
-          }
+          ${getAnno(s) ? `
+            <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
+              <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
+              <div style="margin-top:8px">${getAnno(s)}</div>
+            </details>` : ``}
 
-          ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+          ${body}
 
-          <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+          <hr>
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read/${encodeURIComponent(prev.id)}">← ${esc(prev.title)}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${encodeURIComponent(next.id)}">${esc(next.title)} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -390,20 +417,25 @@
         <h3>Комментарии</h3>
         <section id="comments"></section>
       </section>`;
-    mountComments('story:'+(s.slug||s.id)); setTimeout(restoreScroll,0); adminDockFor('story', s.slug||s.id); ensureAdminUI();
+    mountComments('story:'+(s.slug||s.id));
+    setTimeout(restoreScroll,0);
+    adminDockFor('story', s.slug||s.id);
+    ensureAdminUI();
   }
+
   function renderTag(tag){
     const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
     app.innerHTML = `
       <section class="card">
         <a class="back" href="#/">← На главную</a>
-        <h1>#${tag}</h1>
+        <h1>#${esc(tag)}</h1>
         <div class="list">
           ${items.map(s=>`
-            <div class="story-item"><a href="#/read/${s.id}">
-              <div class="title">✶ ${s.title}</div>
-              <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
-            </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}
+            <div class="story-item"><a href="#/read/${encodeURIComponent(s.id)}">
+              <div class="title">✶ ${esc(s.title)}</div>
+              <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round(String(s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+            </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>
+          `).join('')}
         </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
@@ -412,10 +444,11 @@
   /* ===== ПЕРГАМЕНТ ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function isProtected(ed){ return !!(ed && (ed.protected || ed.code || ed.codeHash || (ed.access && ed.access.enabled))); }
-  function pergPrevYear(ed){
-    if(ed?.year) return ed.year;
-    if (ed?.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4);
-    return '';
+  function parseHashQuery(){
+    const h = location.hash.split('?')[1]||'';
+    const out={};
+    h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); });
+    return out;
   }
 
   function renderPergList(){
@@ -426,24 +459,17 @@
           ${items.map(d=>{
             const e=lastEdition(d)||{};
             return `
-              <div class="story-item">
-                <a href="#/perg/${encodeURIComponent(d.id)}">
-                  <div class="title">📜 ${d.title}</div>
-                  <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
-                </a>
-                ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
-              </div>`;
+            <div class="story-item">
+              <a href="#/perg/${encodeURIComponent(d.id)}">
+                <div class="title">📜 ${esc(d.title)}</div>
+                <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
+              </a>
+              ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
+            </div>`;
           }).join('')}
         </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
-  }
-
-  function parseHashQuery(){
-    const h = location.hash.split('?')[1]||'';
-    const out={};
-    h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); });
-    return out;
   }
 
   async function renderPerg(rawId){
@@ -463,7 +489,6 @@
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // === Доступ: последняя редакция ВСЕГДА открыта; остальные — только по коду ===
     async function ensureAccessForNonLast(ed){
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
@@ -479,36 +504,34 @@
     const canOpen = await ensureAccessForNonLast(e);
     if(!canOpen){ location.hash = '#/perg'; return; }
 
-    // загрузка тела
     let body = '';
-    try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
-    catch(_){ body = '(не удалось загрузить текст)'; }
+    try{
+      body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject());
+    } catch(_){ body = '(не удалось загрузить текст)'; }
 
-    // селектор редакций
-    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
+    const options = editions.map(x=>`<option value="${esc(x.id)}" ${x.id===e.id?'selected':''}>${esc(x.title||x.id)} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
 
-    // плашка «предыдущая редакция …» (всегда по коду)
     let prevBlock = '';
     if (isLast && editions.length > 1){
       const prev = editions[editions.length-2];
       prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prev.date||'')} — доступ по коду</div>`;
     }
 
+    const bodyHtml = String(body||'').split(/\n\n+/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');
+
     app.innerHTML = `
       <a class="back" href="#/perg">← К «Пергаменту»</a>
-      <article class="with-margin" data-id="${d.id}">
+      <article class="with-margin" data-id="${esc(d.id)}">
         <div class="prose parchment readbox">
-          <h1>📜 ${d.title}</h1>
+          <h1>📜 ${esc(d.title)}</h1>
           <div class="muted">Редакции:
             <select id="edSel" class="btn" style="padding:6px 10px">${options}</select>
           </div>
-          ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
+          ${d.annotation?`<div class="anno" style="margin-top:6px">${esc(d.annotation)}</div>`:''}
           ${prevBlock}
-          <div class="scroll-body">
-            ${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-          </div>
+          <div class="scroll-body">${bodyHtml}</div>
         </div>
-        <aside class="margin-notes">${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
+        <aside class="margin-notes">${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${esc(m)}</div>`).join('')}</aside>
       </article>
 
       <section class="card" style="margin-top:16px">
@@ -516,18 +539,27 @@
       </section>`;
 
     const sel=document.getElementById('edSel');
-    if(sel){ sel.onchange=()=>{ const nv=sel.value; const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); } }
+    if(sel){
+      sel.onchange=()=>{ const nv=sel.value; const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); };
+    }
 
-    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||'')); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
+    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||''));
+    setTimeout(restoreScroll,0);
+    adminDockFor('perg', d.slug||d.id);
+    ensureAdminUI();
   }
 
   /* ===== ДОСТУП: проверка кода ===== */
-  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+  async function sha256Hex(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    const arr = Array.from(new Uint8Array(buf));
+    return arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
   async function checkPergCode(input, ed){
     const pass = (input||'').trim();
     if(!pass) return false;
 
-    // 1) приоритет: редакционный codeHash / code
     if(ed && ed.codeHash){
       const [alg, hex] = String(ed.codeHash).split(':');
       if((alg||'sha256').toLowerCase()==='sha256'){
@@ -539,7 +571,6 @@
       return pass === String(ed.code).trim();
     }
 
-    // 2) глобальные настройки PERG: CODE_HASH > CODE
     if(PERG.CODE_HASH){
       const [alg, hex] = String(PERG.CODE_HASH).split(':');
       if((alg||'sha256').toLowerCase()==='sha256'){
@@ -550,20 +581,19 @@
     if(PERG.CODE){
       return pass === String(PERG.CODE).trim();
     }
-
     return false;
   }
 
   function showAccessModal(cfg, verify){
     return new Promise(resolve=>{
       const wrap=document.createElement('div'); wrap.className='modal';
-      wrap.innerHTML = `
+      wrap.innerHTML=`
         <div class="box">
           <div style="display:flex; gap:12px; align-items:center">
             <div class="seal" aria-hidden="true"></div>
             <div>
-              <h3 style="margin:0 0 6px">${(cfg&&cfg.message)||'Ваш доступ?'}</h3>
-              <div class="muted" style="margin-bottom:10px">${cfg&&cfg.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.'}</div>
+              <h3 style="margin:0 0 6px">${esc((cfg&&cfg.message)||'Ваш доступ?')}</h3>
+              <div class="muted" style="margin-bottom:10px">${esc(cfg&&cfg.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.')}</div>
             </div>
           </div>
           <div style="display:flex; gap:8px; margin-top:12px">
@@ -582,49 +612,54 @@
       cancel.onclick=()=> close(false);
       ok.onclick=async()=>{
         const pass = await verify(codeIn.value||'');
-        if(pass){ close(true); }
-        else { err.style.display='block'; codeIn.select(); }
+        if(pass){ close(true); } else { err.style.display='block'; codeIn.select(); }
       };
       codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
       setTimeout(()=>codeIn.focus(),0);
     });
   }
 
-  /* ===== ЗАМЕТКИ/PROJECT ===== */
+  /* ===== ЗАМЕТКИ / PROJECT ===== */
   function renderNotes(){
     app.innerHTML = `
-      <section class="card"><h1>Авторские заметки</h1>
-        <div class="list">${
-          (notes||[]).map(n=>`
-            <div class="story-item"><a href="#/note/${n.id}">
-              <div class="title">✶ ${n.title}</div>
+      <section class="card">
+        <h1>Авторские заметки</h1>
+        <div class="list">
+          ${(notes||[]).map(n=>`
+            <div class="story-item"><a href="#/note/${encodeURIComponent(n.id)}">
+              <div class="title">✶ ${esc(n.title)}</div>
               <div class="muted">${fmtHumanDate(n.date)}</div>
-            </a></div>`).join('')
-        }</div>
+            </a></div>`).join('')}
+        </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
+
   function renderNote(id){
-    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
+    const n=(notes||[]).find(x=>x.id===id||x.slug===id);
+    if(!n){location.hash='#/notes';return;}
+    const body = String(n.text||'').split(/\n\n+/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');
     app.innerHTML = `
       <a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
+      <article class="prose readbox with-margin" data-id="${esc(n.id)}" data-slug="${esc(n.slug||n.id)}">
         <div>
-          <h1>${n.title}</h1>
+          <h1>${esc(n.title)}</h1>
           <div class="muted">${fmtHumanDate(n.date)}</div>
-          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+          ${body}
         </div>
-        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
+        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${esc(m)}</div>`).join('')}</aside>
       </article>
       <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
+    mountComments('note:'+(n.slug||n.id));
+    setTimeout(restoreScroll,0);
+    adminDockFor('note', n.slug||n.id);
+    ensureAdminUI();
   }
 
   function renderProject(){
     const wip = (notes||[])
       .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
       .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
-
     app.innerHTML = `
       <section class="card">
         <h1>О проекте | планы</h1>
@@ -634,7 +669,10 @@
           <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
           <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
           <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-          <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
+          <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${
+            wip ? `<a href="#/note/${encodeURIComponent(wip.id)}">${esc(wip.title)}</a> · ${fmtHumanDate(wip.date)}`
+                : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`
+          }</div>
         </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
@@ -652,22 +690,50 @@
       <div id="c-anon" style="display:none;min-height:300px"></div>`;
     const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon');
     let ghLoaded=false, anonLoaded=false;
-    function loadGH(){ if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML=''; const s=document.createElement('script'); s.src='https://utteranc.es/client.js'; s.setAttribute('repo','sviam-byte/kainrax-site'); s.setAttribute('issue-term', term || 'home'); s.setAttribute('label','comments'); s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark'); s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s); }
+
+    function loadGH(){
+      if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML='';
+      const s=document.createElement('script');
+      s.src='https://utteranc.es/client.js';
+      s.setAttribute('repo','sviam-byte/kainrax-site');
+      s.setAttribute('issue-term', term || 'home');
+      s.setAttribute('label','comments');
+      s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');
+      s.setAttribute('crossorigin','anonymous');
+      s.async=true; ghBox.appendChild(s);
+    }
     function loadAnon(){
       if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
       if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML='';
-      const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID; t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark'; anonBox.appendChild(t);
+      const t=document.createElement('div');
+      t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID;
+      t.dataset.pageId=term || (location.pathname+location.hash);
+      t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ru';
+      t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark';
+      anonBox.appendChild(t);
       if (!window.__cusdisLoaded){
-        const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js'; s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }; document.body.appendChild(s);
-      } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
+        const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
+        s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} };
+        document.body.appendChild(s);
+      } else {
+        try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){}
+      }
     }
     function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
     function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
-    wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
-    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
+    wrap.querySelector('#tab-gh').onclick=showGH;
+    wrap.querySelector('#tab-anon').onclick=showAnon;
+    const io=new IntersectionObserver(es=>{
+      if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); }
+    },{rootMargin:'200px'}); io.observe(wrap);
   }
-  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
-  function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
+  function setUtterancesTheme(theme){
+    const iframe=document.querySelector('iframe.utterances-frame');
+    if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es');
+  }
+  function setCusdisTheme(){
+    try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){}
+  }
 
   /* ===== АДМИН ПЛАВАЮЩАЯ КНОПКА ===== */
   const adminDock=document.getElementById('adminDock');
@@ -692,14 +758,15 @@
       const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
       progress.style.width=(isFinite(pct)?pct:0)+'%';
       const id=art.dataset.slug||art.dataset.id;
-      if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      if(id){ localStorage.setItem('read:'+id, String(window.scrollY)); }
       ticking=false;
     });
   }
   addEventListener('scroll', onScroll, {passive:true});
   function restoreScroll(){
     const art=document.querySelector('article'); if(!art) return;
-    const id=art.dataset.slug||art.dataset.id; const y=+localStorage.getItem('read:'+id)||0; if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
+    const id=art.dataset.slug||art.dataset.id; const y=+localStorage.getItem('read:'+id)||0;
+    if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
   /* ===== ЗВЁЗДЫ (фон) ===== */
@@ -708,7 +775,11 @@
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
   addEventListener('resize', resize);
-  function makeStars(){ const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120; const k = (W*H)/30000; const count = Math.floor(base + k); starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2 })); }
+  function makeStars(){
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120;
+    const k = (W*H)/30000; const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2 }));
+  }
   function drawStars(ts, once=false){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
@@ -728,15 +799,18 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(mRead[1]); return; }
-    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(decodeURIComponent(mRead[1])); return; }
+    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(decodeURIComponent(mArc[1])); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ renderNote(mNote[1]); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(mPerg[1]); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ renderNote(decodeURIComponent(mNote[1])); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(decodeURIComponent(mPerg[1])); return; }
     renderList();
   }
 
-  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); });
+  loadContent().then(()=>{
+    applyTheme(); render(); ensureAdminUI(); resize();
+    if(!prefersReduced) requestAnimationFrame(drawStars);
+  });
   </script>
 </body>
 </html>
