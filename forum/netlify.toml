@@ -1,0 +1,9 @@
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+  Cache-Control = "public, max-age=60"
+
+[[redirects]]
+  from = "/t/:id"
+  to = "/thread.html#/:id"
+  status = 302
