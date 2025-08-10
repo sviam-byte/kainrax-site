@@ -5,28 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Доска сектора — Кайнракс</title>
   <meta name="theme-color" content="#0b0f14" />
-
-  <!-- Внутримировой фавикон: гекс + искра -->
-  <link rel="icon" href='data:image/svg+xml;utf8,
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-    <defs>
-      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#7dd3fc"/>
-        <stop offset="1" stop-color="#a78bfa"/>
-      </linearGradient>
-    </defs>
-    <path d="M16 6 L48 6 L58 32 L48 58 L16 58 L6 32 Z" fill="#0b1422" stroke="url(#g)" stroke-width="3" />
-    <path d="M32 10 L35 22 L48 24 L35 28 L32 40 L29 28 L16 24 L29 22 Z" fill="#7dd3fc" fill-opacity=".9"/>
-  </svg>' />
-
+  <!-- Внутримировой фавикон: сигилл-звезда -->
+  <link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/ radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="/assets/forum.css" />
-  <script defer data-domain="forum.kainrax.site" src="https://plausible.io/js/script.js"></script>
   <style>
-    /* Ползущая линия свода */
+    /* Ползущая линия свода (как на основном) */
     #sky-line{
       position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);
       background:radial-gradient(ellipse 80% 150% at 50% 50%, rgba(125,211,252,.9) 0%, transparent 40%);
     }
+    /* Небольшие правки для индекса */
+    .kx-board{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+    .kx-board .kx-tag{cursor:pointer}
   </style>
 </head>
 <body>
@@ -44,34 +34,13 @@
     <section class="kx-panel">
       <h1>Доска сектора</h1>
       <p class="kx-muted">Быт, странности, техузлы. Внутримировая «доска» Кайнракс.</p>
+      <div id="filters" class="kx-board"></div>
       <div id="threads" class="kx-grid"></div>
     </section>
   </main>
 
   <script type="module">
-    // ===== Дата "N-й день YYYY-го года, HH:MM"
-    function fmtDayYear(s){
-      if(!s) return '';
-      if(/^\d{4}-\d{2}-\d{2}/.test(s)){ // ISO -> DOY
-        const d=new Date(s);
-        const yy=d.getUTCFullYear();
-        const start=new Date(Date.UTC(yy,0,1));
-        const doy=Math.floor((d - start)/86400000)+1;
-        const hh=String(d.getHours()).padStart(2,'0');
-        const mm=String(d.getMinutes()).padStart(2,'0');
-        return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
-      }
-      const m=(s+'').trim().match(/^(\d{4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
-      if(m){
-        const yy=+m[1], doy=+m[2];
-        const hh=m[3]?m[3].padStart(2,'0'):'00';
-        const mm=m[4]?m[4]:'00';
-        return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
-      }
-      return s;
-    }
-
-    // ===== Полоса неба (время суток -> позиция)
+    // ===== Полоса неба по времени суток =====
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
       function tick(){
@@ -84,30 +53,74 @@
       requestAnimationFrame(tick);
     })();
 
-    // ===== Список тем
+    // ===== Формат даты: "N-й день YYYY-го года, HH:MM" =====
+    function fmtDayYear(s){
+      if(!s) return '';
+      if(/^\d{4}-\d{2}-\d{2}/.test(s)){ // ISO
+        const d=new Date(s); const y=d.getUTCFullYear();
+        const start=new Date(Date.UTC(y,0,1));
+        const doy=Math.floor((d-start)/86400000)+1;
+        const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+        return `${doy}-й день ${y}-го года, ${hh}:${mm}`;
+      }
+      const m=String(s).trim().match(/^(\d{4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
+      if(m){
+        const y=+m[1], doy=+m[2];
+        const hh=m[3]?m[3].padStart(2,'0'):'00', mm=m[4]?m[4]:'00';
+        return `${doy}-й день ${y}-го года, ${hh}:${mm}`;
+      }
+      return s;
+    }
+
+    function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+    // ===== Загрузка индекса и рендер =====
     const box=document.getElementById('threads');
+    const filt=document.getElementById('filters');
+    let allItems=[], currentBoard='';
+
     async function loadIndex(){
       try{
         const r=await fetch('/content/threads-index.json',{cache:'no-store'});
-        if(!r.ok) throw new Error('index missing');
+        if(!r.ok) throw 0;
         return await r.json();
       }catch(_){ return []; }
     }
-    function card(t){
+
+    function itemCard(t){
       const when=fmtDayYear(t.created);
-      const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${x}</span>`).join(' ');
+      const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${escapeHTML(x)}</span>`).join(' ');
       const preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+'…';
       return `<article class="kx-thread">
         <a class="kx-link" href="/thread.html#/${t.id}">
-          <h3 class="kx-title">✶ ${t.title}</h3>
-          <div class="kx-sub muted">${when} · ${t.author||'anon'} · сектор: ${t.sector||'—'}${t.board?` · раздел: ${t.board}`:''}</div>
-          <p class="kx-preview">${preview}</p>
+          <h3 class="kx-title">✶ ${escapeHTML(t.title)}</h3>
+          <div class="kx-sub muted">${when} · ${escapeHTML(t.author||'anon')} · сектор: ${escapeHTML(t.sector||'—')}${t.board?` · раздел: ${escapeHTML(t.board)}`:''}</div>
+          <p class="kx-preview">${escapeHTML(preview)}</p>
           <div class="kx-tags">${tags}</div>
         </a>
       </article>`;
     }
-    const items=await loadIndex();
-    box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-muted">Тем пока нет.</div>`;
+
+    function renderList(){
+      const items = currentBoard ? allItems.filter(x=> (x.board||'')===currentBoard) : allItems;
+      box.innerHTML = items.length ? items.map(itemCard).join('') : `<div class="kx-muted">Тем пока нет.</div>`;
+    }
+
+    function renderBoards(){
+      const boards = Array.from(new Set(allItems.map(x=>x.board).filter(Boolean)));
+      if(!boards.length){ filt.innerHTML=''; return; }
+      const tag = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" data-board="${escapeHTML(b)}">${escapeHTML(b)}</span>`;
+      filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" data-board="">Все</span>` + boards.map(tag).join('');
+      filt.onclick = e=>{
+        const el=e.target.closest('.kx-tag'); if(!el) return;
+        currentBoard = el.dataset.board || '';
+        renderBoards(); renderList();
+      };
+    }
+
+    allItems = await loadIndex();
+    renderBoards();
+    renderList();
   </script>
 </body>
 </html>
