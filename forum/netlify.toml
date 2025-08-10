@@ -1,9 +1,16 @@
-[[headers]]
-  for = "/content/*"
-  [headers.values]
-  Cache-Control = "public, max-age=60"
+[build]
+  base = "forum"
+  publish = "forum"
+  command = "npm ci && npm run build"
 
+# красивые короткие URL на тред
 [[redirects]]
   from = "/t/:id"
   to = "/thread.html#/:id"
   status = 302
+
+# кэш индекса на минуту, чтобы не липло
+[[headers]]
+  for = "/content/threads-index.json"
+  [headers.values]
+  Cache-Control = "public, max-age=60, must-revalidate"
