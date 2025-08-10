@@ -1,0 +1,43 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Кайнракс — Доска сектора</title>
+<link rel="stylesheet" href="/assets/forum.css">
+<meta name="theme-color" content="#0b0f14">
+<script defer data-domain="forum.kainrax.site" src="https://plausible.io/js/script.js"></script>
+</head><body>
+<header class="head">
+  <a class="brand" href="/">Кайнракс ✶</a>
+  <nav>
+    <a class="btn" href="/">К рассказам</a>
+    <a class="btn" href="/index.html">Темы</a>
+  </nav>
+</header>
+
+<main id="app" class="card">
+  <h1>Доска сектора</h1>
+  <div id="list" class="list"></div>
+</main>
+
+<script type="module">
+async function fetchIndex() {
+  // на ходу собираем список по манифесту; если не хочешь генерить манифест — можно сделать fetch к папке через предсобранный index.json
+  const res = await fetch('/content/threads-index.json', {cache:'no-store'});
+  return res.ok ? res.json() : [];
+}
+function itemHtml(t){
+  const d=new Date(t.created);
+  const when=d.toLocaleString('ru-RU',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'});
+  const tags=(t.tags||[]).map(x=>`<span class="tag">${x}</span>`).join(' ');
+  return `<article class="thread">
+    <h3><a href="/thread.html#/${t.id}">${t.title}</a></h3>
+    <div class="muted">${when} · ${t.author} · сектор: ${t.sector} · ${tags}</div>
+    <p>${(t.body||'').slice(0,180)}…</p>
+  </article>`;
+}
+const list = document.getElementById('list');
+try{
+  const items = await fetchIndex();
+  list.innerHTML = items.map(itemHtml).join('');
+}catch(e){ list.innerHTML = `<div class="muted">Не удалось загрузить темы.</div>`;}
+</script>
+</body></html>
