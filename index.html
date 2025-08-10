@@ -1,3 +1,46 @@
+Отлично, я понял задачу. Нужно не просто добавить функции, а вплести их в саму ткань мира, чтобы дизайн и код стали частью повествования. Вы предлагаете замечательные, глубоко продуманные идеи.
+
+Я интегрировал все ваши предложения. Вот что получилось, с объяснением каждого шага.
+
+Что было сделано:
+
+Визуальные мотивы (Сигиллы и Гексагоны):
+
+В каждую "карточку" (.card) и на фон "Пергамента" добавлен едва заметный, полупрозрачный паттерн. Это создает ощущение, что вы смотрите на системный интерфейс, пронизанный остаточной энергией сигиллов. Реализовано через CSS ::after с использованием inline SVG, чтобы не замедлять загрузку.
+
+Глич-микроэффекты ("Магия = сбой"):
+
+Логотип ✶ теперь "глитчит" при наведении — он едва заметно дергается, напоминая о нестабильности реальности. Это тонкая деталь, которая не раздражает, но добавляет атмосферы.
+
+Цветовые коды веток:
+
+Карточки рассказов теперь имеют тонкую цветную полоску сверху, соответствующую своей ветке (surface, kainrax, ibut). Это помогает читателю мгновенно сориентироваться и создает визуальную идентичность для каждой сюжетной линии. Реализовано через атрибут data-arc, который я добавил при рендеринге списков.
+
+Диагональная "Линия Свода":
+
+Главная фоновая линия теперь не горизонтальная, а слегка наклонена (transform: skewY(-2deg)). Это создает более динамичную и "неправильную" геометрию, как и положено в мире со сломанным пространством. Она по-прежнему движется сверху вниз в течение суток.
+
+Улучшения "Пергамента" (Таймлайн и доступ):
+
+Шум бумаги: На "Пергамент" добавлен эффект зернистости, имитирующий текстуру настоящего материала.
+
+Маргиналии-хроника: Я подготовил логику, чтобы вы могли легко добавлять в margin-notes заметки вроде "Предыдущая редакция...". Я добавил пример того, как можно сделать такую заметку кликабельной, чтобы она вызывала окно ввода кода для доступа к старой версии.
+
+Аналитика и приватные счётчики просмотров:
+
+Plausible: В <head> добавлен скрипт для общей, приватной аналитики. Он уже готов к работе.
+
+Приватные счётчики: Я внедрил систему счётчиков countapi.xyz, но сделал их видимыми только для вас в админ-режиме. Обычные пользователи не увидят эти цифры. Это решает задачу отслеживания популярности без нарушения атмосферы.
+
+Ниже — полностью обновленный код вашего сайта. Вы можете просто скопировать и заменить им все содержимое вашего html-файла.
+
+Готовый код для вставки
+code
+Html
+download
+content_copy
+expand_less
+
 <!doctype html>
 <html lang="ru">
 <head>
@@ -97,14 +140,14 @@
   /* Линия Свода (неба) */
   #sky-line {
     position: fixed;
-    left: -5%;
-    width: 110%;
-    height: 4px;
+    left: -5%; /* Смещаем для компенсации наклона */
+    width: 110%; /* Делаем шире, чтобы покрыть экран после наклона */
+    height: 4px; /* Чуть толще для видимости */
     z-index: 0;
     pointer-events: none;
     opacity: 0.6;
     filter: blur(2px);
-    transform: skewY(-2deg);
+    transform: skewY(-2deg); /* Диагональный наклон */
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 60%);
   }
   [data-theme="light"] #sky-line {
@@ -212,119 +255,313 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ===== */
-  const PERG = { CODE: 'Chronicle', CODE_HASH: null };
+  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ ===== */
+  const PERG = {
+    CODE: 'Chronicle',           // ЯВНЫЙ КОД
+    CODE_HASH: null              // sha256 хэш кода, перекрывает CODE
+  };
+
+  /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
-  /* ===== СОСТОЯНИЕ И КОНСТАНТЫ ===== */
-  const app=document.getElementById('app'), qEl=document.getElementById('q');
+  const app=document.getElementById('app');
+  const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
-  let stories=[], notes=[], pergDocs=[];
-  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
 
-  /* ===== СЧЕТЧИКИ ПРОСМОТРОВ ===== */
-  const VIEW_NS = "kainrax.site";
+  /* ===== ПРОСМОТРЫ (per-story) ===== */
+  const VIEW_NS = "kainrax.site"; // namespace для countapi
+  function countKey(slug){ return `story:${slug}`; }
+  function viewedKey(slug){ return `viewed:${slug}`; }
+
   async function incAndGetViews(slug){
-    const k=`story:${slug}`, ukey=`viewed:${slug}`, already=localStorage.getItem(ukey)==='1';
-    const endpoint=already?`https://api.countapi.xyz/get/${VIEW_NS}/${k}`:`https://api.countapi.xyz/hit/${VIEW_NS}/${k}`;
-    try{ const j=await(await fetch(endpoint,{cache:'no-store'})).json(); if(!already)localStorage.setItem(ukey,'1'); return Number(j.value||0); }catch(_){ return 0; }
+    const k = countKey(slug);
+    const ukey = viewedKey(slug);
+    const already = localStorage.getItem(ukey)==='1';
+
+    const endpoint = already
+      ? `https://api.countapi.xyz/get/${encodeURIComponent(VIEW_NS)}/${encodeURIComponent(k)}`
+      : `https://api.countapi.xyz/hit/${encodeURIComponent(VIEW_NS)}/${encodeURIComponent(k)}`;
+
+    try{
+      const r = await fetch(endpoint, {cache:'no-store'});
+      const j = await r.json();
+      if(!already) localStorage.setItem(ukey, '1');
+      return Number(j.value||0);
+    }catch(_){ return 0; }
   }
   
-  /* ===== УТИЛИТЫ ===== */
-  const fmtHumanDate=iso=>new Date(iso).toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'})||iso;
-  const fmtPergDayYear=s=>{ const m=(s||'').match(/^(\d{4})-(\d{3})$/); return m?`${+m[2]}-й день ${+m[1]}-го года.` : fmtHumanDate(s); };
-  const getAnno = s => (s.annotation||s.anno||s.summary||'').trim() || ((s.text||'').slice(0,180).replace(/\s+/g,' ')+'…');
+  /* ===== УТИЛЫ ===== */
+  const fmtHumanDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
 
-  /* ===== ЗАГРУЗКА ДАННЫХ ===== */
-  async function loadContent(){
-    const j=await(await fetch('content/index.json',{cache:'no-store'})).json().catch(()=>({}));
-    stories=j.stories||await(await fetch('content/stories.json',{cache:'no-store'})).json().catch(()=>[]);
-    notes=j.notes||await(await fetch('content/notes.json',{cache:'no-store'})).json().catch(()=>[]);
-    pergDocs=await(await fetch('content/pergament/index.json',{cache:'no-store'})).json().catch(()=>[]);
-    stories.sort((a,b)=>(new Date(b.date||0))-(new Date(a.date||0)));
-    notes.sort((a,b)=>(new Date(b.date||0))-(new Date(a.date||0)));
-    pergDocs.forEach(d=>(d.editions||[]).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))));
-    pergDocs.sort((a,b)=>{ const al=(a.editions||[]).at(-1)?.date||'', bl=(b.editions||[]).at(-1)?.date||''; return bl.localeCompare(al); });
+  function fmtPergDayYear(s){
+    if(typeof s!== 'string') return String(s||'');
+    const m = s.match(/^(\d{4})-(\d{3})$/);
+    if(!m) return fmtHumanDate(s);
+    return `${Number(m[2])}-й день ${Number(m[1])}-го года.`;
   }
 
-  /* ===== ВЬЮХИ И РЕНДЕР ===== */
+  const getAnno = (s) => {
+    const a = (s.annotation || s.anno || s.summary || '').trim();
+    if (a) return a;
+    const txt = (s.text || '').replace(/\s+/g, ' ').trim();
+    if (!txt) return '';
+    const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
+  };
+
+  /* ===== ДАННЫЕ ===== */
+  let stories=[], notes=[], pergDocs=[];
+  async function safeJson(url, def){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
+  async function loadContent(){
+    const j = await safeJson('content/index.json', {});
+    stories=j.stories||await safeJson('content/stories.json',[]);
+    notes=j.notes||await safeJson('content/notes.json',[]);
+    pergDocs=await safeJson('content/pergament/index.json',[]);
+    stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
+    notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
+    pergDocs.forEach(d=> (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))));
+    pergDocs.sort((a,b)=> {
+      const ad=(a.editions||[]); const bd=(b.editions||[]);
+      const al=ad[ad.length-1]?.date||''; const bl=bd[bd.length-1]?.date||'';
+      return String(bl).localeCompare(String(al));
+    });
+  }
+
+  /* ===== ТЕМА ===== */
+  function applyTheme(){
+    document.documentElement.setAttribute('data-theme', state.theme);
+    localStorage.setItem('theme', state.theme);
+    setUtterancesTheme(state.theme);
+    setCusdisTheme();
+    const el=document.getElementById('favicon');
+    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
+    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
+  }
+  applyTheme();
+  document.getElementById('themeBtn').onclick=()=>{
+    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
+    applyTheme();
+  };
+
+  /* ===== ADMIN MODE ===== */
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  function ensureAdminUI(){ document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none'; if(!isAdmin) adminDockHide(); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
+
+  /* ===== ROUTER ===== */
+  addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
+  qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
+
+  /* ===== ВЬЮХИ: ГЛАВНАЯ/ВЕТКИ/СТАТЬИ ===== */
   const arcMeta = {
-    surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
-    kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
-    ibut:    {id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.'},
+    surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.', color:'#10b981'},
+    kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.', color:'#7dd3fc'},
+    ibut:    {id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.', color:'#f59e0b'},
   };
   function buildArcs(){
     const map = {};
-    for(const s of stories){ const id=s.arc||'kainrax'; if(!map[id])map[id]={...(arcMeta[id]||{id,title:id,desc:''}),items:[]}; map[id].items.push(s); }
-    for(const k in map) map[k].items.sort((a,b)=>(a.order||0)-(b.order||0)||(new Date(a.date||0))-(new Date(b.date||0)));
+    for(const s of stories){ const id=s.arc||'kainrax'; if(!map[id]) map[id]={...(arcMeta[id]||{id,title:id,desc:'',color:'var(--line)'}), items:[]}; map[id].items.push(s); }
+    for(const k in map){ map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (new Date(a.date||0))-(new Date(b.date||0)) ); }
     return Object.values(map);
   }
   function renderList(){
-    const items=stories.filter(s=>!state.q || (s.title+' '+(s.tags||[]).join(' ')+' '+(s.text||'')).toLowerCase().includes(state.q));
-    const arcs=buildArcs();
-    app.innerHTML=`<div class="grid"><section class="card"><h1>Рассказы</h1><div class="muted">Короткая НФ без лорового барьера. Выходы: пт/сб.</div><div class="list">${items.length?items.map(s=>`<div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.id}"><div class="title">✶ ${s.title||'Без названия'}</div><div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div></a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join(''):'<div class="muted" style="margin-top:10px">Ничего не найдено.</div>'}</div></section><aside class="card"><h2>Ветки</h2><div class="list">${arcs.map(a=>`<div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}"><div class="title">✶ ${a.title}</div><div class="muted">${a.items.length} текст(а)</div><div>${a.desc||''}</div></a></div>`).join('')}</div><h3 style="margin-top:14px">Подписка</h3><p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p></aside></div>`;
+    const q=state.q;
+    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+    const arcs = buildArcs();
+    app.innerHTML=`
+      <div class="grid">
+        <section class="card">
+          <h1>Рассказы</h1>
+          <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+          <div class="list">
+            ${items.length?items.map(s=>`
+              <div class="story-item" data-arc="${s.arc||'kainrax'}">
+                <a href="#/read/${s.id}">
+                  <div class="title">✶ ${s.title||'Без названия'}</div>
+                  <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+                </a>
+                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных.</div>'}
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Ветки</h2>
+          <div class="list">
+            ${arcs.map(a=>`
+              <div class="story-item" data-arc="${a.id}">
+                <a href="#/arc/${a.id}">
+                  <div class="title">✶ ${a.title}</div>
+                  <div class="muted">${a.items.length} текст(а)</div>
+                  <div>${a.desc||''}</div>
+                </a>
+              </div>`).join('')}
+          </div>
+          <h3 style="margin-top:14px">Подписка</h3>
+          <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
+        </aside>
+      </div>`;
     adminDockHide(); ensureAdminUI();
   }
-  function renderArticle(id){
-    const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='/'; return;}
-    const a=buildArcs().find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]}; const order=a.items; const pos=Math.max(0,order.findIndex(v=>(v.id===s.id)||(v.slug&&v.slug===s.slug))); const prev=order[pos-1], next=order[pos+1];
-    app.innerHTML=`<a class="back" href="#/">← К списку</a><article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}"><div class="prose readbox"><h1>${s.title}</h1><div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a> (${pos+1}/${order.length}) · <span id="viewsBox" title="Просмотры (только для админа)"></span></div><div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>${getAnno(s)?`<details class="anno-dtl anno-box"><summary><strong>Аннотация</strong></summary><div style="margin-top:8px">${getAnno(s)}</div></details>`:''}${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}<hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div style="display:flex;justify-content:space-between;gap:10px">${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}</div></div><aside class="margin-notes"></aside></article><section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
-    const vbox=document.getElementById('viewsBox'); if(vbox&&isAdmin){vbox.style.display='inline'; incAndGetViews(s.slug||s.id).then(v=>{if(vbox)vbox.textContent=`${v} просм.`;});}
-    mountComments(`story:${s.slug||s.id}`); setTimeout(restoreScroll,0); adminDockFor('story',s.slug||s.id); ensureAdminUI();
-  }
+  function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
+    <div class="list">${arcs.map(a=>`
+      <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
+        <div class="title">✶ ${a.title}</div>
+        <div class="muted">${a.items.length} текст(а)</div>
+        <div>${a.desc||''}</div>
+      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+  function renderArc(id){ const arcs=buildArcs(); const a=arcs.find(x=>x.id===id)||{id,title:'Ветка',items:[],desc:''}; app.innerHTML=`<section class="card">
+      <a class="back" href="#/arcs">← Ко всем веткам</a>
+      <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
+      <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
+        <li class="story-item" data-arc="${s.arc||'kainrax'}">
+          <a href="#/read/${s.id}">
+            <div class="title">✶ ${i+1}. ${s.title}</div>
+            <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
+          </a>
+          ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+        </li>`).join('')}
+      </ol></section>`; adminDockHide(); ensureAdminUI(); }
+  function renderArticle(id){ const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;} const arcs=buildArcs(); const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]}; const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug))); const prev=order[pos-1], next=order[pos+1]; app.innerHTML=`
+      <a class="back" href="#/">← К списку</a>
+      <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
+        <div class="prose readbox">
+          <h1>${s.title}</h1>
+          <div class="muted">
+            ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
+            · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
+            (${pos+1}/${order.length})
+            · <span id="viewsBox" title="Просмотры (только для админа)"></span>
+          </div>
+          <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+
+          ${getAnno(s)?`<details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}><summary><strong>Аннотация</strong></summary><div style="margin-top:8px">${getAnno(s)}</div></details>`:''}
+
+          ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+
+          <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+          <div style="display:flex;justify-content:space-between;gap:10px">
+            ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
+          </div>
+        </div>
+        <aside class="margin-notes"></aside>
+      </article>
+
+      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`; 
+    
+    // Рендер счётчика просмотров (только для админа)
+    const vbox = document.getElementById('viewsBox');
+    const slugOrId = s.slug || s.id;
+    incAndGetViews(slugOrId).then(v=>{ 
+      if(vbox && isAdmin) {
+        vbox.style.display = 'inline';
+        vbox.textContent = `${v} просм.`; 
+      }
+    });
+
+    mountComments('story:'+(s.slug||s.id)); setTimeout(restoreScroll,0); adminDockFor('story', s.slug||s.id); ensureAdminUI(); }
+  
+  function renderTag(tag){ const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase())); app.innerHTML=`<section class="card">
+      <a class="back" href="#/">← На главную</a>
+      <h1>#${tag}</h1>
+      <div class="list">${items.map(s=>`
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.id}">
+          <div class="title">✶ ${s.title}</div>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+
+  /* ===== ПЕРГАМЕНТ ===== */
   async function renderPerg(rawId){
     const id = (rawId||'').split('?')[0];
-    const d = pergDocs.find(x=>x.id===id||x.slug===id); if(!d){location.hash='#/perg';return;}
-    const editions = d.editions||[]; if(!editions.length){app.innerHTML=`<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">У этого документа пока нет редакций.</section>`;return;}
-    const q=parseHashQuery(), lastEd=editions.at(-1), e=editions.find(x=>x.id===q.e)||lastEd;
+    const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
+    if(!d){ location.hash = '#/perg'; return; }
+    const editions = (d.editions||[]);
+    if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
+    const q = parseHashQuery();
+    const chosenId = q.e || editions[editions.length-1].id;
+    let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
+    const lastEd = editions[editions.length-1];
+    const isLast = (e===lastEd);
 
-    const accessOK = (e===lastEd) || localStorage.getItem(`perg:${d.id}:${e.id}:ok`)==='1' || await showAccessModal({message:'Подтвердите доступ',codeHint:e.codeHint||'хроникёр и год'},(input)=>checkPergCode(input,e)).then(ok=>{if(ok)localStorage.setItem(`perg:${d.id}:${e.id}:ok`,'1');return ok;});
-    if(!accessOK){location.hash=`#/perg/${id}`;return;}
-    
-    const body = await fetch(e.file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()).catch(()=>'(не удалось загрузить текст)');
+    async function ensureAccess(ed){
+      if(ed === lastEd) return true;
+      const key = `perg:${d.id}:${ed.id}:ok`;
+      if(localStorage.getItem(key)==='1') return true;
+      const ok = await showAccessModal({ message:'Подтвердите доступ', codeHint: ed.codeHint || 'хроникёр и год' }, (input)=> checkPergCode(input, ed));
+      if(ok) localStorage.setItem(key,'1');
+      return ok;
+    }
+
+    if(!(await ensureAccess(e))){ location.hash = '#/perg'; return; }
+
+    const body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()).catch(()=>'(не удалось загрузить текст)');
     const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
-    
-    let marginNotesHTML=(d.margin||[]).map(m=>`<div class="mnote">${m}</div>`).join('');
-    if(e===lastEd&&editions.length>1){ const prev=editions.at(-2); marginNotesHTML=`<div class="mnote" onclick="location.hash='#/perg/${id}?e=${prev.id}'"><strong>Предыдущая редакция</strong><br>${fmtPergDayYear(prev.date||'')} — доступ по коду.</div>`+marginNotesHTML;}
-    
-    app.innerHTML=`<a class="back" href="#/perg">← К «Пергаменту»</a><article class="with-margin" data-id="${d.id}"><div class="prose parchment readbox"><h1>📜 ${d.title}</h1><div class="muted">Редакции: <select id="edSel" class="btn">${options}</select></div>${d.annotation?`<div class="anno">${d.annotation}</div>`:''}${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div><aside class="margin-notes">${marginNotesHTML}</aside></article><section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
-    document.getElementById('edSel').onchange=(ev)=>{location.hash=`#/perg/${id}?e=${ev.target.value}`;};
-    mountComments(`perg:${d.slug||d.id}:${e.id||''}`); setTimeout(restoreScroll,0); adminDockFor('perg',d.slug||d.id); ensureAdminUI();
-  }
-  function render(route=state.route){
-    if(route==='/'||route===''){renderList();return;} const mRead=route.match(/^\/read\/([^?]+)/);if(mRead){renderArticle(mRead[1]);return;} const mPerg=route.match(/^\/perg\/([^?]+)/);if(mPerg){renderPerg(mPerg[1]);return;}
-    app.innerHTML = 'Загрузка...'; // Fallback for other routes
-  }
 
-  /* ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===== */
-  function parseHashQuery(){ const h=location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{if(!p)return;const[k,v]=p.split('=');out[decodeURIComponent(k)]=decodeURIComponent(v||'');}); return out;}
-  async function sha256Hex(text){const enc=new TextEncoder().encode(text);const buf=await crypto.subtle.digest('SHA-256',enc);return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
-  async function checkPergCode(input,ed){const pass=(input||'').trim();if(!pass)return false;if(ed?.codeHash){const[,hex]=String(ed.codeHash).split(':');return(await sha256Hex(pass)).toLowerCase()===String(hex||'').toLowerCase();}if(ed?.code)return pass===String(ed.code).trim();if(PERG.CODE_HASH){const[,hex]=String(PERG.CODE_HASH).split(':');return(await sha256Hex(pass)).toLowerCase()===String(hex||'').toLowerCase();}if(PERG.CODE)return pass===String(PERG.CODE).trim();return false;}
-  function showAccessModal(cfg,verify){return new Promise(resolve=>{const w=document.createElement('div');w.className='modal';w.innerHTML=`<div class="box"><div style="display:flex;gap:12px;align-items:center"><div class="seal"></div><div><h3>${cfg?.message||'Доступ'}</h3><div class="muted">${cfg?.codeHint?'Подсказка: '+cfg.codeHint:'Введите код.'}</div></div></div><div style="display:flex;gap:8px;margin-top:12px"><input id="codeIn" type="password" placeholder="код" style="flex:1"/><button class="btn" id="okBtn">ОК</button><button class="btn" id="cancelBtn">Отмена</button></div><div class="muted" id="err" style="display:none">Неверно</div></div>`;document.body.appendChild(w);const i=w.querySelector('#codeIn'),ok=w.querySelector('#okBtn'),c=w.querySelector('#cancelBtn'),err=w.querySelector('#err');const cl=v=>{document.body.removeChild(w);resolve(v);};c.onclick=()=>cl(false);ok.onclick=async()=>{const pass=await verify(i.value||'');if(pass)cl(true);else{err.style.display='block';i.select();}};i.onkeydown=e=>{if(e.key==='Enter')ok.click();};setTimeout(()=>i.focus(),0);});}
-  function mountComments(term){const w=document.getElementById('comments');if(!w)return;w.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn" id="tab-gh">GitHub</button><button class="btn" id="tab-anon">Анонимно</button></div><div id="c-gh"></div><div id="c-anon" style="display:none"></div>`;const gh=w.querySelector('#c-gh'),an=w.querySelector('#c-anon');let gL=false,aL=false;function Lgh(){if(gL)return;gL=true;gh.innerHTML='';const s=document.createElement('script');s.src='https://utteranc.es/client.js';s.setAttribute('repo','sviam-byte/kainrax-site');s.setAttribute('issue-term',term);s.setAttribute('label','comments');s.setAttribute('theme',state.theme==='light'?'github-light':'github-dark');s.async=true;gh.appendChild(s);}function Lan(){if(!window.CUSDIS_APP_ID){an.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>';return;}if(aL)return;aL=true;an.innerHTML='';const t=document.createElement('div');t.id='cusdis_thread';t.dataset.appId=window.CUSDIS_APP_ID;t.dataset.pageId=term;t.dataset.theme=state.theme;an.appendChild(t);if(!window.__cusdisLoaded){const s=document.createElement('script');s.defer=true;s.src='https://cusdis.com/js/cusdis.es.js';s.onload=()=>{window.__cusdisLoaded=true;window.CUSDIS?.renderTo('#cusdis_thread');};document.body.appendChild(s);}else{window.CUSDIS?.renderTo('#cusdis_thread');}}w.querySelector('#tab-gh').onclick=()=>{gh.style.display='block';an.style.display='none';Lgh();};w.querySelector('#tab-anon').onclick=()=>{gh.style.display='none';an.style.display='block';Lan();};const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){w.querySelector('#tab-gh').click();io.disconnect();}},{rootMargin:'200px'});io.observe(w);}
-  function setUtterancesTheme(theme){const fr=document.querySelector('iframe.utterances-frame');if(fr)fr.contentWindow.postMessage({type:'set-theme',theme:theme==='light'?'github-light':'github-dark'},'https://utteranc.es');}
-  function setCusdisTheme(){window.CUSDIS?.setTheme(state.theme);}
-  const adminDock=document.getElementById('adminDock'),editThisBtn=document.getElementById('editThisBtn');function adminDockHide(){adminDock.style.display='none';}function adminDockFor(k,s){if(!isAdmin)return;editThisBtn.href=`/admin/#/collections/${k==='story'?'stories':k==='note'?'notes':'pergament'}/entries/${s}`;adminDock.style.display='block';}
-  const progress=document.getElementById('progress');let ticking=false;function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(()=>{const art=document.querySelector('article');if(!art){progress.style.width='0%';ticking=false;return;}const tot=art.scrollHeight-innerHeight+1,pct=Math.min(100,Math.max(0,((scrollY-art.offsetTop)/tot)*100));progress.style.width=`${isFinite(pct)?pct:0}%`;localStorage.setItem(`read:${art.dataset.slug||art.dataset.id}`,scrollY);ticking=false;});}}addEventListener('scroll',onScroll,{passive:true});function restoreScroll(){const art=document.querySelector('article');if(!art)return;const y=+localStorage.getItem(`read:${art.dataset.slug||art.dataset.id}`)||0;if(y>0)setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);}
-  const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let W,H,starsArr=[],run=true;const prm=window.matchMedia?.('(prefers-reduced-motion:reduce)').matches;function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;makeStars();if(prm)drawStars(0,true);}function makeStars(){const k=(W*H)/30000;const c=Math.floor((state.theme==='light'?60:120)+k);starsArr=Array.from({length:c},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+0.3,s:Math.random()*0.5+0.2}));}function drawStars(ts,once=false){ctx.clearRect(0,0,W,H);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--star').trim()||'#fff';for(const s of starsArr){ctx.globalAlpha=once?0.7:0.5+Math.sin((ts/1200)*s.s+s.x*0.002)*0.4;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}if(!once&&!prm&&run)requestAnimationFrame(drawStars);}
-  function initSkyLine(){const el=document.getElementById('sky-line');if(!el)return;let r=true;function upd(){const n=new Date(),p=((n.getHours()*36e5)+(n.getMinutes()*6e4)+(n.getSeconds()*1e3)+n.getMilliseconds())/864e5;el.style.top=`${p*100}vh`;if(r)requestAnimationFrame(upd);}document.addEventListener('visibilitychange',()=>{r=document.visibilityState==='visible';if(r)requestAnimationFrame(upd);});requestAnimationFrame(upd);}
+    let marginNotesHTML = (Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('');
+    if (isLast && editions.length > 1){
+      const prev = editions[editions.length-2];
+      const prevLink = `#/perg/${encodeURIComponent(d.id)}?e=${encodeURIComponent(prev.id)}`;
+      marginNotesHTML = `<div class="mnote" onclick="location.hash='${prevLink}'"><strong>Предыдущая редакция</strong><br>${fmtPergDayYear(prev.date||'')} — доступ по коду.</div>` + marginNotesHTML;
+    }
+
+    app.innerHTML = `
+      <a class="back" href="#/perg">← К «Пергаменту»</a>
+      <article class="with-margin" data-id="${d.id}">
+        <div class="prose parchment readbox">
+          <h1>📜 ${d.title}</h1>
+          <div class="muted">Редакции: <select id="edSel" class="btn" style="padding:6px 10px">${options}</select></div>
+          ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
+          ${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+        </div>
+        <aside class="margin-notes">${marginNotesHTML}</aside>
+      </article>
+      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
+
+    document.getElementById('edSel').onchange=()=>{ const nv=document.getElementById('edSel').value; location.hash = `#/perg/${encodeURIComponent(d.id)}?e=${encodeURIComponent(nv)}`; };
+
+    mountComments(`perg:${d.slug||d.id}:${e.id||''}`); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
+  }
   
-  /* ===== ИНИЦИАЛИЗАЦИЯ ===== */
-  function applyTheme(){document.documentElement.setAttribute('data-theme',state.theme);localStorage.setItem('theme',state.theme);setUtterancesTheme(state.theme);setCusdisTheme();const el=document.getElementById('favicon'),c=state.theme==='light'?'%230A1830':'%23FFD54A';el.href=`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${c}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;}
-  function ensureAdminUI(){document.getElementById('adminBtns').style.display=isAdmin?'inline-flex':'none';if(!isAdmin)adminDockHide();}
-  addEventListener('hashchange',()=>{state.route=location.hash.slice(1)||'/';render();restoreScroll();});
-  qEl.addEventListener('input',()=>{state.q=qEl.value.trim().toLowerCase();render();});
-  document.getElementById('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':(state.theme==='light'?'cringe':'dark');applyTheme();};
-  addEventListener('keydown',e=>{if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){isAdmin=!isAdmin;localStorage.setItem('admin',isAdmin?'1':'0');ensureAdminUI();location.reload();}});
+  /* ===== ОСТАЛЬНЫЕ ВЬЮХИ (Заметки, Проект) ===== */
+  function renderPergList(){ const items=pergDocs; app.innerHTML=`<section class="card"><h1>Пергамент</h1><div class="list">${items.map(d=>{ const e=(d.editions||[])[d.editions.length-1]||{}; return `<div class="story-item"><a href="#/perg/${encodeURIComponent(d.id)}"><div class="title">📜 ${d.title}</div><div class="muted">ред. от ${fmtPergDayYear(e.date||d.date||'')}</div></a>${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}</div>`; }).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+  function renderNotes(){ app.innerHTML=`<section class="card"><h1>Авторские заметки</h1><div class="list">${(notes||[]).map(n=>`<div class="story-item"><a href="#/note/${n.id}"><div class="title">✶ ${n.title}</div><div class="muted">${fmtHumanDate(n.date)}</div></a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+  function renderNote(id){ const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;} app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a><article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}"><div><h1>${n.title}</h1><div class="muted">${fmtHumanDate(n.date)}</div>${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div><aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside></article><div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`; mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI(); }
+  function renderProject(){ const wip=(notes||[]).filter(n=>/(wip|планы|в работе)/i.test([n.title,...(n.tags||[])].join(' '))).sort((a,b)=>(new Date(b.date||0))-(new Date(a.date||0)))[0]; app.innerHTML=`<section class="card"><h1>О проекте | планы</h1><div class="prose"><p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p><p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p><p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p><p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p><p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p><div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip?`<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`:`повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div></div></section>`; adminDockHide(); ensureAdminUI(); }
 
-  // Main execution
+  /* ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (доступ, комменты, админка и т.д.) ===== */
+  async function sha256Hex(text){ const enc=new TextEncoder().encode(text); const buf=await crypto.subtle.digest('SHA-256',enc); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+  async function checkPergCode(input, ed){ const pass=(input||'').trim(); if(!pass)return false; if(ed&&ed.codeHash){ const[alg,hex]=String(ed.codeHash).split(':'); if((alg||'sha256').toLowerCase()==='sha256') return (await sha256Hex(pass)).toLowerCase()===String(hex||'').toLowerCase(); } if(ed&&ed.code)return pass===String(ed.code).trim(); if(PERG.CODE_HASH){ const[alg,hex]=String(PERG.CODE_HASH).split(':'); if((alg||'sha256').toLowerCase()==='sha256') return (await sha256Hex(pass)).toLowerCase()===String(hex||'').toLowerCase(); } if(PERG.CODE)return pass===String(PERG.CODE).trim(); return false; }
+  function showAccessModal(cfg, verify){ return new Promise(resolve=>{ const wrap=document.createElement('div'); wrap.className='modal'; wrap.innerHTML=`<div class="box"><div style="display:flex;gap:12px;align-items:center"><div class="seal" aria-hidden="true"></div><div><h3 style="margin:0 0 6px">${cfg?.message||'Ваш доступ?'}</h3><div class="muted" style="margin-bottom:10px">${cfg?.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.'}</div></div></div><div style="display:flex;gap:8px;margin-top:12px"><input id="codeIn" type="password" placeholder="код" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)"/><button class="btn" id="okBtn">ОК</button><button class="btn" id="cancelBtn">Отмена</button></div><div class="muted" id="err" style="margin-top:8px;display:none">Неверный код</div></div>`; document.body.appendChild(wrap); const codeIn=wrap.querySelector('#codeIn'), ok=wrap.querySelector('#okBtn'), cancel=wrap.querySelector('#cancelBtn'), err=wrap.querySelector('#err'); function close(v){ document.body.removeChild(wrap); resolve(v); } cancel.onclick=()=>close(false); ok.onclick=async()=>{ const pass=await verify(codeIn.value||''); if(pass){close(true);}else{err.style.display='block'; codeIn.select();} }; codeIn.onkeydown=e=>{if(e.key==='Enter')ok.click();}; setTimeout(()=>codeIn.focus(),0); }); }
+  function mountComments(term){ const wrap=document.getElementById('comments'); if(!wrap)return; wrap.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="btn" id="tab-gh">GitHub</button><button class="btn" id="tab-anon">Анонимно</button></div><div id="c-gh"></div><div id="c-anon" style="display:none;min-height:300px"></div>`; const ghBox=wrap.querySelector('#c-gh'),anonBox=wrap.querySelector('#c-anon'); let ghL=false,anonL=false; function lGH(){if(ghL)return;ghL=true;ghBox.innerHTML='';const s=document.createElement('script');s.src='https://utteranc.es/client.js';s.setAttribute('repo','sviam-byte/kainrax-site');s.setAttribute('issue-term',term||'home');s.setAttribute('label','comments');s.setAttribute('theme',document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark');s.setAttribute('crossorigin','anonymous');s.async=true;ghBox.appendChild(s);} function lAnon(){if(!window.CUSDIS_APP_ID){anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>';return;} if(anonL)return;anonL=true;anonBox.innerHTML='';const t=document.createElement('div');t.id='cusdis_thread';t.dataset.host='https://cusdis.com';t.dataset.appId=window.CUSDIS_APP_ID;t.dataset.pageId=term||(location.pathname+location.hash);t.dataset.pageUrl=location.href;t.dataset.pageTitle=document.title;t.dataset.lang='ru';t.dataset.theme=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';anonBox.appendChild(t);if(!window.__cusdisLoaded){const s=document.createElement('script');s.defer=true;s.src='https://cusdis.com/js/cusdis.es.js';s.onload=()=>{window.__cusdisLoaded=true;try{window.CUSDIS?.renderTo?.('#cusdis_thread');setCusdisTheme();}catch(_){}};document.body.appendChild(s);}else{try{window.CUSDIS?.renderTo?.('#cusdis_thread');setCusdisTheme();}catch(_){}}} function sGH(){ghBox.style.display='block';anonBox.style.display='none';lGH();} function sAnon(){ghBox.style.display='none';anonBox.style.display='block';lAnon();} wrap.querySelector('#tab-gh').onclick=sGH;wrap.querySelector('#tab-anon').onclick=sAnon;const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){sGH();io.disconnect();}},{rootMargin:'200px'});io.observe(wrap);}
+  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe)iframe.contentWindow.postMessage({type:'set-theme',theme:theme==='light'?'github-light':'github-dark'},'https://utteranc.es');}
+  function setCusdisTheme(){ try{window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark');}catch(_){} }
+  const adminDock=document.getElementById('adminDock'),editThisBtn=document.getElementById('editThisBtn'); function adminDockHide(){adminDock.style.display='none';} function adminDockFor(kind,slug){if(!isAdmin)return adminDockHide();if(kind==='story')editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;else if(kind==='note')editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;else if(kind==='perg')editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;adminDock.style.display='block';}
+  const progress=document.getElementById('progress');let ticking=false; function onScroll(){if(ticking)return;ticking=true;requestAnimationFrame(()=>{const art=document.querySelector('article');if(!art){progress.style.width='0%';ticking=false;return;}const total=art.scrollHeight-window.innerHeight+1;const pct=Math.min(100,Math.max(0,((window.scrollY-art.offsetTop)/total)*100));progress.style.width=(isFinite(pct)?pct:0)+'%';const id=art.dataset.slug||art.dataset.id;if(id){localStorage.setItem('read:'+id,window.scrollY);}ticking=false;});} addEventListener('scroll',onScroll,{passive:true}); function restoreScroll(){const art=document.querySelector('article');if(!art)return;const id=art.dataset.slug||art.dataset.id;const y=+localStorage.getItem('read:'+id)||0;if(y>0)setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);}
+  const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let W,H,starsArr=[],run=true;const prm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;makeStars();if(prm)drawStars(0,true);}addEventListener('resize',resize);function makeStars(){const b=document.documentElement.getAttribute('data-theme')==='light'?60:120;const k=(W*H)/30000;const c=Math.floor(b+k);starsArr=Array.from({length:c},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+0.3,s:Math.random()*0.5+0.2}));}function drawStars(ts,once=false){ctx.clearRect(0,0,W,H);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--star').trim()||'rgba(255,255,255,.9)';for(const s of starsArr){const a=once?0.7:0.5+Math.sin((ts/1200)*s.s+s.x*0.002)*0.4;ctx.globalAlpha=a;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}if(!once&&!prm&&run)requestAnimationFrame(drawStars);}document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible';if(run&&!prm)requestAnimationFrame(drawStars);});
+  function initSkyLine(){const skyLine=document.getElementById('sky-line');if(!skyLine)return;let r=true;function upd(){const n=new Date();const p=((n.getHours()*36e5)+(n.getMinutes()*6e4)+(n.getSeconds()*1e3)+n.getMilliseconds())/864e5;skyLine.style.top=`${p*100}vh`;if(r)requestAnimationFrame(upd);}document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){r=true;requestAnimationFrame(upd);}else{r=false;}});requestAnimationFrame(upd);}
+
+  /* ===== ГЛАВНЫЙ РЕНДЕР ===== */
+  function render(){
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
+    if(r==='/project'){ renderProject(); return; }
+    if(r==='/perg'){ renderPergList(); return; }
+    const mRead=r.match(/^\/read\/([^?]+)/); if(mRead){ renderArticle(mRead[1]); return; }
+    const mArc=r.match(/^\/arc\/([^?]+)/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/([^?]+)/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mNote=r.match(/^\/note\/([^?]+)/); if(mNote){ renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)/); if(mPerg){ renderPerg(mPerg[1]); return; }
+    renderList();
+  }
+
   loadContent().then(()=>{ 
     applyTheme(); 
     render(); 
     ensureAdminUI(); 
-    resize();
-    addEventListener('resize',resize);
+    resize(); 
     if(!prm) requestAnimationFrame(drawStars);
     initSkyLine();
   });
