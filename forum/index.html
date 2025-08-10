@@ -5,10 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Доска сектора — Кайнракс</title>
   <meta name="theme-color" content="#0b0f14" />
+
+  <!-- Внутримировой фавикон: гекс + искра -->
+  <link rel="icon" href='data:image/svg+xml;utf8,
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#7dd3fc"/>
+        <stop offset="1" stop-color="#a78bfa"/>
+      </linearGradient>
+    </defs>
+    <path d="M16 6 L48 6 L58 32 L48 58 L16 58 L6 32 Z" fill="#0b1422" stroke="url(#g)" stroke-width="3" />
+    <path d="M32 10 L35 22 L48 24 L35 28 L32 40 L29 28 L16 24 L29 22 Z" fill="#7dd3fc" fill-opacity=".9"/>
+  </svg>' />
+
   <link rel="stylesheet" href="/assets/forum.css" />
   <script defer data-domain="forum.kainrax.site" src="https://plausible.io/js/script.js"></script>
   <style>
-    /* Линия Свода (ползущая полоса неба) */
+    /* Ползущая линия свода */
     #sky-line{
       position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);
       background:radial-gradient(ellipse 80% 150% at 50% 50%, rgba(125,211,252,.9) 0%, transparent 40%);
@@ -19,9 +33,9 @@
   <div id="sky-line" aria-hidden="true"></div>
 
   <header class="kx-head">
-    <a class="kx-brand" href="https://kainrax.site/">Кайнракс ✶</a>
+    <a class="kx-brand" href="https://kainrax.netlify.app/">Кайнракс ✶</a>
     <nav class="kx-nav">
-      <a class="kx-btn" href="https://kainrax.site/">К рассказам</a>
+      <a class="kx-btn" href="https://kainrax.netlify.app/">К рассказам</a>
       <a class="kx-btn is-active" href="/index.html">Темы</a>
     </nav>
   </header>
@@ -35,12 +49,10 @@
   </main>
 
   <script type="module">
-    // ===== Вспомогалки дат =====
-    // Принимаем ISO или "YYYY-DOY" (год-день_года). Часы берём из ISO, если есть.
+    // ===== Дата "N-й день YYYY-го года, HH:MM"
     function fmtDayYear(s){
       if(!s) return '';
-      // ISO
-      if(/^\d{4}-\d{2}-\d{2}T/.test(s) || /^\d{4}-\d{2}-\d{2}$/.test(s)){
+      if(/^\d{4}-\d{2}-\d{2}/.test(s)){ // ISO -> DOY
         const d=new Date(s);
         const yy=d.getUTCFullYear();
         const start=new Date(Date.UTC(yy,0,1));
@@ -49,8 +61,7 @@
         const mm=String(d.getMinutes()).padStart(2,'0');
         return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
       }
-      // "YYYY DOY" или "YYYY-DOY"
-      const m=(s+'').trim().match(/^(\d{4})[\s\-_:.,\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
+      const m=(s+'').trim().match(/^(\d{4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
       if(m){
         const yy=+m[1], doy=+m[2];
         const hh=m[3]?m[3].padStart(2,'0'):'00';
@@ -60,27 +71,27 @@
       return s;
     }
 
-    // ===== Полоса неба =====
+    // ===== Полоса неба (время суток -> позиция)
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
       function tick(){
-        const now=new Date();
-        const ms=now.getHours()*3600000+now.getMinutes()*60000+now.getSeconds()*1000+now.getMilliseconds();
-        el.style.top = (ms/86400000*100)+'vh';
+        const n=new Date();
+        const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
+        el.style.top=(ms/86400000*100)+'vh';
         if(run) requestAnimationFrame(tick);
       }
-      document.addEventListener('visibilitychange',()=>{ run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick); });
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick);});
       requestAnimationFrame(tick);
     })();
 
-    // ===== Рендер списка тем =====
+    // ===== Список тем
     const box=document.getElementById('threads');
     async function loadIndex(){
       try{
         const r=await fetch('/content/threads-index.json',{cache:'no-store'});
         if(!r.ok) throw new Error('index missing');
         return await r.json();
-      }catch(e){ return []; }
+      }catch(_){ return []; }
     }
     function card(t){
       const when=fmtDayYear(t.created);
@@ -89,7 +100,7 @@
       return `<article class="kx-thread">
         <a class="kx-link" href="/thread.html#/${t.id}">
           <h3 class="kx-title">✶ ${t.title}</h3>
-          <div class="kx-sub muted">${when} · ${t.author||'anon'} · сектор: ${t.sector||'—'}</div>
+          <div class="kx-sub muted">${when} · ${t.author||'anon'} · сектор: ${t.sector||'—'}${t.board?` · раздел: ${t.board}`:''}</div>
           <p class="kx-preview">${preview}</p>
           <div class="kx-tags">${tags}</div>
         </a>
