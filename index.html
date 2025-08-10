@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-skin="aurora">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +9,9 @@
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
   <style>
+  /* ========================
+     THEME TOKENS (dark/light/cringe)
+  ========================= */
   :root{
     --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
     --card:rgba(16,21,32,.92); --line:#223042;
@@ -51,7 +54,8 @@
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
   .list{display:flex;flex-direction:column;gap:12px}
-  .story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
+  .story-item{padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18);transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease}
+  .story-item:hover{transform:translateY(-2px);border-color: rgba(167,139,250,.35);box-shadow: 0 10px 28px rgba(0,0,0,.30)}
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
@@ -84,17 +88,48 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  /* Пергамент */
+  /* ========================
+     SKINS (pure-CSS aesthetics)
+     data-skin="aurora|terminal"
+  ========================= */
+  /* AURORA (default) */
+  [data-skin="aurora"] body{background:#0b0f14}
+  [data-skin="aurora"] .card,[data-skin="aurora"] .readbox{
+    background:rgba(18,24,36,.72); border:1px solid #28374d; backdrop-filter: blur(12px) saturate(1.15)
+  }
+  [data-skin="aurora"] body::before{
+    content:"";position:fixed;inset:-10% -5%;filter: blur(60px) saturate(1.2);opacity:.45;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(35% 40% at 20% 20%, #5eead4 0%, transparent 60%),
+      radial-gradient(40% 45% at 80% 30%, #7dd3fc 0%, transparent 60%),
+      radial-gradient(30% 30% at 50% 80%, #a78bfa 0%, transparent 60%);
+  }
+
+  /* TERMINAL (per-page or toggle) */
+  [data-skin="terminal"] body{background:#0a0f0a;color:#c1f7c1;font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+  [data-skin="terminal"] .card,[data-skin="terminal"] .readbox{background:#0b120b;border:1px solid #123;box-shadow:0 0 0 1px #0c1 inset,0 12px 36px rgba(0,0,0,.45)}
+  [data-skin="terminal"] .title,[data-skin="terminal"] h1 {color:#9aff9a;text-shadow:0 0 6px rgba(96,255,128,.35)}
+  [data-skin="terminal"] body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;z-index:0;
+    background:repeating-linear-gradient(to bottom, #000 0 1px, transparent 2px 4px);
+    mix-blend-mode:screen
+  }
+  [data-skin="terminal"] a:hover{ text-decoration:none; box-shadow:0 0 0 1px #1f4029 inset }
+
+  /* ========================
+     PARchment (Codex enhancements)
+  ========================= */
   .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3); color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18)}
   [data-theme="light"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,250,240,.6), transparent 60%), linear-gradient(#fffaf1, #f5ecda); color:#2b2418; border-color:#e8dcc4}
   [data-theme="cringe"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.85), transparent 60%), linear-gradient(#ffffff, #faf7ef); color:#222; border-color:#e9e1d6}
   .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
+  .parchment p:first-letter{float:left; font-size:2.2em; line-height:1; padding:4px 8px 0 0; font-weight:700; color:#2b2418}
 
-  /* Маргиналии */
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
-  .margin-notes{position:sticky;top:76px;align-self:start}
-  .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
+  .margin-notes{position:sticky;top:76px;align-self:start;border-left:2px dashed #e2d5b7; padding-left:14px}
+  .margin-notes .mnote{font-size:13px; color:var(--muted); padding-left:0; margin-bottom:12px; position:relative}
+  .margin-notes .mnote::before{content:"§"; position:absolute; left:-16px; top:0; opacity:.45}
 
   /* модалка доступа */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:20}
@@ -105,6 +140,20 @@
   /* админ-панель скрыта */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminBtns{display:none}
+
+  /* HERO (на главной) */
+  .hero {position: relative; overflow: clip; border-radius: 18px; padding: 32px; margin-bottom: 16px; background: radial-gradient(120% 160% at 10% 0%, rgba(125,211,252,.10), transparent 60%), linear-gradient(180deg, rgba(20,26,38,.85), rgba(20,26,38,.65)); border: 1px solid #263449; box-shadow: var(--shadow)}
+  [data-theme="light"] .hero{background: linear-gradient(180deg,#ffffff,#f7fbff); border-color:#e6ecf2}
+  .hero h1{font-size:34px; letter-spacing:.4px; margin:0 0 6px}
+  .hero p{margin:0; color:var(--muted)}
+  .hero .actions{margin-top:14px; display:flex; gap:8px; flex-wrap:wrap}
+  .hero .actions .btn{padding:10px 14px}
+
+  /* MOBILE DOCK */
+  .dock{position:fixed; left:50%; transform:translateX(-50%); bottom:10px; z-index:9; backdrop-filter: blur(10px) saturate(1.1); background: var(--card); border:1px solid var(--line); border-radius: 14px; padding:6px; display:flex; gap:6px; box-shadow: var(--shadow)}
+  .dock-itm{display:inline-flex; width:42px; height:42px; align-items:center; justify-content:center; border-radius:10px; text-decoration:none; color:var(--fg); border:1px solid transparent}
+  .dock-itm:hover{border-color:var(--line)}
+  @media (min-width:980px){ .dock{display:none} }
   </style>
 </head>
 <body>
@@ -124,6 +173,7 @@
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/project">О проекте | планы</a>
         <button id="themeBtn" title="Сменить тему">🌓</button>
+        <button id="skinBtn" title="Сменить скин (aurora/terminal)">🎨</button>
         <span id="adminBtns">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
@@ -137,116 +187,92 @@
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
+  <!-- Mobile reader dock -->
+  <nav class="dock" aria-label="Навигация по сайту">
+    <a href="#/" class="dock-itm" title="Главная">🏠</a>
+    <a href="#/arcs" class="dock-itm" title="Ветки">✶</a>
+    <a href="#/perg" class="dock-itm" title="Пергамент">📜</a>
+    <a href="#/notes" class="dock-itm" title="Заметки">✎</a>
+    <button id="dockTheme" class="dock-itm" title="Тема">🌓</button>
+  </nav>
+
   <script>
-  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ =====
-     Варианты:
-       1) ЯВНЫЙ КОД:   PERG.CODE = 'Chronicle'
-       2) ХЭШ КОДА:    PERG.CODE_HASH = 'sha256:....hex'
-     Приоритет: CODE_HASH > CODE. Последняя редакция ВСЕГДА открыта.
-     Можно переопределить на уровне конкретной редакции в манифесте:
-       { protected:true, code:"..." }  или  { protected:true, codeHash:"sha256:..." }
-  */
-  const PERG = {
-    CODE: 'Chronicle',           // <<<< тут задаётся ЯВНЫЙ КОД
-    CODE_HASH: null              // например: 'sha256:e14dcd50....'; если задан, перекрывает CODE
-  };
+  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ ===== */
+  const PERG = { CODE: 'Chronicle', CODE_HASH: null };
 
   /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
 
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
-  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
+  const state={
+    theme: localStorage.getItem('theme') || 'dark',
+    skin:  localStorage.getItem('skin')  || (new URLSearchParams(location.search).get('skin') || 'aurora'),
+    route: location.hash.slice(1)||'/', q:''
+  };
 
   /* ===== УТИЛЫ ===== */
   const fmtHumanDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
-
-  // Формат «N-й день M-го года.» для строк вида YYYY-DOY (например, "0430-349")
-  function fmtPergDayYear(s){
-    if(typeof s!== 'string') return String(s||'');
-    const m = s.match(/^(\d{4})-(\d{3})$/); // YYYY-DOY
-    if(!m) return fmtHumanDate(s);
-    const year = Number(m[1]);
-    const day  = Number(m[2]);
-    return `${day}-й день ${year}-го года.`;
-  }
-
-  const getAnno = (s) => {
-    const a = (s.annotation || s.anno || s.summary || '').trim();
-    if (a) return a;
-    const txt = (s.text || '').replace(/\s+/g, ' ').trim();
-    if (!txt) return '';
-    const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
-  };
+  function fmtPergDayYear(s){ if(typeof s!== 'string') return String(s||''); const m = s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s); const year = Number(m[1]); const day  = Number(m[2]); return `${day}-й день ${year}-го года.`; }
+  const getAnno = (s) => { const a = (s.annotation || s.anno || s.summary || '').trim(); if (a) return a; const txt = (s.text || '').replace(/\s+/g, ' ').trim(); if (!txt) return ''; const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt; };
 
   /* ===== ДАННЫЕ ===== */
-  let stories=[], notes=[], pergDocs=[]; // pergDocs: документы с редакциями
+  let stories=[], notes=[], pergDocs=[];
   async function safeJson(url, def){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
   async function loadContent(){
     const j = await safeJson('content/index.json', {});
     if(Array.isArray(j.stories)) stories=j.stories; else stories=await safeJson('content/stories.json', []);
     if(Array.isArray(j.notes))   notes=j.notes;   else notes  =await safeJson('content/notes.json',   []);
-
-    // ПЕРГАМЕНТ: отдельный манифест (папка content/pergament/index.json)
     pergDocs = await safeJson('content/pergament/index.json', []);
-
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
     notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
-
-    // сортируем Пергамент по последней по дате редакции (по исходной строке даты не сортируем; если YYYY-DOY — сложный случай, но relative сравнение по строке YYYY-DOY ок)
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
-    pergDocs.sort((a,b)=> {
-      const ad=(a.editions||[]); const bd=(b.editions||[]);
-      const al=ad[ad.length-1]?.date||''; const bl=bd[bd.length-1]?.date||'';
-      return String(bl).localeCompare(String(al));
-    });
+    pergDocs.sort((a,b)=> { const ad=(a.editions||[]); const bd=(b.editions||[]); const al=ad[ad.length-1]?.date||''; const bl=bd[bd.length-1]?.date||''; return String(bl).localeCompare(String(al)); });
   }
 
-  /* ===== ТЕМА ===== */
-  function applyTheme(){
-    document.documentElement.setAttribute('data-theme', state.theme);
-    localStorage.setItem('theme', state.theme);
-    setUtterancesTheme(state.theme);
-    setCusdisTheme();
-    const el=document.getElementById('favicon');
-    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
-    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
-  }
-  applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{
-    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
-    applyTheme();
-  };
+  /* ===== ТЕМА/СКИН ===== */
+  function applyTheme(){ document.documentElement.setAttribute('data-theme', state.theme); localStorage.setItem('theme', state.theme); setUtterancesTheme(state.theme); setCusdisTheme(); const el=document.getElementById('favicon'); const color = state.theme==='light' ? '%230A1830' : '%23FFD54A'; el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`; }
+  function applySkin(){ document.documentElement.setAttribute('data-skin', state.skin); localStorage.setItem('skin', state.skin); }
+  applyTheme(); applySkin();
+  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.getElementById('skinBtn').onclick=()=>{ state.skin = state.skin==='aurora' ? 'terminal' : 'aurora'; applySkin(); };
+  const dockBtn = document.getElementById('dockTheme'); if(dockBtn){ dockBtn.onclick = ()=> document.getElementById('themeBtn')?.click(); }
 
   /* ===== ADMIN MODE (скрыт) ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
   function ensureAdminUI(){ document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none'; if(!isAdmin) adminDockHide(); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='s'){ document.getElementById('skinBtn')?.click(); } });
 
   /* ===== ROUTER ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== ВЬЮХИ: ГЛАВНАЯ/ВЕТКИ/СТАТЬИ ===== */
+  /* ===== ВЬЮХИ ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
     ibut:    {id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.'},
   };
-  function buildArcs(){
-    const map = {};
-    for(const s of stories){ const id=s.arc||'kainrax'; if(!map[id]) map[id]={...(arcMeta[id]||{id,title:id,desc:''}), items:[]}; map[id].items.push(s); }
-    for(const k in map){ map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (new Date(a.date||0))-(new Date(b.date||0)) ); }
-    return Object.values(map);
-  }
+  function buildArcs(){ const map = {}; for(const s of stories){ const id=s.arc||'kainrax'; if(!map[id]) map[id]={...(arcMeta[id]||{id,title:id,desc:''}), items:[]}; map[id].items.push(s); } for(const k in map){ map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (new Date(a.date||0))-(new Date(b.date||0)) ); } return Object.values(map); }
+
   function renderList(){
-    const q=state.q;
-    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+    const q=state.q; const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
     const arcs = buildArcs();
+    const hero = `
+      <section class="hero">
+        <h1>Кайнракс — короткая НФ без лорового барьера</h1>
+        <p>Обновления по пятницам/субботам · ветки · анонимные комментарии</p>
+        <div class="actions">
+          <a class="btn" href="#/perg">📜 Пергамент</a>
+          <a class="btn" href="#/arcs">✶ Ветки</a>
+          <a class="btn" href="#/project">ℹ️ О проекте</a>
+        </div>
+      </section>`;
     app.innerHTML=`
       <div class="grid">
         <section class="card">
+          ${hero}
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
           <div class="list">
@@ -279,6 +305,7 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
   }
+
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item"><a href="#/arc/${a.id}">
@@ -286,6 +313,7 @@
         <div class="muted">${a.items.length} текст(а)</div>
         <div>${a.desc||''}</div>
       </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+
   function renderArc(id){ const arcs=buildArcs(); const a=arcs.find(x=>x.id===id)||{id,title:'Ветка',items:[],desc:''}; app.innerHTML=`<section class="card">
       <a class="back" href="#/arcs">← Ко всем веткам</a>
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
@@ -298,36 +326,33 @@
           ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
         </li>`).join('')}
       </ol></section>`; adminDockHide(); ensureAdminUI(); }
-  function renderArticle(id){ const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;} const arcs=buildArcs(); const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]}; const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug))); const prev=order[pos-1], next=order[pos+1]; app.innerHTML=`
+
+  function renderArticle(id){
+    const s=stories.find(x=>x.id===id||x.slug===id); if(!s){location.hash='#/'; return;}
+    const arcs=buildArcs(); const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]}; const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug))); const prev=order[pos-1], next=order[pos+1];
+    app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
       <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <div class="prose readbox">
           <h1>${s.title}</h1>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a> (${pos+1}/${order.length})</div>
           <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
-
           ${getAnno(s) ? `
             <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
               <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
               <div style="margin-top:8px">${getAnno(s)}</div>
             </details>
           ` : ``}
-
           ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-          <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
-          </div>
+          <div style="display:flex;justify-content:space-between;gap:10px">${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}</div>
         </div>
         <aside class="margin-notes"></aside>
       </article>
+      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
+    mountComments('story:'+(s.slug||s.id)); setTimeout(restoreScroll,0); adminDockFor('story', s.slug||s.id); ensureAdminUI();
+  }
 
-      <section class="card" style="margin-top:16px">
-        <h3>Комментарии</h3>
-        <section id="comments"></section>
-      </section>`; mountComments('story:'+(s.slug||s.id)); setTimeout(restoreScroll,0); adminDockFor('story', s.slug||s.id); ensureAdminUI(); }
   function renderTag(tag){ const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase())); app.innerHTML=`<section class="card">
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
@@ -339,19 +364,12 @@
 
   /* ===== ПЕРГАМЕНТ ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-  function isProtected(ed){ return !!(ed && (ed.protected || ed.code || ed.codeHash || (ed.access && ed.access.enabled))); }
-  function pergPrevYear(ed){ // пригодится для «предыдущая редакция»
-    if(ed?.year) return ed.year;
-    if (ed?.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4);
-    return '';
-  }
+  function pergPrevYear(ed){ if(ed?.year) return ed.year; if (ed?.date && /^\d{4}/.test(ed.date)) return ed.date.slice(0,4); return ''; }
 
   function renderPergList(){
     const items = pergDocs;
     app.innerHTML = `<section class="card"><h1>Пергамент</h1>
-      <div class="list">${items.map(d=>{
-        const e=lastEdition(d)||{};
-        return `<div class="story-item">
+      <div class="list">${items.map(d=>{ const e=lastEdition(d)||{}; return `<div class="story-item">
           <a href="#/perg/${encodeURIComponent(d.id)}">
             <div class="title">📜 ${d.title}</div>
             <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
@@ -361,18 +379,12 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  function parseHashQuery(){
-    const h = location.hash.split('?')[1]||'';
-    const out={};
-    h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); });
-    return out;
-  }
+  function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
   async function renderPerg(rawId){
     const id = (rawId||'').split('?')[0];
     const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
     if(!d){ location.hash = '#/perg'; return; }
-
     const editions = (d.editions||[]);
     if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
 
@@ -382,103 +394,21 @@
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // === Доступ: последняя редакция ВСЕГДА открыта; остальные — только по коду ===
-    async function ensureAccessForNonLast(ed){
-      if(isLast) return true;
-      const key = 'perg:'+d.id+':'+ed.id+':ok';
-      if(localStorage.getItem(key)==='1') return true;
-      const ok = await showAccessModal(
-        { message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access&&ed.access.hint) || 'хроникёр и год' },
-        (input)=> checkPergCode(input, ed)
-      );
-      if(ok){ localStorage.setItem(key,'1'); return true; }
+    async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    async function checkPergCode(input, ed){
+      const pass = (input||'').trim(); if(!pass) return false;
+      if(ed && ed.codeHash){ const [alg, hex] = String(ed.codeHash).split(':'); if((alg||'sha256').toLowerCase()==='sha256'){ const got = await sha256Hex(pass); return got.toLowerCase() === String(hex||'').toLowerCase(); } }
+      if(ed && ed.code){ return pass === String(ed.code).trim(); }
+      if(PERG.CODE_HASH){ const [alg, hex] = String(PERG.CODE_HASH).split(':'); if((alg||'sha256').toLowerCase()==='sha256'){ const got = await sha256Hex(pass); return got.toLowerCase() === String(hex||'').toLowerCase(); } }
+      if(PERG.CODE){ return pass === String(PERG.CODE).trim(); }
       return false;
     }
 
-    const canOpen = await ensureAccessForNonLast(e);
-    if(!canOpen){ location.hash = '#/perg'; return; }
-
-    // загрузка тела
-    let body = '';
-    try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
-    catch(_){ body = '(не удалось загрузить текст)'; }
-
-    // селектор редакций
-    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
-
-    // плашка «предыдущая редакция …» (всегда по коду)
-    let prevBlock = '';
-    if (isLast && editions.length > 1){
-      const prev = editions[editions.length-2];
-      prevBlock = `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prev.date||'')} — доступ по коду</div>`;
-    }
-
-    app.innerHTML = `
-      <a class="back" href="#/perg">← К «Пергаменту»</a>
-      <article class="with-margin" data-id="${d.id}">
-        <div class="prose parchment readbox">
-          <h1>📜 ${d.title}</h1>
-          <div class="muted">Редакции:
-            <select id="edSel" class="btn" style="padding:6px 10px">${options}</select>
-          </div>
-          ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
-          ${prevBlock}
-          ${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-        </div>
-        <aside class="margin-notes">${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-      </article>
-
-      <section class="card" style="margin-top:16px">
-        <h3>Комментарии</h3><section id="comments"></section>
-      </section>`;
-
-    const sel=document.getElementById('edSel');
-    if(sel){ sel.onchange=()=>{ const nv=sel.value; const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); } }
-
-    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||'')); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
-  }
-
-  /* ===== ДОСТУП: проверка кода ===== */
-  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
-  async function checkPergCode(input, ed){
-    const pass = (input||'').trim();
-    if(!pass) return false;
-
-    // 1) приоритет: редакционный codeHash / code
-    if(ed && ed.codeHash){
-      const [alg, hex] = String(ed.codeHash).split(':');
-      if((alg||'sha256').toLowerCase()==='sha256'){
-        const got = await sha256Hex(pass);
-        return got.toLowerCase() === String(hex||'').toLowerCase();
-      }
-    }
-    if(ed && ed.code){
-      return pass === String(ed.code).trim();
-    }
-
-    // 2) глобальные настройки PERG: CODE_HASH > CODE
-    if(PERG.CODE_HASH){
-      const [alg, hex] = String(PERG.CODE_HASH).split(':');
-      if((alg||'sha256').toLowerCase()==='sha256'){
-        const got = await sha256Hex(pass);
-        return got.toLowerCase() === String(hex||'').toLowerCase();
-      }
-    }
-    if(PERG.CODE){
-      return pass === String(PERG.CODE).trim();
-    }
-
-    return false;
-  }
-
-  function showAccessModal(cfg, verify){
-    return new Promise(resolve=>{
-      const wrap=document.createElement('div'); wrap.className='modal';
-      wrap.innerHTML=`<div class="box">
+    function showAccessModal(cfg, verify){ return new Promise(resolve=>{ const wrap=document.createElement('div'); wrap.className='modal'; wrap.innerHTML=`<div class="box">
         <div style="display:flex; gap:12px; align-items:center">
           <div class="seal" aria-hidden="true"></div>
           <div>
-            <h3 style="margin:0 0 6px">${(cfg&&cfg.message)||'Ваш доступ?'}</h3>
+            <h3 style="margin:0 0 6px">${(cfg&&cfg.message)||'Подтвердите доступ'}</h3>
             <div class="muted" style="margin-bottom:10px">${cfg&&cfg.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.'}</div>
           </div>
         </div>
@@ -488,22 +418,35 @@
           <button class="btn" id="cancelBtn">Отмена</button>
         </div>
         <div class="muted" id="err" style="margin-top:8px;display:none">Неверный код</div>
-      </div>`;
-      document.body.appendChild(wrap);
-      const codeIn=wrap.querySelector('#codeIn');
-      const ok=wrap.querySelector('#okBtn');
-      const cancel=wrap.querySelector('#cancelBtn');
-      const err=wrap.querySelector('#err');
-      function close(val){ document.body.removeChild(wrap); resolve(val); }
-      cancel.onclick=()=> close(false);
-      ok.onclick=async()=>{
-        const pass = await verify(codeIn.value||'');
-        if(pass){ close(true); }
-        else { err.style.display='block'; codeIn.select(); }
-      };
-      codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
-      setTimeout(()=>codeIn.focus(),0);
-    });
+      </div>`; document.body.appendChild(wrap); const codeIn=wrap.querySelector('#codeIn'); const ok=wrap.querySelector('#okBtn'); const cancel=wrap.querySelector('#cancelBtn'); const err=wrap.querySelector('#err'); function close(val){ document.body.removeChild(wrap); resolve(val); } cancel.onclick=()=> close(false); ok.onclick=async()=>{ const pass = await verify(codeIn.value||''); if(pass){ close(true); } else { err.style.display='block'; codeIn.select(); } }; codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); }; setTimeout(()=>codeIn.focus(),0); }); }
+
+    async function ensureAccessForNonLast(ed){ if(isLast) return true; const key = 'perg:'+d.id+':'+ed.id+':ok'; if(localStorage.getItem(key)==='1') return true; const ok = await showAccessModal({ message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access&&ed.access.hint) || 'хроникёр и год' }, (input)=> checkPergCode(input, ed)); if(ok){ localStorage.setItem(key,'1'); return true; } return false; }
+
+    const canOpen = await ensureAccessForNonLast(e); if(!canOpen){ location.hash = '#/perg'; return; }
+
+    let body = ''; try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); } catch(_){ body = '(не удалось загрузить текст)'; }
+
+    // ленточка редакций
+    const options = editions.map(x=>`<button class="chip ${x.id===e.id?'chip--on':''}" data-ed="${x.id}">${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</button>`).join('');
+    const ribbon = `<div class="ribbon" role="tablist" aria-label="Редакции">${options}</div>`;
+
+    app.innerHTML = `
+      <a class="back" href="#/perg">← К «Пергаменту»</a>
+      <article class="with-margin" data-id="${d.id}">
+        <div class="prose parchment readbox">
+          <h1>📜 ${d.title}</h1>
+          ${ribbon}
+          ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
+          ${ (e===lastEd && editions.length>1) ? `<div class="anno-box" style="margin-top:10px"><strong>Предыдущая редакция:</strong> ${fmtPergDayYear(editions[editions.length-2].date||'')} — доступ по коду</div>` : ''}
+          ${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+        </div>
+        <aside class="margin-notes">${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
+      </article>
+      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
+
+    document.querySelectorAll('.chip').forEach(b=>{ b.onclick=()=>{ const nv=b.dataset.ed; const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); }; });
+
+    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||'')); setTimeout(restoreScroll,0); adminDockFor('perg', d.slug||d.id); ensureAdminUI();
   }
 
   /* ===== ЗАМЕТКИ/PROJECT ===== */
@@ -513,6 +456,7 @@
         <div class="title">✶ ${n.title}</div>
         <div class="muted">${fmtHumanDate(n.date)}</div>
       </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+
   function renderNote(id){ const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;} app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
     <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
       <div>
@@ -525,10 +469,7 @@
     <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`; mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI(); }
 
   function renderProject(){
-    const wip = (notes||[])
-      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
-      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
-
+    const wip = (notes||[]).filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' '))).sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
     app.innerHTML=`<section class="card">
       <h1>О проекте | планы</h1>
       <div class="prose">
@@ -568,8 +509,7 @@
 
   /* ===== ЗВЁЗДЫ (фон) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
-  let W,H,starsArr=[], running=true;
-  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W,H,starsArr=[], running=true; const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
   addEventListener('resize', resize);
   function makeStars(){ const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120; const k = (W*H)/30000; const count = Math.floor(base + k); starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2 })); }
@@ -577,22 +517,12 @@
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
   /* ===== РЕНДЕР ===== */
-  function render(){
-    const r=state.route;
-    if(r==='/'||r===''){ renderList(); return; }
-    if(r==='/arcs'){ renderArcs(); return; }
-    if(r==='/notes'){ renderNotes(); return; }
-    if(r==='/project'){ renderProject(); return; }
-    if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(mRead[1]); return; }
-    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
-    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ renderNote(mNote[1]); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(mPerg[1]); return; }
-    renderList();
-  }
+  function render(){ const r=state.route; if(r==='/'||r===''){ renderList(); return; } if(r==='/arcs'){ renderArcs(); return; } if(r==='/notes'){ renderNotes(); return; } if(r==='/project'){ renderProject(); return; } if(r==='/perg'){ renderPergList(); return; } const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(mRead[1]); return; } const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; } const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; } const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ renderNote(mNote[1]); return; } const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(mPerg[1]); return; } renderList(); }
 
-  loadContent().then(()=>{ applyTheme(); render(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); });
+  loadContent().then(()=>{ applyTheme(); applySkin(); render(); ensureAdminUI(); resize(); const skinParam = new URLSearchParams(location.search).get('skin'); if(skinParam){ state.skin = skinParam; applySkin(); } const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if(!prefersReduced) requestAnimationFrame(drawStars); });
+
+  // quick nav in reader
+  addEventListener('keydown', (e)=>{ if(!/read\//.test(location.hash)) return; if(e.key==='['){ document.querySelector('a.btn[href^="#/read/"]:first-child')?.click(); } if(e.key===']'){ document.querySelector('a.btn[href^="#/read/"]:last-child')?.click(); } });
   </script>
 </body>
 </html>
