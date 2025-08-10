@@ -1,50 +1,96 @@
-<!doctype html><html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Тема — Доска сектора</title>
-<link rel="stylesheet" href="/assets/forum.css">
-<script defer data-domain="forum.kainrax.site" src="https://plausible.io/js/script.js"></script>
-</head><body>
-<header class="head">
-  <a class="brand" href="/index.html">Кайнракс ✶ Доска</a>
-  <nav><a class="btn" href="/index.html">Все темы</a></nav>
-</header>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Тема — Доска сектора</title>
+  <link rel="stylesheet" href="/assets/forum.css"/>
+  <script defer data-domain="forum.kainrax.site" src="https://plausible.io/js/script.js"></script>
+  <style>
+    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);
+      background:radial-gradient(ellipse 80% 150% at 50% 50%, rgba(125,211,252,.9) 0%, transparent 40%);}
+  </style>
+</head>
+<body>
+  <div id="sky-line" aria-hidden="true"></div>
 
-<main id="app" class="card"><div id="threadBox">Загрузка…</div></main>
+  <header class="kx-head">
+    <a class="kx-brand" href="/index.html">Доска Кайнракс</a>
+    <nav class="kx-nav">
+      <a class="kx-btn" href="/index.html">Темы</a>
+      <a class="kx-btn" href="https://kainrax.site/">К рассказам</a>
+    </nav>
+  </header>
 
-<script type="module">
-const id = location.hash.replace(/^#\\//,'');
-async function loadThread(){
-  const url = `/content/threads/${id}.json`;
-  const r = await fetch(url,{cache:'no-store'});
-  if(!r.ok) throw new Error('404');
-  return await r.json();
-}
-function render(t){
-  const when = new Date(t.created).toLocaleString('ru-RU',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'});
-  const tags=(t.tags||[]).map(x=>`<span class="tag">${x}</span>`).join(' ');
-  document.title = `${t.title} — Доска сектора`;
-  document.getElementById('threadBox').innerHTML = `
-    <article class="thread-full">
-      <h1>${t.title}</h1>
-      <div class="muted">${when} · ${t.author} · сектор: ${t.sector} · ${tags}</div>
-      ${(t.body||'').split(/\\n\\n+/).map(p=>`<p>${p}</p>`).join('')}
-      <hr>
-      <h3>Комментарии</h3>
-      <div id="comments"></div>
-    </article>`;
-  // Cusdis — анонимные комменты под ID треда
-  const d=document.createElement('div');
-  d.id='cusdis_thread';
-  d.dataset.host='https://cusdis.com';
-  d.dataset.appId='${(typeof window!=="undefined" && window.CUSDIS_APP_ID) || '079685b7-f335-4fbd-9217-9d857a3cc369'}';
-  d.dataset.pageId='thread:'+t.id;
-  d.dataset.pageTitle=t.title;
-  d.dataset.lang='ru';
-  document.getElementById('comments').appendChild(d);
-  const s=document.createElement('script');
-  s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
-  document.body.appendChild(s);
-}
-loadThread().then(render).catch(()=>{document.getElementById('threadBox').innerHTML='<div class="muted">Тема не найдена.</div>';});
-</script>
-</body></html>
+  <main class="kx-shell">
+    <article id="post" class="kx-panel">Загрузка…</article>
+  </main>
+
+  <script type="module">
+    function fmtDayYear(s){
+      if(!s) return '';
+      if(/^\d{4}-\d{2}-\d{2}T/.test(s) || /^\d{4}-\d{2}-\d{2}$/.test(s)){
+        const d=new Date(s); const yy=d.getUTCFullYear();
+        const start=new Date(Date.UTC(yy,0,1));
+        const doy=Math.floor((d-start)/86400000)+1;
+        const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0');
+        return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
+      }
+      const m=(s+'').trim().match(/^(\d{4})[\s\-_:.,\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
+      if(m){
+        const yy=+m[1], doy=+m[2]; const hh=m[3]?m[3].padStart(2,'0'):'00'; const mm=m[4]?m[4]:'00';
+        return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
+      }
+      return s;
+    }
+    (function sky(){ const el=document.getElementById('sky-line'); let run=true;
+      function t(){ const n=new Date(); const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
+        el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(t); }
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(t);});
+      requestAnimationFrame(t);
+    })();
+
+    function getId(){ return decodeURIComponent(location.hash.replace(/^#\/?/,'')).trim(); }
+    async function loadThread(id){
+      const url=`/content/threads/${id}.json`;
+      const r=await fetch(url,{cache:'no-store'});
+      if(!r.ok) throw new Error('not found');
+      return await r.json();
+    }
+    function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    async function render(){
+      const box=document.getElementById('post');
+      const id=getId(); if(!id){ box.textContent='Тема не указана.'; return; }
+      try{
+        const t=await loadThread(id);
+        document.title = `${t.title} — Доска сектора`;
+        const when=fmtDayYear(t.created);
+        const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${escapeHTML(x)}</span>`).join(' ');
+        const body=(t.body||'').split(/\n\n+/).map(p=>`<p>${escapeHTML(p)}</p>`).join('');
+        box.innerHTML = `
+          <h1>${escapeHTML(t.title)}</h1>
+          <div class="kx-muted">${when} · ${escapeHTML(t.author||'anon')} · сектор: ${escapeHTML(t.sector||'—')}</div>
+          <div class="kx-tags" style="margin:8px 0 14px">${tags}</div>
+          ${body}
+          <hr class="kx-hr">
+          <h3>Комментарии</h3>
+          <div id="comments"></div>`;
+        // Cusdis (аноним)
+        const d=document.createElement('div');
+        d.id='cusdis_thread';
+        d.dataset.host='https://cusdis.com';
+        d.dataset.appId='079685b7-f335-4fbd-9217-9d857a3cc369';
+        d.dataset.pageId='thread:'+t.id;
+        d.dataset.pageTitle=t.title;
+        d.dataset.lang='ru';
+        document.getElementById('comments').appendChild(d);
+        const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js'; document.body.appendChild(s);
+      }catch(_){
+        box.innerHTML = `<div class="kx-muted">Тема не найдена. Проверь <code>/content/threads/${getId()}.json</code> и индекс.</div>`;
+      }
+    }
+    addEventListener('hashchange', render);
+    render();
+  </script>
+</body>
+</html>
