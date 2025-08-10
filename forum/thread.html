@@ -1,0 +1,50 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Тема — Доска сектора</title>
+<link rel="stylesheet" href="/assets/forum.css">
+<script defer data-domain="forum.kainrax.site" src="https://plausible.io/js/script.js"></script>
+</head><body>
+<header class="head">
+  <a class="brand" href="/index.html">Кайнракс ✶ Доска</a>
+  <nav><a class="btn" href="/index.html">Все темы</a></nav>
+</header>
+
+<main id="app" class="card"><div id="threadBox">Загрузка…</div></main>
+
+<script type="module">
+const id = location.hash.replace(/^#\\//,'');
+async function loadThread(){
+  const url = `/content/threads/${id}.json`;
+  const r = await fetch(url,{cache:'no-store'});
+  if(!r.ok) throw new Error('404');
+  return await r.json();
+}
+function render(t){
+  const when = new Date(t.created).toLocaleString('ru-RU',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'});
+  const tags=(t.tags||[]).map(x=>`<span class="tag">${x}</span>`).join(' ');
+  document.title = `${t.title} — Доска сектора`;
+  document.getElementById('threadBox').innerHTML = `
+    <article class="thread-full">
+      <h1>${t.title}</h1>
+      <div class="muted">${when} · ${t.author} · сектор: ${t.sector} · ${tags}</div>
+      ${(t.body||'').split(/\\n\\n+/).map(p=>`<p>${p}</p>`).join('')}
+      <hr>
+      <h3>Комментарии</h3>
+      <div id="comments"></div>
+    </article>`;
+  // Cusdis — анонимные комменты под ID треда
+  const d=document.createElement('div');
+  d.id='cusdis_thread';
+  d.dataset.host='https://cusdis.com';
+  d.dataset.appId='${(typeof window!=="undefined" && window.CUSDIS_APP_ID) || '079685b7-f335-4fbd-9217-9d857a3cc369'}';
+  d.dataset.pageId='thread:'+t.id;
+  d.dataset.pageTitle=t.title;
+  d.dataset.lang='ru';
+  document.getElementById('comments').appendChild(d);
+  const s=document.createElement('script');
+  s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js';
+  document.body.appendChild(s);
+}
+loadThread().then(render).catch(()=>{document.getElementById('threadBox').innerHTML='<div class="muted">Тема не найдена.</div>';});
+</script>
+</body></html>
