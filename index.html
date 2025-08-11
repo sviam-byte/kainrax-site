@@ -19,7 +19,7 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
-  <!-- Favicon (динамически перекрашивается) -->
+  <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
   <style>
@@ -48,7 +48,6 @@
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
-
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
@@ -174,7 +173,7 @@
   <div id="sky-line" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
   <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
-  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 Л80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
   <header>
@@ -203,7 +202,7 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== Глобальные настройки / Пергамент / Plausible ===== */
+  /* ===== Глобальные настройки / Plausible на проде ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
 
   (function loadPlausibleOnProd(){
@@ -254,7 +253,35 @@
     const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
 
-  /* ===== Загрузка данных с защитой от SPA-редиректа ===== */
+  // ——— Парсер фронтматтера и загрузка Markdown по file
+  function parseFrontMatter(md){
+    const m = md.match(/^---\s*([\s\S]*?)\s*---\s*\n?([\s\S]*)$/);
+    if (!m) return { attributes:{}, body: md.trim() };
+    const yaml = m[1], body = m[2].trim();
+    const attrs = {};
+    yaml.split('\n').forEach(line=>{
+      const i=line.indexOf(':'); if(i<0) return;
+      const k=line.slice(0,i).trim(); let v=line.slice(i+1).trim();
+      if (/^\[.*\]$/.test(v)) { try { v = JSON.parse(v.replace(/'/g,'"')); } catch {} }
+      attrs[k]=v.replace(/^['"]|['"]$/g,'');
+    });
+    return { attributes: attrs, body };
+  }
+  async function loadMdIntoStory(s){
+    if (!s || s.text || !s.file) return s;
+    const raw = await fetch(s.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+    const { attributes, body } = parseFrontMatter(raw);
+    s.title      = s.title      || attributes.title || s.id;
+    s.date       = s.date       || attributes.date  || '';
+    s.minutes    = s.minutes    || attributes.minutes || Math.max(5, Math.round(body.length/1100));
+    s.arc        = s.arc        || attributes.arc   || 'kainrax';
+    s.tags       = s.tags       || attributes.tags  || [];
+    s.annotation = s.annotation || attributes.annotation || '';
+    s.text       = body || '';
+    return s;
+  }
+
+  /* ===== Загрузка данных: функция → статические индексы ===== */
   let stories=[], notes=[], pergDocs=[];
   async function safeJson(url, def, label){
     try{
@@ -270,9 +297,15 @@
     }
   }
   async function loadContent(){
-    const j = await safeJson('content/index.json', {}, 'content/index.json');
-    stories = Array.isArray(j.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
-    notes   = Array.isArray(j.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
+    // 1) живой индекс с сервера
+    let j = await safeJson('/.netlify/functions/content-index', null, 'content-index function');
+    // 2) если его нет — статический агрегатор
+    if (!j) j = await safeJson('content/index.json', null, 'content/index.json');
+    // 3) старые отдельные файлы как последний шанс
+    stories = Array.isArray(j?.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
+    notes   = Array.isArray(j?.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
+
+    // Пергамент — отдельный индекс
     pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
 
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
@@ -348,7 +381,7 @@
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
-              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>'}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Если уверен, что файлы есть, проверь функцию <code>content-index</code> и редиректы.</div>'}
           </div>
         </section>
 
@@ -397,9 +430,11 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  function renderArticle(id){
+  async function renderArticle(id){
     const s=stories.find(x=>x.id===id||x.slug===id);
     if(!s){location.hash='#/'; return;}
+    if (!s.text && s.file) { try { await loadMdIntoStory(s); } catch(e){ console.warn('md load fail', e); } }
+
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
     const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
@@ -727,7 +762,7 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Заметки и О проекте (минимальные вьюхи, чтобы не падало) ===== */
+  /* ===== Заметки и О проекте (минимальные вьюхи) ===== */
   function renderNotes(){
     const items = notes || [];
     app.innerHTML = `
@@ -743,7 +778,7 @@
                   <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
                   ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
                 </div>`).join('')
-              : '<div class="muted">Пусто. Проверь <code>content/notes.json</code>.</div>'
+              : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>'
           }
         </div>
       </section>`;
@@ -755,23 +790,23 @@
       <section class="card">
         <a class="back" href="#/">← На главную</a>
         <h1>О проекте | планы</h1>
-        <p class="muted">Добавь файл в <code>content/project.md</code> и подтяни через fetch, если нужно. Пока заглушка, чтобы роут не падал.</p>
+        <p class="muted">Здесь может быть markdown/текст из файла, пока заглушка.</p>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
   /* ===== Router render ===== */
-  function render(){
+  async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(mRead[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(mPerg[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
   }
 
@@ -781,7 +816,6 @@
     render();
     ensureAdminUI();
     resize();
-    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!prefersReduced) requestAnimationFrame(drawStars);
     initSkyLine();
   });
