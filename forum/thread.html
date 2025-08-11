@@ -13,10 +13,13 @@
     html[data-theme="glitch"]{--bg:#07090d;--panel:#0c121b;--text:#e8f0ff;--muted:#9fb6d6;--tag:#0d1a2a;--tag-on:#14253a;--link:#b9a4ff;--ring:#a78bfa}
     html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
     a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+
     .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid rgba(255,255,255,.05)}
     .kx-brand{font-weight:800;color:var(--text)} .kx-nav{display:flex;gap:8px;align-items:center}
     .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow);color:var(--text)}
-    .kx-btn:hover{transform:translateY(-1px)} .is-active{outline:2px solid var(--ring)} .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:rgba(255,255,255,.12);font-weight:600}
+    .kx-btn:hover{transform:translateY(-1px)} .is-active{outline:2px solid var(--ring)}
+    .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:rgba(255,255,255,.12);font-weight:600}
+
     .kx-shell{max-width:900px;margin:0 auto;padding:16px}
     .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;position:relative;overflow:hidden}
     h1{margin:4px 0 8px 0;font-size:24px}
@@ -28,13 +31,15 @@
 </head>
 <body>
   <div id="sky-line" aria-hidden="true"></div>
+
   <header class="kx-head">
     <a class="kx-brand" href="/index.html">Доска Кайнракс</a>
     <nav class="kx-nav">
       <a class="kx-btn" href="/index.html">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
       <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
-      <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">TG</a>
+      <!-- одна кнопка подписки, без отдельного TG -->
+      <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Подписаться</a>
     </nav>
   </header>
 
@@ -43,54 +48,101 @@
   </main>
 
   <script type="module">
+    /* ===== Полоса неба ===== */
     (function sky(){const el=document.getElementById('sky-line');let run=true;function t(){const n=new Date();const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();el.style.top=(ms/86400000*100)+'vh';if(run) requestAnimationFrame(t)}document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(t)});requestAnimationFrame(t)})();
 
+    /* ===== Темы с памятью ===== */
     const THEMES=['subsurface','sepia','glitch'], themeKey='kx-theme';
     (function initTheme(){let t='subsurface';try{t=localStorage.getItem(themeKey)||t}catch(_){ }applyTheme(t)})();
     function applyTheme(t){ if(!THEMES.includes(t)) t='subsurface'; document.documentElement.setAttribute('data-theme',t); const m=document.querySelector('meta[name="theme-color"]'); if(m){const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; m.setAttribute('content', bg)} }
 
+    /* ===== Утилиты ===== */
     function fmtDayYear(s){ if(!s) return ''; if(/^\d{4}-\d{2}-\d{2}/.test(s)){const d=new Date(s),y=d.getUTCFullYear(),start=new Date(Date.UTC(y,0,1)),doy=Math.floor((d-start)/86400000)+1; const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0'); return `${doy}-й день ${y}-го года, ${hh}:${mm}`} const m=String(s).trim().match(/^(\d{4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/); if(m){const y=+m[1],doy=+m[2],hh=m[3]?m[3].padStart(2,'0'):'00',mm=m[4]?m[4]:'00'; return `${doy}-й день ${y}-го года, ${hh}:${mm}`} return s }
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
     function getId(){ return decodeURIComponent(location.hash.replace(/^#\/?/,'')).trim() }
     async function getJSON(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(r.status); return await r.json() }
+
+    // стабильные смайлики авторам
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
     function authorEmoji(name){ const i=hashStr(name||'anon')%EMO.length; return EMO[i] }
+
+    function renderCommentNode(c, depth=0){
+      const pad = Math.min(depth*14, 56);
+      const emo = authorEmoji(c.author||'anon');
+      return `
+        <div style="border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;background:rgba(255,255,255,.02); margin-left:${pad}px">
+          <div class="kx-muted" style="font-size:12px">${fmtDayYear(c.created)} · ${emo} ${esc(c.author||'anon')}${c.sector?` · сектор: ${esc(c.sector)}`:''}</div>
+          <div style="margin-top:6px;white-space:pre-wrap">${esc(c.body||'')}</div>
+          ${Array.isArray(c.replies)&&c.replies.length ? c.replies.map(r=>renderCommentNode(r, depth+1)).join('') : ''}
+        </div>
+      `;
+    }
 
     async function render(){
       const box=document.getElementById('post'); const id=getId(); if(!id){ box.textContent='Тема не указана.'; return }
       try{
         const t = await getJSON(`/content/threads/${id}.json`);
         document.title = `${t.title||id} — Доска сектора`;
+
         const when=fmtDayYear(t.created);
-        const auth=t.author||'anon'; const aId=encodeURIComponent(t.author_id||auth.toLowerCase());
         const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${esc(x)}</span>`).join(' ');
         const body=(t.body||'').split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('');
+        const auth=t.author||'anon'; const aId=encodeURIComponent(t.author_id||auth.toLowerCase());
         const emo=authorEmoji(auth);
+
         box.innerHTML = `
           <h1>${esc(t.title||id)}</h1>
-          <div class="kx-muted">${when} · <a href="/author.html#/${aId}" title="Все посты автора">${emo} ${esc(auth)}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}</div>
+          <div class="kx-muted">${when} · <a href="/author.html#/${aId}">${emo} ${esc(auth)}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}</div>
           <div class="kx-tags">${tags}</div>
           ${body}
           <hr class="kx-hr">
           <div id="related"></div>
         `;
+
+        const relatedBox = document.getElementById('related');
+
+        // 1) Если есть встроенные комментарии — рисуем дерево
+        if (Array.isArray(t.comments) && t.comments.length){
+          relatedBox.innerHTML = `
+            <div><strong>Комментарии:</strong></div>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:10px">
+              ${t.comments.map(c => renderCommentNode(c, 0)).join('')}
+            </div>
+          `;
+          return;
+        }
+
+        // 2) Фолбэк на «детей»-комментарии из индекса
         try{
-          const idx=await getJSON('/content/threads-index.json');
-          const kids = idx.filter(x=>x.parentId===t.id);
-          const siblings = t.parentId ? idx.filter(x=>x.parentId===t.parentId && x.id!==t.id) : [];
-          const sameAuthor = idx.filter(x=>x.author_id===(t.author_id||auth.toLowerCase()) && x.id!==t.id).slice(0,6);
-          let html='';
-          if(kids.length){ html += `<div><strong>Подтемы:</strong><ul>${kids.map(x=>`<li><a href="/thread.html#/${encodeURIComponent(x.id)}">${esc(x.title)}</a></li>`).join('')}</ul></div>` }
-          if(siblings.length){ html += `<div style="margin-top:6px"><strong>Связанные:</strong><ul>${siblings.map(x=>`<li><a href="/thread.html#/${encodeURIComponent(x.id)}">${esc(x.title)}</a></li>`).join('')}</ul></div>` }
-          if(sameAuthor.length){ html += `<div style="margin-top:6px"><strong>Ещё от автора:</strong><ul>${sameAuthor.map(x=>`<li><a href="/thread.html#/${encodeURIComponent(x.id)}">${esc(x.title)}</a></li>`).join('')}</ul></div>` }
-          document.getElementById('related').innerHTML = html || '';
-        }catch(_){}
+          const idx = await getJSON('/content/threads-index.json');
+          const kids = idx.filter(x=>x.parentId === t.id);
+          const comments = kids.filter(x => (x.board||'') === 'комментарии');
+          const subthreads = kids.filter(x => (x.board||'') !== 'комментарии');
+
+          let html = '';
+          if (comments.length){
+            html += `<div><strong>Комментарии:</strong><div style="margin-top:6px;display:flex;flex-direction:column;gap:10px">
+              ${comments.map(c => `
+                <div style="border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;background:rgba(255,255,255,.02)">
+                  <div class="kx-muted" style="font-size:12px">${fmtDayYear(c.created)} · ${esc(c.author||'anon')}</div>
+                  <div style="margin-top:6px">${esc((c.body||'').slice(0,600))}${(c.body||'').length>600?'…':''}</div>
+                </div>`).join('')}
+            </div></div>`;
+          }
+          if (subthreads.length){
+            html += `<div style="margin-top:12px"><strong>Подтемы:</strong><ul>${subthreads.map(x=>`<li><a href="/thread.html#/${encodeURIComponent(x.id)}">${esc(x.title)}</a></li>`).join('')}</ul></div>`;
+          }
+          relatedBox.innerHTML = html || '';
+        }catch(_){ /* молчим */ }
+
       }catch(e){
         box.innerHTML = `<div class="kx-muted">Тема не найдена. Проверь <code>/content/threads/${esc(id)}.json</code>.</div>`;
       }
     }
-    addEventListener('hashchange', render); render();
+
+    addEventListener('hashchange', render);
+    render();
   </script>
 </body>
 </html>
