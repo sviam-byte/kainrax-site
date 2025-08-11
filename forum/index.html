@@ -15,28 +15,46 @@
     }
     html[data-theme="sepia"]{ --bg:#0e0b09; --bg-soft:#14100d; --panel:#16120d; --card:#17120e; --text:#ece3d3; --muted:#bdae95; --brand:#d2b48c; --link:#f3d7a6; --tag:#2a2218; --tag-on:#3a2f21; --ring:#d6b778; }
     html[data-theme="glitch"]{ --bg:#07090d; --bg-soft:#0b0f16; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6; --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa; }
-    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+
     .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid rgba(255,255,255,.05)}
-    .kx-brand{font-weight:800;color:var(--text)} .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .kx-brand{font-weight:800;color:var(--text)}
+    .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow);color:var(--text)}
-    .kx-btn:hover{transform:translateY(-1px)} .is-active{outline:2px solid var(--ring)}
+    .kx-btn:hover{transform:translateY(-1px)}
+    .is-active{outline:2px solid var(--ring)}
     .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:rgba(255,255,255,.12);font-weight:600}
-    .kx-themes{display:flex;gap:6px} .kx-pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+
+    .kx-themes{display:flex;gap:6px}
+    .kx-pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid rgba(255,255,255,.06);cursor:pointer}
     .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
+
     .kx-shell{max-width:1100px;margin:0 auto;padding:16px}
     .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
-    h1{margin:0 0 6px 0;font-size:22px} .kx-muted{color:var(--muted);font-size:14px}
+    h1{margin:0 0 6px 0;font-size:22px}
+    .kx-muted{color:var(--muted);font-size:14px}
+
     .bar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+    #filters{display:flex;gap:6px;flex-wrap:wrap}
     .search{flex:1;min-width:220px;display:flex;gap:8px}
     .search input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:var(--card);color:var(--text)}
+
+    #sorters{display:flex;gap:8px;flex-wrap:wrap}
+    #sorters .kx-btn.is-active{outline:1px solid var(--ring);background:var(--tag-on);color:var(--text)}
+
     .kx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
     .kx-thread{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
     .kx-thread .kx-title{margin:2px 0 4px 0;font-size:18px}
-    .kx-sub{font-size:12px;color:var(--muted)} .kx-preview{margin:8px 0 10px 0}
+    .kx-sub{font-size:12px;color:var(--muted)}
+    .kx-preview{margin:8px 0 10px 0}
     .kx-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
     .kx-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid rgba(255,255,255,.06)}
     .kx-tag--on{background:var(--tag-on);color:var(--text)}
+
     #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
     html[data-theme="glitch"] .kx-link{position:relative;display:block;background:linear-gradient(0deg,rgba(255,255,255,.012),rgba(255,255,255,0))}
     html[data-theme="glitch"] .kx-link::after{content:"";position:absolute;inset:0;mix-blend-mode:screen;opacity:.07;background:repeating-linear-gradient(180deg,rgba(167,139,250,.25) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(125,211,252,.15) 0 2px,transparent 2px 4px);pointer-events:none}
@@ -53,7 +71,7 @@
       <a class="kx-btn" href="/people.html">Все люди</a>
       <a class="kx-btn" href="/tags.html">Теги</a>
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться">Подписаться</a>
-      <div class="kx-themes" id="themePicker">
+      <div class="kx-themes" id="themePicker" aria-label="Темы">
         <button class="kx-pill" data-theme="subsurface">Subsurface Lab</button>
         <button class="kx-pill" data-theme="sepia">Archive Sepia</button>
         <button class="kx-pill" data-theme="glitch">Glitch Basilica</button>
@@ -68,6 +86,12 @@
 
       <div class="bar">
         <div id="filters"></div>
+
+        <div id="sorters" role="group" aria-label="Сортировка">
+          <button class="kx-btn" data-sort="newest" aria-pressed="true">Сначала новые</button>
+          <button class="kx-btn" data-sort="popular" aria-pressed="false">Популярные</button>
+        </div>
+
         <div class="search">
           <input id="q" type="search" placeholder="поиск по заголовку, тексту, тегам, автору…" autocomplete="off">
           <button class="kx-btn" id="clearQ">Сброс</button>
@@ -130,10 +154,13 @@
       }
       return s;
     }
+
+    // Утилиты
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
     function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
+    async function loadIndex(){ try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw 0; return await r.json() }catch(_){ return [] } }
 
-    // Стабильный смайлик автора
+    // Стабильный эмодзи-«аватар»
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
     function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
@@ -141,11 +168,11 @@
     // Состояние
     const box=document.getElementById('threads'), filt=document.getElementById('filters');
     const qInp=document.getElementById('q'), qClr=document.getElementById('clearQ');
+    const sortersBox=document.getElementById('sorters');
+    const sortKey='kx-sort';
     let allItems=[], currentBoard='', query='';
-
-    async function loadIndex(){
-      try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw 0; return await r.json() }catch(_){ return [] }
-    }
+    let currentSort='newest';
+    try{ currentSort = localStorage.getItem(sortKey) || 'newest'; }catch(_){}
 
     function card(t){
       const when=fmtDayYear(t.created);
@@ -153,16 +180,17 @@
       const name=esc(t.author||'anon'); const aId=encodeURIComponent(t.author_id||slugify(name));
       const emo=authorEmoji(name);
       const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}">${esc(x)}</a>`).join(' ');
+      const cc = t.commentCount||0;
       return `<article class="kx-thread">
         <a class="kx-link" href="/thread.html#/${encodeURIComponent(t.id)}"><h3 class="kx-title">✶ ${esc(t.title||'Без названия')}</h3></a>
-        <div class="kx-sub">${when} · <a href="/author.html#/${aId}" title="Все посты автора">${emo} ${name}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}</div>
+        <div class="kx-sub">${when} · <a href="/author.html#/${aId}" title="Все посты автора">${emo} ${name}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}${cc?` · комментариев: ${cc}`:''}</div>
         <p class="kx-preview">${esc(preview)}</p>
         <div class="kx-tags">${tags}</div>
       </article>`;
     }
 
     function matches(t){
-      if ((t.board||'') === 'комментарии') return false; // файлы-комменты не показываем
+      if ((t.board||'') === 'комментарии') return false;
       if(currentBoard && (t.board||'')!==currentBoard) return false;
       if(!query) return true;
       const hay = [t.title,t.body,(t.tags||[]).join(' '),t.author,t.sector,t.id].join(' ').toLowerCase();
@@ -170,7 +198,14 @@
     }
 
     function render(){
-      const items = allItems.filter(matches);
+      let items = allItems.filter(matches);
+
+      if (currentSort === 'popular') {
+        items.sort((a,b)=> (b.commentCount||0) - (a.commentCount||0) || (new Date(b.created) - new Date(a.created)));
+      } else {
+        items.sort((a,b)=> new Date(b.created) - new Date(a.created));
+      }
+
       box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-muted">Ничего не найдено.</div>`;
     }
 
@@ -182,11 +217,26 @@
       filt.onclick = e=>{ const el=e.target.closest('.kx-tag'); if(!el) return; currentBoard = el.dataset.board || ''; renderBoards(); render(); };
     }
 
+    function syncSortUI(){
+      sortersBox.querySelectorAll('button[data-sort]').forEach(btn=>{
+        const on = btn.dataset.sort === currentSort;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+
     allItems = await loadIndex();
-    renderBoards(); render();
+    renderBoards(); syncSortUI(); render();
 
     qInp.addEventListener('input', ()=>{ query=qInp.value.trim().toLowerCase(); render(); });
     qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); });
+
+    sortersBox.addEventListener('click', e=>{
+      const btn=e.target.closest('button[data-sort]'); if(!btn) return;
+      currentSort = btn.dataset.sort;
+      try{ localStorage.setItem(sortKey, currentSort) }catch(_){}
+      syncSortUI(); render();
+    });
   </script>
 </body>
 </html>
