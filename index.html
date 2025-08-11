@@ -81,11 +81,9 @@
   @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
 
   .list{display:flex;flex-direction:column;gap:12px}
-
   .story-item{position:relative;padding:14px 14px 14px 16px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
-
   .story-item::before{
     content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
     background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);
@@ -117,7 +115,6 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* Линия свода */
   #sky-line {
     position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: 0.7; filter: blur(1px);
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%);
@@ -135,7 +132,6 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  /* Пергамент */
   .parchment{
     position:relative;
     background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
@@ -205,10 +201,10 @@
   <script>
   /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
+  const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
 
   (function loadPlausibleOnProd(){
-    const PROD = ['kainrax.netlify.app','kainrax.site'];
-    if (PROD.includes(location.hostname)) {
+    if (PROD_HOSTS.includes(location.hostname)) {
       const s=document.createElement('script'); s.defer=true;
       s.setAttribute('data-domain', location.hostname);
       s.src='https://plausible.io/js/script.js';
@@ -216,7 +212,29 @@
     }
   })();
 
-  /* ===== Счётчик просмотров (Netlify Function /.netlify/functions/hit) ===== */
+  /* ===== Хелперы сети с таймаутами (чтобы главная не висла) ===== */
+  function timeout(ms){ return new Promise(res=> setTimeout(res, ms)); }
+
+  async function fetchJson(url, {timeoutMs=1500, headers={}}={}){
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+      const r = await fetch(url, { signal: ctrl.signal, headers });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return await r.json();
+    }finally{ clearTimeout(t); }
+  }
+  async function fetchText(url, {timeoutMs=4000, cacheMode}={}){
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+      const r = await fetch(url, { signal: ctrl.signal, ...(cacheMode?{cache:cacheMode}:{}) });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return await r.text();
+    }finally{ clearTimeout(t); }
+  }
+
+  /* ===== Счётчик просмотров (мягкая деградация) ===== */
   window.hit = async function(slug, outEl){
     try{
       const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
@@ -224,7 +242,6 @@
       if(outEl) outEl.textContent = j?.count ?? '—';
       return Number(j?.count ?? 0);
     }catch(e){
-      console.warn('hit() failed:', e);
       if(outEl) outEl.textContent='—';
       return 0;
     }
@@ -249,6 +266,7 @@
     }
     return null;
   }
+  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
   function fmtHumanDate(v){
     const d=toDate(v);
     return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : '';
@@ -281,7 +299,7 @@
     return { attributes: attrs, body };
   }
 
-  async function loadMdIntoStory(s){
+  async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
     if(!file){
@@ -289,20 +307,22 @@
       if(name) file = `content/stories/${name}.md`;
     }
     if(!file || s.text) return s;
-    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
-    const { attributes, body } = parseFrontMatter(raw);
-    s.file       = file;
-    s.title      = s.title      || attributes.title || s.id;
-    s.date       = s.date       || attributes.date  || '';
-    s.minutes    = s.minutes    || attributes.minutes || Math.max(5, Math.round((body||'').length/1100));
-    s.arc        = s.arc        || attributes.arc   || 'kainrax';
-    s.tags       = s.tags       || attributes.tags  || [];
-    s.annotation = s.annotation || attributes.annotation || '';
-    s.text       = body || '';
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      s.file       = file;
+      s.title      = s.title      || attributes.title || s.id;
+      s.date       = s.date       || attributes.date  || '';
+      s.minutes    = s.minutes    || attributes.minutes || Math.max(5, Math.round((body||'').length/1100));
+      s.arc        = s.arc        || attributes.arc   || 'kainrax';
+      s.tags       = s.tags       || attributes.tags  || [];
+      s.annotation = s.annotation || attributes.annotation || '';
+      s.text       = body || '';
+    }catch(e){ /* молчим, текст подтянется потом или останется краткая карточка */ }
     return s;
   }
 
-  async function loadMdIntoNote(n){
+  async function loadMdIntoNote(n, isAdmin){
     if (!n) return n;
     let file = n.file;
     if(!file){
@@ -310,14 +330,16 @@
       if(name) file = `content/notes/${name}.md`;
     }
     if(!file || n.text) return n;
-    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
-    const { attributes, body } = parseFrontMatter(raw);
-    n.file       = file;
-    n.title      = n.title || attributes.title || n.id;
-    n.date       = n.date  || attributes.date  || '';
-    n.tags       = n.tags  || attributes.tags  || [];
-    n.annotation = n.annotation || attributes.annotation || '';
-    n.text       = body || '';
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      n.file       = file;
+      n.title      = n.title || attributes.title || n.id;
+      n.date       = n.date  || attributes.date  || '';
+      n.tags       = n.tags  || attributes.tags  || [];
+      n.annotation = n.annotation || attributes.annotation || '';
+      n.text       = body || '';
+    }catch(e){}
     return n;
   }
 
@@ -337,55 +359,37 @@
     return html;
   }
 
-  /* ===== Загрузка данных ===== */
+  /* ===== Загрузка данных (с приоритетом статики и таймаутами) ===== */
   let stories=[], notes=[], pergDocs=[];
-  async function safeJson(url, def, label){
-    const ctrl = new AbortController();
-    const tid = setTimeout(()=>ctrl.abort('timeout'), 6500); // 6.5s: и хватит мучиться
-    try{
-      const r=await fetch(url,{cache:'no-store',headers:{'Accept':'application/json'},signal:ctrl.signal});
-      clearTimeout(tid);
-      if(!r.ok){ console.warn('[load]',label,'HTTP',r.status); return def; }
-      const ct=(r.headers.get('content-type')||'').toLowerCase();
-      if(ct.includes('application/json')) return await r.json();
-      const txt=await r.text(); try{ return JSON.parse(txt); }catch(_){ return def; }
-    }catch(e){ clearTimeout(tid); console.warn('[load]',label,'ошибка',e); return def; }
-  }
-  function dedupeSlugs(items){
-    const count = new Map();
-    for (const s of items){ const k=(s.slug||s.id||'').trim(); count.set(k,(count.get(k)||0)+1); }
-    for (const s of items){
-      const k=(s.slug||s.id||'').trim();
-      if (!k) { s.slug=s.id; continue; }
-      if ((count.get(k)||0) > 1) { s.slug = s.id; }
-    }
-  }
   async function loadContent(){
-    // 1) функция
-    let j = await safeJson('/.netlify/functions/content-index', null, 'content-index function');
-    // 2) статический агрегатор
-    if (!j) j = await safeJson('content/index.json', null, 'content/index.json');
-    // 3) старые файлы
-    stories = Array.isArray(j?.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
-    notes   = Array.isArray(j?.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
-    // пергамент
-    pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
+    // параллельно: статический индекс и функция; что успеет, то и рендерим
+    const staticP = fetchJson('content/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
+    const fnP     = fetchJson('/.netlify/functions/content-index',{timeoutMs:900, headers:{'Accept':'application/json'}}).catch(()=>null);
 
-    // догадка путей для md, если не проставлены
-    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.slug||s.id}.md`; });
-    notes.forEach(n=>{ if(!n.file) n.file = `content/notes/${n.slug||n.id}.md`; });
+    let j = await Promise.race([fnP, staticP]);
+    if(!j) j = await (staticP ?? fnP); // добираем второй вариант
+    if(!j) j = { stories:[], notes:[] };
 
-    // починить дубли slug (типовой косяк при копировании глав)
-    dedupeSlugs(stories);
+    stories = Array.isArray(j.stories) ? j.stories : [];
+    notes   = Array.isArray(j.notes)   ? j.notes   : [];
 
-    // сортировки
-    stories.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
-    notes.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
+    // пергамент — всегда статикой
+    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}); }
+    catch{ pergDocs = []; }
+
+    // нормализация и сортировки
+    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''));
+    stories.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+    notes.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
       const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
       return String(bl).localeCompare(String(al));
     });
+
+    // гарантируем file-пути
+    stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
+    notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
   }
 
   /* ===== Тема ===== */
@@ -416,7 +420,7 @@
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== Вьюхи ===== */
+  /* ===== Построение арок, карты и безопасные ссылки по ID ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
@@ -430,11 +434,26 @@
       map[id].items.push(s);
     }
     for(const k in map){
-      map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (toDate(a.date)?.getTime()||0)-(toDate(b.date)?.getTime()||0) );
+      map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
     }
     return Object.values(map);
   }
 
+  function findStoryByKey(key){
+    if(!key) return null;
+    // приоритетный поиск по id, затем по slug
+    let s = stories.find(x=> (x.id||'') === key);
+    if(s) return s;
+    const bySlug = stories.filter(x=> (x.slug||'') === key);
+    if(bySlug.length>1){
+      // коллизия slug — выберем самый свежий, чтобы не сводить с ума читателя
+      bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
+      return bySlug[0] || null;
+    }
+    return bySlug[0] || null;
+  }
+
+  /* ===== Вьюхи ===== */
   function renderList(){
     const q=state.q;
     const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
@@ -447,12 +466,12 @@
           <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read/${s.slug || s.id}">
+                <a href="#/read-id/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
-              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Если уверена, что файлы есть, проверь функцию <code>content-index</code> и редиректы.</div>'}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или функцию <code>content-index</code>.</div>'}
           </div>
         </section>
 
@@ -474,9 +493,9 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
 
-    // мягкая гидратация: подтягиваем мету первых 12 без перезагрузки
+    // подтягиваем мету первых 12 без перезагрузки
     const need = items.filter(s=>!s.title || !s.date).slice(0,12);
-    if(need.length){ Promise.all(need.map(loadMdIntoStory)).then(()=>{ renderList(); }); }
+    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
@@ -495,7 +514,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read/${s.slug || s.id}">
+          <a href="#/read-id/${s.id}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
@@ -505,14 +524,13 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  async function renderArticle(id){
-    const s=stories.find(x=>x.id===id||x.slug===id);
-    if(!s){location.hash='#/'; return;}
-    try{ await loadMdIntoStory(s); }catch(e){ console.warn('md load fail', e); }
+  async function renderArticleByObj(s){
+    if(!s){ location.hash='#/'; return; }
+    try{ await loadMdIntoStory(s, isAdmin); }catch(e){}
 
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
-    const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> v.id===s.id ));
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
@@ -538,8 +556,8 @@
 
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.slug || prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.slug || next.id}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read-id/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read-id/${next.id}">${next.title} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -562,13 +580,19 @@
     ensureAdminUI();
   }
 
+  async function renderArticle(key){
+    const s = findStoryByKey(key);
+    if(!s){ location.hash='#/'; return; }
+    await renderArticleByObj(s);
+  }
+
   function renderTag(tag){
     const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
     app.innerHTML=`<section class="card">
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.slug || s.id}">
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
@@ -602,7 +626,7 @@
 
   async function renderNote(id){
     const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
-    try{ await loadMdIntoNote(n); }catch(e){ console.warn('note md load fail', e); }
+    try{ await loadMdIntoNote(n, isAdmin); }catch(e){}
     app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
       <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
         <div>
@@ -622,12 +646,13 @@
     let updated = '';
     let body = 'Здесь будет описание проекта.';
     try {
-      const raw = await fetch('content/project.md', { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject(r.status));
+      const raw = await fetchText('content/project.md',{ timeoutMs: 3000, cacheMode: isAdmin?'no-store':undefined });
       const { attributes, body: mdBody } = parseFrontMatter(raw);
       title = attributes.title || title;
       updated = attributes.updated || '';
       body = mdBody || body;
     } catch(_) {}
+    // Вставляем твой текстовый блок именно сюда, не на главную
     const intro = `
       <div class="prose">
         <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
@@ -648,7 +673,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент ===== */
+  /* ===== Пергамент (как у тебя, не ломаем) ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -726,7 +751,6 @@
     }
 
     async function ensureAccessForNonLast(ed){
-      const isLast = (ed===lastEd);
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
       if(localStorage.getItem(key)==='1') return true;
@@ -741,7 +765,7 @@
     if(!canOpen){ location.hash = '#/perg'; return; }
 
     let body = '';
-    try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
+    try{ body = await fetchText(e.file, { timeoutMs: 4000, cacheMode: isAdmin?'no-store':undefined }); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
     const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
@@ -752,7 +776,7 @@
 
     let prevBlock = '';
     let prevObj = null;
-    if (e===lastEd && editions.length > 1){
+    if (isLast && editions.length > 1){
       prevObj = editions[editions.length-2];
       prevBlock = `<div class="anno-box" id="prevBox" style="margin-top:10px;cursor:pointer">
         <strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prevObj.date||'')} — <u>доступ по коду</u>
@@ -775,8 +799,8 @@
         </div>
         <aside class="margin-notes">
           ${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}
-          ${(e!==lastEd) ? `<div class="mnote">Эта версия защищена: подтверждение кода обязательно.</div>`:''}
-          ${(e===lastEd && prevObj) ? `<div class="mnote"><span class="linklike" id="mPrevLink">Предыдущая редакция: ${fmtPergDayYear(prevObj.date||'')} (клик — ввести код)</span></div>`:''}
+          ${!isLast && e ? `<div class="mnote">Эта версия защищена: подтверждение кода обязательно.</div>`:''}
+          ${isLast && prevObj ? `<div class="mnote"><span class="linklike" id="mPrevLink">Предыдущая редакция: ${fmtPergDayYear(prevObj.date||'')} (клик — ввести код)</span></div>`:''}
         </aside>
       </article>
 
@@ -906,7 +930,7 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Рендерер маршрутов ===== */
+  /* ===== Рендерер маршрутов (с поддержкой read-id/:id и read/:slug) ===== */
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -914,7 +938,13 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
+
+    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
+    if(mReadId){ await renderArticle(mReadId[1]); return; }
+
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
+    if(mRead){ await renderArticle(mRead[1]); return; }
+
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
     const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
@@ -923,17 +953,19 @@
   }
 
   /* ===== Инициализация ===== */
-  // ВАЖНО: сначала рисуем UI, потом грузим данные. Иначе при залипшей функции будет черный экран.
-  applyTheme();
-  render();
-  ensureAdminUI();
-  resize();
-  if(!prefersReduced) requestAnimationFrame(drawStars);
-  initSkyLine();
-
-  // Грузим данные параллельно и по готовности перерисовываем.
-  loadContent().then(()=>{ render(); ensureAdminUI(); }).catch((e)=>{ console.warn('loadContent failed', e); });
-
+  (async function init(){
+    // быстрый «скелет» чтобы не было пустоты
+    app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
+    try{
+      await loadContent();
+    }catch(_){}
+    applyTheme();
+    render();
+    ensureAdminUI();
+    resize();
+    if(!prefersReduced) requestAnimationFrame(drawStars);
+    initSkyLine();
+  })();
   </script>
 </body>
 </html>
