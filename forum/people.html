@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru" data-theme="subsurface">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Люди — Доска сектора</title>
+  <meta name="theme-color" content="#0b0f14"/>
+  <style>
+    :root{--bg:#0b0f14;--panel:#0e141d;--text:#e6edf5;--muted:#9fb0c7;--tag:#112131;--link:#bfe9ff;--r:14px;--shadow:0 8px 30px rgba(0,0,0,.35)}
+    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter}
+    a{color:var(--link)} .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));border-bottom:1px solid rgba(255,255,255,.05)}
+    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);color:var(--text)}
+    .kx-shell{max-width:900px;margin:0 auto;padding:16px}
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+    ul{list-style:none;padding:0;margin:0} li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .muted{color:var(--muted)} .row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+    .search{display:flex;gap:8px;margin:8px 0 12px} .search input{flex:1;min-width:220px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0e141d;color:var(--text)}
+  </style>
+</head>
+<body>
+  <header class="kx-head">
+    <a class="kx-btn" href="/index.html">← Темы</a>
+    <div style="display:flex;gap:8px">
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
+      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">TG</a>
+    </div>
+  </header>
+  <main class="kx-shell">
+    <section class="kx-panel">
+      <h1>Все люди</h1>
+      <div class="search"><input id="q" type="search" placeholder="поиск по имени…" autocomplete="off"><button class="kx-btn" id="clearQ">Сброс</button></div>
+      <ul id="list"><li class="muted">Загрузка…</li></ul>
+    </section>
+  </main>
+  <script type="module">
+    const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
+    function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
+    function authorEmoji(name){ const i=hashStr(name||'anon')%EMO.length; return EMO[i] }
+    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+    const list=document.getElementById('list'); const q=document.getElementById('q'); const clr=document.getElementById('clearQ'); let data=[], query='';
+    async function load(){ const r=await fetch('/content/authors-index.json',{cache:'no-store'}); data = r.ok ? await r.json() : []; render() }
+    function render(){
+      const rows = data.filter(a=>!query || a.author.toLowerCase().includes(query)).sort((a,b)=>b.count-a.count);
+      list.innerHTML = rows.length ? rows.map(a=>{
+        const emo=authorEmoji(a.author);
+        const id=encodeURIComponent(a.author_id);
+        return `<li><div class="row"><div><a href="/author.html#/${id}">${emo} ${esc(a.author)}</a></div><div class="muted">${a.count} пост.</div></div></li>`
+      }).join('') : `<li class="muted">Ничего не найдено.</li>`;
+    }
+    q.addEventListener('input',()=>{ query=q.value.trim().toLowerCase(); render() }); clr.addEventListener('click',()=>{ q.value=''; query=''; render() });
+    load();
+  </script>
+</body>
+</html>
