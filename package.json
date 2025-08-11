@@ -1,5 +1,5 @@
 {
-  "name": "kainrax-forum",
+  "name": "kainrax-site",
   "private": true,
   "type": "commonjs",
   "engines": { "node": ">=18" },
