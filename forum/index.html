@@ -51,6 +51,7 @@
       <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">← к рассказам</a>
       <a class="kx-btn is-active" href="/index.html">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
+      <a class="kx-btn" href="/tags.html">Теги</a>
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться">Подписаться</a>
       <div class="kx-themes" id="themePicker">
         <button class="kx-pill" data-theme="subsurface">Subsurface Lab</button>
@@ -151,7 +152,7 @@
       const preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+(t.body&&t.body.length>200?'…':'');
       const name=esc(t.author||'anon'); const aId=encodeURIComponent(t.author_id||slugify(name));
       const emo=authorEmoji(name);
-      const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${esc(x)}</span>`).join(' ');
+      const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}">${esc(x)}</a>`).join(' ');
       return `<article class="kx-thread">
         <a class="kx-link" href="/thread.html#/${encodeURIComponent(t.id)}"><h3 class="kx-title">✶ ${esc(t.title||'Без названия')}</h3></a>
         <div class="kx-sub">${when} · <a href="/author.html#/${aId}" title="Все посты автора">${emo} ${name}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}</div>
@@ -161,7 +162,7 @@
     }
 
     function matches(t){
-      if ((t.board||'') === 'комментарии') return false; // комменты-файлы не показываем как темы
+      if ((t.board||'') === 'комментарии') return false; // файлы-комменты не показываем
       if(currentBoard && (t.board||'')!==currentBoard) return false;
       if(!query) return true;
       const hay = [t.title,t.body,(t.tags||[]).join(' '),t.author,t.sector,t.id].join(' ').toLowerCase();
