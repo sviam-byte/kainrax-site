@@ -19,9 +19,6 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
-  <!-- Plausible: грузим динамически ТОЛЬКО на проде (см. скрипт ниже) -->
-  <!-- <script defer data-domain="kainrax.site" src="https://plausible.io/js/script.js"></script> -->
-
   <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
@@ -32,7 +29,6 @@
     --accent:#7dd3fc; --accent2:#a78bfa; --link:#93c5fd;
     --max:1024px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
     --code:#0a0e16; --mountain:#121723; --star:rgba(255,255,255,.9);
-    /* ветки */
     --surface:#10b981; --kainrax:#7dd3fc; --ibut:#f59e0b;
   }
   [data-theme="light"]{
@@ -121,7 +117,7 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* Линия Свода */
+  /* Линия свода */
   #sky-line {
     position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: 0.7; filter: blur(1px);
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%);
@@ -139,7 +135,7 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  /* Пергамент — оставляем как есть по ТЗ */
+  /* Пергамент (поведение последней редакции не меняем) */
   .parchment{
     position:relative;
     background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
@@ -207,11 +203,10 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ (не трогаем поведение последней) ===== */
+  /* ===== Глобальные настройки / Plausible на проде ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
 
-  /* ===== СТОРОНА КЛИЕНТА: Plausible только на проде ===== */
-  (function(){
+  (function loadPlausibleOnProd(){
     const PROD = ['kainrax.netlify.app','kainrax.site'];
     if (PROD.includes(location.hostname)) {
       const s=document.createElement('script');
@@ -222,22 +217,29 @@
     }
   })();
 
-  /* ===== ГЛОБАЛЬНЫЙ СЧЁТЧИК ПРОСМОТРОВ (Netlify Function) ===== */
-  window.hit = async function(slug,outEl){
+  /* ===== Счётчик просмотров: Netlify Function; виден только админке ===== */
+  window.hit = async function(slug, outEl){
     try{
-      const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
-      const j=await r.json(); if(outEl) outEl.textContent=j?.count??'—';
-    }catch(e){ if(outEl) outEl.textContent='—'; }
+      const r=await fetch('/.netlify/functions/hit',{
+        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})
+      });
+      const j=await r.json();
+      if(outEl) outEl.textContent = j?.count ?? '—';
+      return Number(j?.count ?? 0);
+    }catch(e){
+      console.warn('hit() failed:', e);
+      if(outEl) outEl.textContent='—';
+      return 0;
+    }
   };
 
-  /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369"; // если не нужен аноним-коммент — обнули
-
+  /* ===== Состояние ===== */
+  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
-  /* ===== УТИЛЫ ===== */
+  /* ===== Утилиты ===== */
   const fmtHumanDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
   function fmtPergDayYear(s){
     if(typeof s!=='string') return String(s||'');
@@ -252,14 +254,27 @@
     const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
 
-  /* ===== ДАННЫЕ (СТРУКТУРА ПО ПАПКАМ — оставляем как есть) ===== */
+  /* ===== Загрузка данных с защитой от «SPA-редиректа» ===== */
   let stories=[], notes=[], pergDocs=[];
-  async function safeJson(url, def){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
+  async function safeJson(url, def, label){
+    try{
+      const r=await fetch(url,{cache:'no-store', headers:{'Accept':'application/json'}});
+      if(!r.ok){ console.warn('[load]',label,'HTTP',r.status); return def; }
+      const ct=(r.headers.get('content-type')||'').toLowerCase();
+      if(ct.includes('application/json')) return await r.json();
+      // если отдали HTML (например, catch-all редирект), попробуем распарсить текст и показать предупреждение
+      const txt=await r.text();
+      try{ return JSON.parse(txt); }
+      catch(e){ console.warn('[load]',label,'не JSON, получили',ct||'unknown', 'первые 120 символов:', txt.slice(0,120)); return def; }
+    }catch(e){
+      console.warn('[load]',label,'ошибка',e); return def;
+    }
+  }
   async function loadContent(){
-    const j = await safeJson('content/index.json', {});
-    stories = Array.isArray(j.stories) ? j.stories : await safeJson('content/stories.json', []);
-    notes   = Array.isArray(j.notes)   ? j.notes   : await safeJson('content/notes.json',   []);
-    pergDocs = await safeJson('content/pergament/index.json', []);
+    const j = await safeJson('content/index.json', {}, 'content/index.json');
+    stories = Array.isArray(j.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
+    notes   = Array.isArray(j.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
+    pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
 
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
     notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
@@ -270,7 +285,7 @@
     });
   }
 
-  /* ===== ТЕМА (кнопка + хоткей T) ===== */
+  /* ===== Тема ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
@@ -292,21 +307,21 @@
     }
   });
 
-  /* ===== ADMIN MODE (Alt+Shift+A или ?admin) ===== */
+  /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
   addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
-
   function ensureAdminUI(){
     document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
     if(!isAdmin) adminDockHide();
   }
 
-  /* ===== ROUTER ===== */
+  /* ===== Router ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
-  qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
+  const qEl=document.getElementById('q'); qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== ВЬЮХИ ===== */
+  /* ===== Вьюхи ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
@@ -391,7 +406,6 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПРОСМОТР РАССКАЗА: считаем просмотры через Netlify Function и показываем всем ===== */
   function renderArticle(id){
     const s=stories.find(x=>x.id===id||x.slug===id);
     if(!s){location.hash='#/'; return;}
@@ -409,7 +423,7 @@
             ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
             · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
             (${pos+1}/${order.length})
-            · просмотры: <b id="views">—</b>
+            · <span id="viewsBox" data-admin-only style="display:none">—</span>
           </div>
           <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
 
@@ -435,9 +449,12 @@
         <section id="comments"></section>
       </section>`;
 
-    // просмотры: инкремент и вывод всем
-    const vEl=document.getElementById('views');
-    if(vEl){ window.hit('story:'+(s.slug||s.id), vEl); }
+    // инкремент всем; видеть число — только админка
+    (async () => {
+      const count = await window.hit('story:'+(s.slug||s.id));
+      const box = document.getElementById('viewsBox');
+      if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
+    })();
 
     mountComments('story:'+(s.slug||s.id));
     setTimeout(restoreScroll,0);
@@ -458,13 +475,9 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПЕРГАМЕНТ (оставляем текущую механику доступа) ===== */
+  /* ===== Пергамент (как было) ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-  function parseHashQuery(){
-    const h = location.hash.split('?')[1]||'';
-    const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); });
-    return out;
-  }
+  function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
   function renderPergList(){
     const items = pergDocs;
@@ -485,20 +498,14 @@
     const id = (rawId||'').split('?')[0];
     const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
     if(!d){ location.hash = '#/perg'; return; }
-
     const editions = (d.editions||[]);
-    if(!editions.length){
-      app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`;
-      return;
-    }
-
+    if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
     const q = parseHashQuery();
     const chosenId = q.e || editions[editions.length-1].id;
     let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // Проверка доступа для НЕ последней (как было)
     async function ensureAccessForNonLast(ed){
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
@@ -510,11 +517,9 @@
       if(ok){ localStorage.setItem(key,'1'); return true; }
       return false;
     }
-
     const canOpen = await ensureAccessForNonLast(e);
     if(!canOpen){ location.hash = '#/perg'; return; }
 
-    // загрузка тела
     let body = '';
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
@@ -562,7 +567,6 @@
     const sel=document.getElementById('edSel');
     const edProgress=document.getElementById('edProgress');
     const edHint=document.querySelector('.edhint');
-
     function updateEdUI(nv){
       const ix = editions.findIndex(x=>x.id===nv);
       const e2 = editions[ix];
@@ -570,10 +574,7 @@
       if(edProgress) edProgress.style.width = f.toFixed(1)+'%';
       if(edHint) edHint.textContent = `${fmtPergDayYear(e2.date||'')} → последняя: ${lastLabel}`;
     }
-
-    if(sel){
-      sel.onchange=()=>{ const nv=sel.value; updateEdUI(nv); const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); };
-    }
+    if(sel){ sel.onchange=()=>{ const nv=sel.value; updateEdUI(nv); const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); }; }
 
     const prevBox=document.getElementById('prevBox');
     const mPrevLink=document.getElementById('mPrevLink');
@@ -597,7 +598,7 @@
     ensureAdminUI();
   }
 
-  /* ===== ДОСТУП: проверка кода (как было) ===== */
+  /* ===== Доступ к пергаменту: как было ===== */
   async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
   async function checkPergCode(input, ed){
     const pass = (input||'').trim(); if(!pass) return false;
@@ -613,7 +614,6 @@
     if(PERG.CODE){ return pass === String(PERG.CODE).trim(); }
     return false;
   }
-
   function showAccessModal(cfg, verify){
     return new Promise(resolve=>{
       const wrap=document.createElement('div'); wrap.className='modal';
@@ -645,48 +645,7 @@
     });
   }
 
-  /* ===== ЗАМЕТКИ/PROJECT ===== */
-  function renderNotes(){ app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
-    <div class="list">${(notes||[]).map(n=>`
-      <div class="story-item" data-arc="kainrax"><a href="#/note/${n.id}">
-        <div class="title">✶ ${n.title}</div>
-        <div class="muted">${fmtHumanDate(n.date)}</div>
-      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
-
-  function renderNote(id){
-    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
-    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
-        <div>
-          <h1>${n.title}</h1>
-          <div class="muted">${fmtHumanDate(n.date)}</div>
-          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-        </div>
-        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-      </article>
-      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
-  }
-
-  function renderProject(){
-    const wip = (notes||[]).filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
-      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
-
-    app.innerHTML=`<section class="card">
-      <h1>О проекте | планы</h1>
-      <div class="prose">
-        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
-      </div>
-    </section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-
-  /* ===== КОММЕНТЫ ===== */
+  /* ===== Комментарии, админ-док, прогресс, звёзды, линия свода ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -710,7 +669,6 @@
   function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
   function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
 
-  /* ===== АДМИН ПЛАВАЮЩАЯ КНОПКА ===== */
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
@@ -722,7 +680,6 @@
     adminDock.style.display='block';
   }
 
-  /* ===== ПРОГРЕСС + ВОССТ.СКРОЛЛ ===== */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true;
@@ -744,7 +701,6 @@
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ===== ЗВЁЗДЫ (фон) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -762,7 +718,6 @@
   }
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
-  /* ===== ЛИНИЯ СВОДА ===== */
   function initSkyLine() {
     const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
     function updatePosition() {
@@ -778,7 +733,6 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== РОУТИНГ И СТАРТ ===== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
