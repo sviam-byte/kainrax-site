@@ -77,14 +77,12 @@ async function main(){
     }
   }
 
-  // новые сверху
   items.sort((a,b)=> (new Date(b.created)) - (new Date(a.created)));
   comments.sort((a,b)=> (new Date(b.created)) - (new Date(a.created)));
 
   await fs.writeFile(OUT_THREADS, JSON.stringify(items, null, 2), 'utf8');
   await fs.writeFile(OUT_COMMENTS, JSON.stringify(comments, null, 2), 'utf8');
 
-  // каталог авторов: считаем и посты, и комментарии
   const map = new Map();
   for (const it of items){
     const key = it.author_id;
@@ -101,8 +99,8 @@ async function main(){
     map.set(key, cur);
   }
   const authors = Array.from(map.values())
-    .map(a => ({...a, count: a.posts})) // count — посты, чтобы не ломать people.html
-    .sort((a,b)=> b.posts - a.posts || a.author.localeCompare(b.author));
+    .map(a => ({...a, count: a.posts})) // совместимость со старой people.html, если она живёт
+    .sort((a,b)=> b.posts - a.posts || a.author.localeCompare(b.author,'ru'));
 
   await fs.writeFile(OUT_AUTHORS, JSON.stringify(authors, null, 2), 'utf8');
 
