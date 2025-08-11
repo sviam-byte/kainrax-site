@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru" data-theme="subsurface">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Профиль — Доска сектора</title>
+  <meta name="theme-color" content="#0b0f14"/>
+  <style>
+    :root{--bg:#0b0f14;--panel:#0e141d;--text:#e6edf5;--muted:#9fb0c7;--tag:#112131;--link:#bfe9ff;--r:14px;--shadow:0 8px 30px rgba(0,0,0,.35)}
+    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter}
+    a{color:var(--link)} .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));border-bottom:1px solid rgba(255,255,255,.05)}
+    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);color:var(--text)}
+    .kx-shell{max-width:900px;margin:0 auto;padding:16px}
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+    .muted{color:var(--muted)} .kx-list{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .item{border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;background:#0e141d}
+  </style>
+</head>
+<body>
+  <header class="kx-head">
+    <a class="kx-btn" href="/people.html">← Все люди</a>
+    <div style="display:flex;gap:8px">
+      <a class="kx-btn" href="/index.html">Темы</a>
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
+      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">TG</a>
+    </div>
+  </header>
+  <main class="kx-shell">
+    <section class="kx-panel" id="root">Загрузка…</section>
+  </main>
+  <script type="module">
+    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+    function getId(){ return decodeURIComponent(location.hash.replace(/^#\/?/,'')).trim() }
+    const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
+    function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
+    function authorEmoji(name){ const i=hashStr(name||'anon')%EMO.length; return EMO[i] }
+    function fmtDayYear(s){ if(!s) return ''; if(/^\d{4}-\d{2}-\d{2}/.test(s)){const d=new Date(s),y=d.getUTCFullYear(),start=new Date(Date.UTC(y,0,1)),doy=Math.floor((d-start)/86400000)+1; const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0'); return `${doy}-й день ${y}-го года, ${hh}:${mm}`} const m=String(s).trim().match(/^(\d{4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/); if(m){const y=+m[1],doy=+m[2],hh=m[3]?m[3].padStart(2,'0'):'00',mm=m[4]?m[4]:'00'; return `${doy}-й день ${y}-го года, ${hh}:${mm}`} return s }
+
+    async function load(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw 0; return await r.json() }
+    async function render(){
+      const root=document.getElementById('root'); const id=getId(); if(!id){root.textContent='Автор не указан.';return}
+      try{
+        const authors = await load('/content/authors-index.json');
+        const a = authors.find(x=>x.author_id===id);
+        if(!a){ root.innerHTML=`<div class="muted">Не найден автор <code>${esc(id)}</code>.</div>`; return }
+        const idx = await load('/content/threads-index.json');
+        const posts = idx.filter(x=>x.author_id===id).sort((a,b)=>(new Date(b.created))-(new Date(a.created)));
+        const emo=authorEmoji(a.author);
+        root.innerHTML = `
+          <h1>${emo} ${esc(a.author)}</h1>
+          <div class="muted">${posts.length} пост.</div>
+          <div class="kx-list">
+            ${posts.map(p=>`<div class="item"><a href="/thread.html#/${encodeURIComponent(p.id)}">✶ ${esc(p.title)}</a><div class="muted" style="margin-top:4px">${fmtDayYear(p.created)} · сектор: ${esc(p.sector||'—')}${p.board?` · раздел: ${esc(p.board)}`:''}</div></div>`).join('')}
+          </div>
+        `;
+      }catch(_){ root.innerHTML='<div class="muted">Ошибка загрузки.</div>' }
+    }
+    addEventListener('hashchange', render); render();
+  </script>
+</body>
+</html>
