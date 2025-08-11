@@ -19,8 +19,8 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
-  <!-- Plausible -->
-  <script defer data-domain="kainrax.site" src="https://plausible.io/js/script.js"></script>
+  <!-- Plausible: грузим динамически ТОЛЬКО на проде (см. скрипт ниже) -->
+  <!-- <script defer data-domain="kainrax.site" src="https://plausible.io/js/script.js"></script> -->
 
   <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
@@ -51,22 +51,19 @@
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
-  /* едва заметный «шум» на ссылках при ховере */
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
 
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
-  /* сигилл-узор на карточках (тонкий + гекс-паттерн) */
   .card::after{
     content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.35;
     background-image:
       radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><path d='M80 6 L87 27 L109 31 L87 35 L80 56 L73 35 L51 31 L73 27 Z' fill='rgba(125,211,252,0.06)'/></svg>"),
       url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><defs><pattern id='hex' width='16' height='14' patternUnits='userSpaceOnUse' patternTransform='skewX(-12)'><path d='M4 0 L12 0 L16 7 L12 14 L4 14 L0 7 Z' fill='none' stroke='rgba(125,211,252,0.05)'/></pattern></defs><rect width='100%' height='100%' fill='url(%23hex)'/></svg>\");
-    background-repeat:no-repeat, repeat, repeat;
-    background-size:auto, 160px 160px, auto;
+    background-repeat:no-repeat, repeat, repeat; background-size:auto, 160px 160px, auto;
   }
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
@@ -78,12 +75,8 @@
   .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
   .brand{font-weight:800;letter-spacing:.2px}
   .brand a{color:var(--fg);display:inline-block;transform:translateZ(0)}
-  /* глич-микродрейф ✶ */
   .brand a:hover{ animation:kx-glitch .6s steps(2,end) }
-  @keyframes kx-glitch{
-    30%{ transform:translate(.4px,-.4px) skewX(.25deg) }
-    60%{ transform:translate(-.4px,.4px) skewY(.25deg) }
-  }
+  @keyframes kx-glitch{ 30%{ transform:translate(.4px,-.4px) skewX(.25deg) } 60%{ transform:translate(-.4px,.4px) skewY(.25deg) } }
 
   .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
@@ -97,11 +90,9 @@
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
 
-  /* диагональная полоска ветки */
   .story-item::before{
     content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
-    background:linear-gradient(12deg, var(--kainrax), transparent 60%);
-    border-top-left-radius:12px; transform:skewX(-12deg);
+    background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);
   }
   .story-item[data-arc="surface"]::before{ background:linear-gradient(12deg, var(--surface), transparent 60%) }
   .story-item[data-arc="kainrax"]::before{ background:linear-gradient(12deg, var(--kainrax), transparent 60%) }
@@ -130,7 +121,7 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* Линия Свода (энергетический скан) */
+  /* Линия Свода */
   #sky-line {
     position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: 0.7; filter: blur(1px);
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%);
@@ -144,12 +135,11 @@
   }
   @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
-  /* читаемый бокс */
   .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  /* Пергамент */
+  /* Пергамент — оставляем как есть по ТЗ */
   .parchment{
     position:relative;
     background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
@@ -164,24 +154,20 @@
   [data-theme="cringe"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.85), transparent 60%), linear-gradient(#ffffff, #faf7ef)}
   .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
 
-  /* Маргиналии */
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
   .margin-notes{position:sticky;top:76px;align-self:start}
   .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
   .mnote .linklike{cursor:pointer; text-decoration:underline}
 
-  /* модалка доступа */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:20}
   .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);max-width:440px;width:92%}
   .seal{display:inline-block;min-width:64px;min-height:64px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff6b6b,#c81e1e);box-shadow:0 8px 24px rgba(0,0,0,.3);transform-origin:center;animation:seal 1.4s ease-in-out infinite}
   @keyframes seal{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.06)}}
 
-  /* админ-панель скрыта */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminBtns{display:none}
 
-  /* таймлайн редакций */
   .edbar{position:relative;margin:8px 0 6px;height:4px;background:linear-gradient(90deg, rgba(0,0,0,.15), rgba(255,255,255,.12));border-radius:999px;overflow:hidden}
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
@@ -206,7 +192,7 @@
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/project">О проекте | планы</a>
         <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
-        <button id="themeBtn" title="Сменить тему">🌓</button>
+        <button id="themeBtn" title="Сменить тему (T)">🌓</button>
         <span id="adminBtns">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
@@ -221,10 +207,27 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ ===== */
-  const PERG = {
-    CODE: 'Chronicle',  // явный код
-    CODE_HASH: null     // 'sha256:...'(hex) — если задашь, перекроет CODE
+  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ (не трогаем поведение последней) ===== */
+  const PERG = { CODE: 'Chronicle', CODE_HASH: null };
+
+  /* ===== СТОРОНА КЛИЕНТА: Plausible только на проде ===== */
+  (function(){
+    const PROD = ['kainrax.netlify.app','kainrax.site'];
+    if (PROD.includes(location.hostname)) {
+      const s=document.createElement('script');
+      s.defer=true;
+      s.setAttribute('data-domain', location.hostname);
+      s.src='https://plausible.io/js/script.js';
+      document.head.appendChild(s);
+    }
+  })();
+
+  /* ===== ГЛОБАЛЬНЫЙ СЧЁТЧИК ПРОСМОТРОВ (Netlify Function) ===== */
+  window.hit = async function(slug,outEl){
+    try{
+      const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
+      const j=await r.json(); if(outEl) outEl.textContent=j?.count??'—';
+    }catch(e){ if(outEl) outEl.textContent='—'; }
   };
 
   /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
@@ -236,7 +239,6 @@
 
   /* ===== УТИЛЫ ===== */
   const fmtHumanDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
-  // «N-й день M-го года.» для YYYY-DOY
   function fmtPergDayYear(s){
     if(typeof s!=='string') return String(s||'');
     const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s);
@@ -250,7 +252,7 @@
     const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
 
-  /* ===== ДАННЫЕ ===== */
+  /* ===== ДАННЫЕ (СТРУКТУРА ПО ПАПКАМ — оставляем как есть) ===== */
   let stories=[], notes=[], pergDocs=[];
   async function safeJson(url, def){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
   async function loadContent(){
@@ -261,16 +263,14 @@
 
     stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
     notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
-
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
-      const ad=(a.editions||[]), bd=(b.editions||[]);
-      const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
+      const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
       return String(bl).localeCompare(String(al));
     });
   }
 
-  /* ===== ТЕМА ===== */
+  /* ===== ТЕМА (кнопка + хоткей T) ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
@@ -285,6 +285,12 @@
     state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
     applyTheme();
   };
+  document.addEventListener('keyup',(e)=>{
+    if((e.key||'').toLowerCase()==='t'){
+      state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
+      applyTheme();
+    }
+  });
 
   /* ===== ADMIN MODE (Alt+Shift+A или ?admin) ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
@@ -294,10 +300,6 @@
   function ensureAdminUI(){
     document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
     if(!isAdmin) adminDockHide();
-    // показываем просмотры только админке
-    document.querySelectorAll('[data-admin-only]').forEach(el=>{
-      el.style.display = isAdmin ? '' : 'none';
-    });
   }
 
   /* ===== ROUTER ===== */
@@ -389,24 +391,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПРОСМОТРЫ (per-story) — только админ видит ===== */
-  const VIEW_NS = "kainrax.site";
-  function viewedKey(slug){ return 'viewed:'+slug }
-  function countKey(slug){ return 'story:'+slug }
-  async function incAndGetViews(slug){
-    const k = countKey(slug);
-    const ukey = viewedKey(slug);
-    const already = localStorage.getItem(ukey)==='1';
-    const endpoint = already
-      ? `https://api.countapi.xyz/get/${encodeURIComponent(VIEW_NS)}/${encodeURIComponent(k)}`
-      : `https://api.countapi.xyz/hit/${encodeURIComponent(VIEW_NS)}/${encodeURIComponent(k)}`;
-    try{
-      const r = await fetch(endpoint, {cache:'no-store'}); const j = await r.json();
-      if(!already) localStorage.setItem(ukey,'1');
-      return Number(j.value||0);
-    }catch(_){ return 0; }
-  }
-
+  /* ===== ПРОСМОТР РАССКАЗА: считаем просмотры через Netlify Function и показываем всем ===== */
   function renderArticle(id){
     const s=stories.find(x=>x.id===id||x.slug===id);
     if(!s){location.hash='#/'; return;}
@@ -424,12 +409,12 @@
             ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
             · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
             (${pos+1}/${order.length})
-            · <span id="viewsBox" data-admin-only style="display:none">—</span>
+            · просмотры: <b id="views">—</b>
           </div>
           <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
 
-          ${getAnno(s) ?
-            `<details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
+          ${getAnno(s) ? `
+            <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
               <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
               <div style="margin-top:8px">${getAnno(s)}</div>
             </details>` : ''}
@@ -450,15 +435,9 @@
         <section id="comments"></section>
       </section>`;
 
-    // просмотры (покажем только админке)
-    (async()=>{
-      const vbox=document.getElementById('viewsBox');
-      if(!vbox) return;
-      const slugOrId=s.slug||s.id;
-      const v=await incAndGetViews(slugOrId);
-      vbox.textContent = `${v} просмотров`;
-      ensureAdminUI(); // переключит display в зависимости от isAdmin
-    })();
+    // просмотры: инкремент и вывод всем
+    const vEl=document.getElementById('views');
+    if(vEl){ window.hit('story:'+(s.slug||s.id), vEl); }
 
     mountComments('story:'+(s.slug||s.id));
     setTimeout(restoreScroll,0);
@@ -479,7 +458,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПЕРГАМЕНТ ===== */
+  /* ===== ПЕРГАМЕНТ (оставляем текущую механику доступа) ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){
     const h = location.hash.split('?')[1]||'';
@@ -519,7 +498,7 @@
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // проверка доступа для НЕ последней
+    // Проверка доступа для НЕ последней (как было)
     async function ensureAccessForNonLast(ed){
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
@@ -540,14 +519,12 @@
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
-    // селектор редакций + таймлайн
     const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
     const idx = editions.findIndex(x=>x.id===e.id);
     const frac = (idx+1)/editions.length*100;
     const lastLabel = fmtPergDayYear(lastEd.date||'');
     const currLabel = fmtPergDayYear(e.date||'');
 
-    // плашка «предыдущая редакция …»
     let prevBlock = '';
     let prevObj = null;
     if (isLast && editions.length > 1){
@@ -598,7 +575,6 @@
       sel.onchange=()=>{ const nv=sel.value; updateEdUI(nv); const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); };
     }
 
-    // кликабельный маркер «предыдущая редакция»
     const prevBox=document.getElementById('prevBox');
     const mPrevLink=document.getElementById('mPrevLink');
     async function openPrev(){
@@ -621,7 +597,7 @@
     ensureAdminUI();
   }
 
-  /* ===== ДОСТУП: проверка кода ===== */
+  /* ===== ДОСТУП: проверка кода (как было) ===== */
   async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
   async function checkPergCode(input, ed){
     const pass = (input||'').trim(); if(!pass) return false;
@@ -693,8 +669,7 @@
   }
 
   function renderProject(){
-    const wip = (notes||[])
-      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
+    const wip = (notes||[]).filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
       .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
 
     app.innerHTML=`<section class="card">
@@ -793,7 +768,7 @@
     function updatePosition() {
       const now = new Date();
       const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
-      const progress = msSinceMidnight / 86400000; // 0..1
+      const progress = msSinceMidnight / 86400000;
       skyLine.style.top = `${progress * 100}vh`;
       if (running) requestAnimationFrame(updatePosition);
     }
@@ -803,8 +778,7 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== РЕНДЕР ===== */
-  addEventListener('hashchange',()=>{ /* уже задано выше */ });
+  /* ===== РОУТИНГ И СТАРТ ===== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
