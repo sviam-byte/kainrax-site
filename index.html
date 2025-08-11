@@ -237,6 +237,9 @@
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
   /* ===== Утилиты ===== */
+  const withTimeout = (p, ms = 2500) =>
+    Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+
   function toDate(val){
     if(!val) return null;
     if(val instanceof Date) return val;
@@ -285,29 +288,11 @@
     if (!s) return s;
     let file = s.file;
     if(!file){
-      const name=(s.id || s.slug || '').trim();
+      const name=(s.id||s.slug||'').trim();
       if(name) file = `content/stories/${name}.md`;
     }
     if(!file || s.text) return s;
-
-    let raw;
-    try{
-      raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
-    }catch(e){
-      // фоллбек: если не нашли по id, попробуем по slug (и наоборот)
-      const trySlug = s.slug && `content/stories/${s.slug}.md`;
-      const tryId   = s.id   && `content/stories/${s.id}.md`;
-      const alt = (file.endsWith(`/${s.id}.md`) && s.slug) ? trySlug
-                : (file.endsWith(`/${s.slug}.md`) && s.id) ? tryId
-                : null;
-      if(alt && alt!==file){
-        raw = await fetch(alt,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
-        file = alt;
-      }else{
-        throw e;
-      }
-    }
-
+    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
     const { attributes, body } = parseFrontMatter(raw);
     s.file       = file;
     s.title      = s.title      || attributes.title || s.id;
@@ -324,28 +309,11 @@
     if (!n) return n;
     let file = n.file;
     if(!file){
-      const name=(n.id || n.slug || '').trim();
+      const name=(n.id||n.slug||'').trim();
       if(name) file = `content/notes/${name}.md`;
     }
     if(!file || n.text) return n;
-
-    let raw;
-    try{
-      raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
-    }catch(e){
-      const trySlug = n.slug && `content/notes/${n.slug}.md`;
-      const tryId   = n.id   && `content/notes/${n.id}.md`;
-      const alt = (file.endsWith(`/${n.id}.md`) && n.slug) ? trySlug
-                : (file.endsWith(`/${n.slug}.md`) && n.id) ? tryId
-                : null;
-      if(alt && alt!==file){
-        raw = await fetch(alt,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
-        file = alt;
-      }else{
-        throw e;
-      }
-    }
-
+    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
     const { attributes, body } = parseFrontMatter(raw);
     n.file       = file;
     n.title      = n.title || attributes.title || n.id;
@@ -384,19 +352,29 @@
     }catch(e){ console.warn('[load]',label,'ошибка',e); return def; }
   }
   async function loadContent(){
-    // 1) функция
-    let j = await safeJson('/.netlify/functions/content-index', null, 'content-index function');
+    // 1) функция на проде, но не дольше 2.5с
+    const CAN_FN = ['kainrax.netlify.app','kainrax.site'].includes(location.hostname);
+    let j = null;
+    if (CAN_FN) {
+      j = await withTimeout(
+        safeJson('/.netlify/functions/content-index', null, 'content-index function'),
+        2500
+      ).catch(()=>null);
+    }
+
     // 2) статический агрегатор
     if (!j) j = await safeJson('content/index.json', null, 'content/index.json');
+
     // 3) старые файлы
     stories = Array.isArray(j?.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
     notes   = Array.isArray(j?.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
+
     // пергамент
     pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
 
-    // догадка путей для md, если не проставлены — ИСПОЛЬЗУЕМ id в приоритете
-    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.id || s.slug}.md`; });
-    notes.forEach(n  =>{ if(!n.file) n.file = `content/notes/${n.id || n.slug}.md`; });
+    // догадка путей для md, если не проставлены
+    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.id||s.slug}.md`; });
+    notes.forEach(n=>{ if(!n.file) n.file = `content/notes/${n.id||n.slug}.md`; });
 
     // сортировки
     stories.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
@@ -467,7 +445,7 @@
           <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read/${s.id}">
+                <a href="#/read/${encodeURIComponent(s.id)}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
@@ -515,7 +493,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read/${s.id}">
+          <a href="#/read/${encodeURIComponent(s.id)}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
@@ -525,19 +503,24 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  async function renderArticle(id){
-    const s=stories.find(x=>x.id===id||x.slug===id);
+  function findStory(key){
+    // читаем по id; если вдруг в адрес вставили slug — попробуем по slug
+    return stories.find(x=>x.id===key) || stories.find(x=>x.slug===key);
+  }
+
+  async function renderArticle(key){
+    const s=findStory(key);
     if(!s){location.hash='#/'; return;}
     try{ await loadMdIntoStory(s); }catch(e){ console.warn('md load fail', e); }
 
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
-    const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> v.id===s.id));
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
-      <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
+      <article class="with-margin" data-id="${s.id}" data-slug="${s.id}">
         <div class="prose readbox">
           <h1>${s.title}</h1>
           <div class="muted">
@@ -558,8 +541,8 @@
 
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read/${encodeURIComponent(prev.id)}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${encodeURIComponent(next.id)}">${next.title} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -571,14 +554,14 @@
       </section>`;
 
     (async () => {
-      const count = await window.hit('story:'+(s.id||s.slug));
+      const count = await window.hit('story:'+s.id);
       const box = document.getElementById('viewsBox');
       if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
     })();
 
-    mountComments('story:'+(s.id||s.slug));
+    mountComments('story:'+s.id);
     setTimeout(restoreScroll,0);
-    adminDockFor('story', s.slug||s.id);
+    adminDockFor('story', s.id);
     ensureAdminUI();
   }
 
@@ -588,7 +571,7 @@
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.id}">
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${encodeURIComponent(s.id)}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
@@ -607,7 +590,7 @@
             items.length
               ? items.map(n => `
                 <div class="story-item" data-arc="${n.arc||'kainrax'}">
-                  <a href="#/note/${n.id}">
+                  <a href="#/note/${encodeURIComponent(n.id)}">
                     <div class="title">✶ ${n.title || 'Без названия'}</div>
                     <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
                   </a>
@@ -624,7 +607,7 @@
     const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
     try{ await loadMdIntoNote(n); }catch(e){ console.warn('note md load fail', e); }
     app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
+      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.id}">
         <div>
           <h1>${n.title}</h1>
           <div class="muted">${fmtHumanDate(n.date)}</div>
@@ -633,14 +616,15 @@
         <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
       </article>
       <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.id||n.slug)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
+    mountComments('note:'+n.id); setTimeout(restoreScroll,0); adminDockFor('note', n.id); ensureAdminUI();
   }
 
   /* ===== Проект ===== */
   async function renderProject() {
+    // базовые данные из content/project.md (если есть)
     let title = 'О проекте | планы';
     let updated = '';
-    let body = 'Здесь будет описание проекта.';
+    let body = '';
     try {
       const raw = await fetch('content/project.md', { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject(r.status));
       const { attributes, body: mdBody } = parseFrontMatter(raw);
@@ -649,36 +633,37 @@
       body = mdBody || body;
     } catch(_) {}
 
-    // WIP-заметка по тегу wip
-    const wip = (notes||[]).find(n => (n.tags||[]).map(t=>String(t).toLowerCase()).includes('wip')) || null;
-
-    const headProse = `
-      <div class="prose">
-        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${
-          wip
-            ? `<a href="#/note/${encodeURIComponent(wip.id)}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`
-            : `роман и повесть фолк-хоррорная`
-        }</div>
-      </div>
-    `;
+    // пробуем найти «работается сейчас» среди заметок (tag: wip | work | draft)
+    const wip = (notes||[]).find(n =>
+      (n.tags||[]).some(t => /^(wip|work|draft|в работе|work-in-progress)$/i.test(String(t)))
+    );
 
     app.innerHTML = `
       <section class="card">
         <a class="back" href="#/">← На главную</a>
         <h1>${title}</h1>
         ${updated ? `<div class="muted">обновлено: ${fmtHumanDate(updated)}</div>` : ''}
-        ${headProse}
-        <div class="prose readbox" style="margin-top:10px">${mdToHtml(body)}</div>
+
+        <div class="prose readbox" style="margin-top:10px">
+          <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
+          <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
+          <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
+          <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+          <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
+          <div class="anno-box"><strong>Прямо сейчас пишется:</strong>
+            ${
+              wip
+                ? `<a href="#/note/${encodeURIComponent(wip.id)}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`
+                : `роман и фолк-хоррорная повесть`
+            }
+          </div>
+          ${body ? mdToHtml(body) : ''}
+        </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент ===== */
+  /* ===== Пергамент (как было, «не трогать») ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -773,16 +758,16 @@
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
-    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
-    const idx = editions.findIndex(x=>x.id===e.id);
-    const frac = (idx+1)/editions.length*100;
-    const lastLabel = fmtPergDayYear(lastEd.date||'');
+    const options = (d.editions||[]).map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
+    const idx = (d.editions||[]).findIndex(x=>x.id===e.id);
+    const frac = (idx+1)/(d.editions||[]).length*100;
+    const lastLabel = fmtPergDayYear((d.editions||[])[(d.editions||[]).length-1].date||'');
     const currLabel = fmtPergDayYear(e.date||'');
 
     let prevBlock = '';
     let prevObj = null;
-    if (isLast && editions.length > 1){
-      prevObj = editions[editions.length-2];
+    if (isLast && (d.editions||[]).length > 1){
+      prevObj = (d.editions||[])[(d.editions||[]).length-2];
       prevBlock = `<div class="anno-box" id="prevBox" style="margin-top:10px;cursor:pointer">
         <strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prevObj.date||'')} — <u>доступ по коду</u>
       </div>`;
@@ -817,9 +802,9 @@
     const edProgress=document.getElementById('edProgress');
     const edHint=document.querySelector('.edhint');
     function updateEdUI(nv){
-      const ix = editions.findIndex(x=>x.id===nv);
-      const e2 = editions[ix];
-      const f = (ix+1)/editions.length*100;
+      const ix = (d.editions||[]).findIndex(x=>x.id===nv);
+      const e2 = (d.editions||[])[ix];
+      const f = (ix+1)/(d.editions||[]).length*100;
       if(edProgress) edProgress.style.width = f.toFixed(1)+'%';
       if(edHint) edHint.textContent = `${fmtPergDayYear(e2.date||'')} → последняя: ${lastLabel}`;
     }
@@ -841,13 +826,13 @@
     if(prevBox) prevBox.addEventListener('click', openPrev);
     if(mPrevLink) mPrevLink.addEventListener('click', openPrev);
 
-    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||''));
+    mountComments('perg:'+(d.id)+':'+(e.id||''));
     setTimeout(restoreScroll,0);
-    adminDockFor('perg', d.slug||d.id);
+    adminDockFor('perg', d.id);
     ensureAdminUI();
   }
 
-  /* ===== Комментарии / утилиты ===== */
+  /* ===== Комменты / утилиты ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -874,11 +859,11 @@
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
-  function adminDockFor(kind, slug){
+  function adminDockFor(kind, id){
     if (!isAdmin) return adminDockHide();
-    if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
-    else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
-    else if(kind==='perg') editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
+    if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${id}`;
+    else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${id}`;
+    else if(kind==='perg') editThisBtn.href=`/admin/#/collections/pergament/entries/${id}`;
     adminDock.style.display='block';
   }
 
@@ -891,14 +876,14 @@
       const total=art.scrollHeight - window.innerHeight + 1;
       const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
       progress.style.width=(isFinite(pct)?pct:0)+'%';
-      const id=art.dataset.id || art.dataset.slug; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
       ticking=false;
     });
   }
   addEventListener('scroll', onScroll, {passive:true});
   function restoreScroll(){
     const art=document.querySelector('article'); if(!art) return;
-    const id=art.dataset.id || art.dataset.slug;
+    const id=art.dataset.slug||art.dataset.id;
     const y=+localStorage.getItem('read:'+id)||0;
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
@@ -943,22 +928,44 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(decodeURIComponent(mRead[1])); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(decodeURIComponent(mNote[1])); return; }
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
   }
 
   /* ===== Инициализация ===== */
-  loadContent().then(()=>{
-    applyTheme();
-    render();
-    ensureAdminUI();
-    resize();
-    if(!prefersReduced) requestAnimationFrame(drawStars);
-    initSkyLine();
+  // сначала рисуем каркас, потом подтаскиваем контент
+  applyTheme();
+  render();
+  ensureAdminUI();
+  resize();
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!prefersReduced) requestAnimationFrame(drawStars);
+  initSkyLine();
+
+  loadContent().then(()=>{ render(); }).catch(()=>{ /* оставим скелет */ });
+
+  // маленькая красная полоска при фатальных JS-ошибках, чтобы было видно «что упало»
+  window.addEventListener('error', (e) => {
+    if (!document.getElementById('fatal')) {
+      const d=document.createElement('div');
+      d.id='fatal';
+      d.style.cssText='position:fixed;left:0;right:0;top:0;background:#300;color:#fff;padding:8px 12px;z-index:9999;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace';
+      d.textContent='JS error: ' + (e.error?.message || e.message);
+      document.body.appendChild(d);
+    }
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    if (!document.getElementById('fatal')) {
+      const d=document.createElement('div');
+      d.id='fatal';
+      d.style.cssText='position:fixed;left:0;right:0;top:0;background:#300;color:#fff;padding:8px 12px;z-index:9999;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace';
+      d.textContent='Promise rejection: ' + (e.reason?.message || String(e.reason));
+      document.body.appendChild(d);
+    }
   });
   </script>
 </body>
