@@ -1,11 +1,13 @@
 [build]
-  command = "node scripts/build-index.mjs"
-  publish = "."
+  command   = "echo no-build"
+  publish   = "."
+  functions = "netlify/functions"
 
-  [build.environment]
-    NODE_VERSION = "18"
+[build.environment]
+  NODE_VERSION = "18"
 
+# SPA-маршруты (если используешь #/ — можно и без этого блока)
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to   = "/index.html"
   status = 200
