@@ -1,15 +1,18 @@
 [build]
   base = "forum"
-  publish = "forum"
-  command = "npm ci && npm run build"
+  publish = "."
+  command = "node scripts/build-index.mjs"
 
-# красивые короткие URL на тред
+[build.environment]
+  NODE_VERSION = "20"
+
+# короткие URL на тред
 [[redirects]]
   from = "/t/:id"
   to = "/thread.html#/:id"
   status = 302
 
-# кэш индекса на минуту, чтобы не липло
+# кэш индекса на минуту
 [[headers]]
   for = "/content/threads-index.json"
   [headers.values]
