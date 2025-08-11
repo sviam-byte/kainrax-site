@@ -19,7 +19,7 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
-  <!-- Favicon -->
+  <!-- Favicon (динамически перекрашивается) -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
   <style>
@@ -135,7 +135,7 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  /* Пергамент (поведение последней редакции не меняем) */
+  /* Пергамент */
   .parchment{
     position:relative;
     background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
@@ -203,7 +203,7 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== Глобальные настройки / Plausible на проде ===== */
+  /* ===== Глобальные настройки / Пергамент / Plausible ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
 
   (function loadPlausibleOnProd(){
@@ -217,7 +217,7 @@
     }
   })();
 
-  /* ===== Счётчик просмотров: Netlify Function; виден только админке ===== */
+  /* ===== Счётчик просмотров: Netlify Function ===== */
   window.hit = async function(slug, outEl){
     try{
       const r=await fetch('/.netlify/functions/hit',{
@@ -254,7 +254,7 @@
     const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
 
-  /* ===== Загрузка данных с защитой от «SPA-редиректа» ===== */
+  /* ===== Загрузка данных с защитой от SPA-редиректа ===== */
   let stories=[], notes=[], pergDocs=[];
   async function safeJson(url, def, label){
     try{
@@ -262,7 +262,6 @@
       if(!r.ok){ console.warn('[load]',label,'HTTP',r.status); return def; }
       const ct=(r.headers.get('content-type')||'').toLowerCase();
       if(ct.includes('application/json')) return await r.json();
-      // если отдали HTML (например, catch-all редирект), попробуем распарсить текст и показать предупреждение
       const txt=await r.text();
       try{ return JSON.parse(txt); }
       catch(e){ console.warn('[load]',label,'не JSON, получили',ct||'unknown', 'первые 120 символов:', txt.slice(0,120)); return def; }
@@ -296,16 +295,8 @@
     el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
   }
   applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{
-    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
-    applyTheme();
-  };
-  document.addEventListener('keyup',(e)=>{
-    if((e.key||'').toLowerCase()==='t'){
-      state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
-      applyTheme();
-    }
-  });
+  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
   /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
@@ -319,7 +310,7 @@
 
   /* ===== Router ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
-  const qEl=document.getElementById('q'); qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
+  qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
   /* ===== Вьюхи ===== */
   const arcMeta = {
@@ -449,11 +440,14 @@
         <section id="comments"></section>
       </section>`;
 
-    // инкремент всем; видеть число — только админка
     (async () => {
-      const count = await window.hit('story:'+(s.slug||s.id));
-      const box = document.getElementById('viewsBox');
-      if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
+      const key = 'vc:' + (s.slug||s.id);
+      if (!sessionStorage.getItem(key)) {
+        const count = await window.hit('story:'+(s.slug||s.id));
+        sessionStorage.setItem(key, '1');
+        const box = document.getElementById('viewsBox');
+        if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
+      }
     })();
 
     mountComments('story:'+(s.slug||s.id));
@@ -475,7 +469,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент (как было) ===== */
+  /* ===== Пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -598,7 +592,7 @@
     ensureAdminUI();
   }
 
-  /* ===== Доступ к пергаменту: как было ===== */
+  /* ===== Доступ к пергаменту ===== */
   async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
   async function checkPergCode(input, ed){
     const pass = (input||'').trim(); if(!pass) return false;
@@ -733,6 +727,40 @@
     requestAnimationFrame(updatePosition);
   }
 
+  /* ===== Заметки и О проекте (минимальные вьюхи, чтобы не падало) ===== */
+  function renderNotes(){
+    const items = notes || [];
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>Заметки</h1>
+        <div class="list">
+          ${
+            items.length
+              ? items.map(n => `
+                <div class="story-item" data-arc="${n.arc||'kainrax'}">
+                  <div class="title">✶ ${n.title || 'Без названия'}</div>
+                  <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
+                  ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
+                </div>`).join('')
+              : '<div class="muted">Пусто. Проверь <code>content/notes.json</code>.</div>'
+          }
+        </div>
+      </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  function renderProject(){
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>О проекте | планы</h1>
+        <p class="muted">Добавь файл в <code>content/project.md</code> и подтяни через fetch, если нужно. Пока заглушка, чтобы роут не падал.</p>
+      </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  /* ===== Router render ===== */
   function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -747,11 +775,13 @@
     renderList();
   }
 
+  /* ===== Инициализация ===== */
   loadContent().then(()=>{
     applyTheme();
     render();
     ensureAdminUI();
     resize();
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!prefersReduced) requestAnimationFrame(drawStars);
     initSkyLine();
   });
