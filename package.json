@@ -4,7 +4,8 @@
   "type": "commonjs",
   "engines": { "node": ">=18" },
   "dependencies": {
-    "deta": "^1.1.0"
+    "deta": "^1.1.0",
+    "gray-matter": "^4.0.3"
   },
   "scripts": {
     "build": "echo \"no build\"",
