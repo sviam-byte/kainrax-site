@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
   <style>
     :root{--bg:#0b0f14;--panel:#0e141d;--text:#e6edf5;--muted:#9fb0c7;--tag:#112131;--tag-on:#183140;--link:#bfe9ff;--ring:#7dd3fc;--r:14px;--shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35)}
-    html[data-theme="sepia"]{--bg:#0e0b09;--panel:#16120д;--text:#ece3d3;--muted:#bdae95;--tag:#2a2218;--tag-on:#3a2f21;--link:#f3d7a6;--ring:#d6b778}
+    html[data-theme="sepia"]{--bg:#0e0b09;--panel:#16120d;--text:#ece3d3;--muted:#bdae95;--tag:#2a2218;--tag-on:#3a2f21;--link:#f3d7a6;--ring:#d6b778}
     html[data-theme="glitch"]{--bg:#07090d;--panel:#0c121b;--text:#e8f0ff;--muted:#9fb6d6;--tag:#0d1a2a;--tag-on:#14253a;--link:#b9a4ff;--ring:#a78bfa}
     html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
     a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
@@ -35,6 +35,7 @@
     <nav class="kx-nav">
       <a class="kx-btn" href="/index.html">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
+      <a class="kx-btn" href="/tags.html">Теги</a>
       <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Подписаться</a>
     </nav>
@@ -105,7 +106,7 @@
         document.title = `${t.title||id} — Доска сектора`;
 
         const when=fmtDayYear(t.created);
-        const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${esc(x)}</span>`).join(' ');
+        const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}">${esc(x)}</a>`).join(' ');
         const body=(t.body||'').split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('');
         const auth=t.author||'anon'; const aId=encodeURIComponent(t.author_id||slugify(auth));
         const emo=authorEmoji(auth);
@@ -154,7 +155,7 @@
           }catch(_){ relatedBox.innerHTML = '' }
         }
 
-        // Якорь ?c=ID — прокрутка к комменту
+        // Якорь ?c=ID — прокрутка и подсветка
         const raw = location.hash.replace(/^#\/?/, '');
         const [, q] = raw.split('?');
         if (q){
