@@ -285,11 +285,29 @@
     if (!s) return s;
     let file = s.file;
     if(!file){
-      const name=(s.slug||s.id||'').trim();
+      const name=(s.id || s.slug || '').trim();
       if(name) file = `content/stories/${name}.md`;
     }
     if(!file || s.text) return s;
-    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+
+    let raw;
+    try{
+      raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+    }catch(e){
+      // фоллбек: если не нашли по id, попробуем по slug (и наоборот)
+      const trySlug = s.slug && `content/stories/${s.slug}.md`;
+      const tryId   = s.id   && `content/stories/${s.id}.md`;
+      const alt = (file.endsWith(`/${s.id}.md`) && s.slug) ? trySlug
+                : (file.endsWith(`/${s.slug}.md`) && s.id) ? tryId
+                : null;
+      if(alt && alt!==file){
+        raw = await fetch(alt,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+        file = alt;
+      }else{
+        throw e;
+      }
+    }
+
     const { attributes, body } = parseFrontMatter(raw);
     s.file       = file;
     s.title      = s.title      || attributes.title || s.id;
@@ -306,11 +324,28 @@
     if (!n) return n;
     let file = n.file;
     if(!file){
-      const name=(n.slug||n.id||'').trim();
+      const name=(n.id || n.slug || '').trim();
       if(name) file = `content/notes/${name}.md`;
     }
     if(!file || n.text) return n;
-    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+
+    let raw;
+    try{
+      raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+    }catch(e){
+      const trySlug = n.slug && `content/notes/${n.slug}.md`;
+      const tryId   = n.id   && `content/notes/${n.id}.md`;
+      const alt = (file.endsWith(`/${n.id}.md`) && n.slug) ? trySlug
+                : (file.endsWith(`/${n.slug}.md`) && n.id) ? tryId
+                : null;
+      if(alt && alt!==file){
+        raw = await fetch(alt,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+        file = alt;
+      }else{
+        throw e;
+      }
+    }
+
     const { attributes, body } = parseFrontMatter(raw);
     n.file       = file;
     n.title      = n.title || attributes.title || n.id;
@@ -359,9 +394,9 @@
     // пергамент
     pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
 
-    // догадка путей для md, если не проставлены
-    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.slug||s.id}.md`; });
-    notes.forEach(n=>{ if(!n.file) n.file = `content/notes/${n.slug||n.id}.md`; });
+    // догадка путей для md, если не проставлены — ИСПОЛЬЗУЕМ id в приоритете
+    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.id || s.slug}.md`; });
+    notes.forEach(n  =>{ if(!n.file) n.file = `content/notes/${n.id || n.slug}.md`; });
 
     // сортировки
     stories.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
@@ -424,33 +459,15 @@
     const q=state.q;
     const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
     const arcs = buildArcs();
-
-    // выбираем WIP: сначала тег 'wip', иначе последняя заметка
-    const wip = (notes||[]).find(n => (n.tags||[]).map(t=>String(t).toLowerCase()).includes('wip')) || (notes||[])[0] || null;
-
     app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
-
-          <div class="prose">
-            <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-            <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-            <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-            <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-            <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-            <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${
-              wip
-                ? `<a href="#/note/${encodeURIComponent(wip.id)}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`
-                : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`
-            }</div>
-          </div>
-
-          <div class="muted" style="margin-top:8px">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
-          <div class="list" style="margin-top:8px">
+          <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+          <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read/${encodeURIComponent(s.id)}">
+                <a href="#/read/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
@@ -498,7 +515,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read/${encodeURIComponent(s.id)}">
+          <a href="#/read/${s.id}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
@@ -508,18 +525,14 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  async function renderArticle(rawId){
-    const key = String(rawId||'').trim().toLowerCase();
-    const s=stories.find(x =>
-      String(x.id||'').toLowerCase() === key ||
-      String(x.slug||'').toLowerCase() === key
-    );
+  async function renderArticle(id){
+    const s=stories.find(x=>x.id===id||x.slug===id);
     if(!s){location.hash='#/'; return;}
     try{ await loadMdIntoStory(s); }catch(e){ console.warn('md load fail', e); }
 
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
-    const order=a.items; const pos=Math.max(0, order.findIndex(v=> String(v.id||'').toLowerCase()===String(s.id||'').toLowerCase()));
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
@@ -545,8 +558,8 @@
 
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${encodeURIComponent(prev.id)}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${encodeURIComponent(next.id)}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -558,12 +571,12 @@
       </section>`;
 
     (async () => {
-      const count = await window.hit('story:'+(s.slug||s.id));
+      const count = await window.hit('story:'+(s.id||s.slug));
       const box = document.getElementById('viewsBox');
       if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
     })();
 
-    mountComments('story:'+(s.slug||s.id));
+    mountComments('story:'+(s.id||s.slug));
     setTimeout(restoreScroll,0);
     adminDockFor('story', s.slug||s.id);
     ensureAdminUI();
@@ -575,7 +588,7 @@
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${encodeURIComponent(s.id)}">
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
@@ -594,7 +607,7 @@
             items.length
               ? items.map(n => `
                 <div class="story-item" data-arc="${n.arc||'kainrax'}">
-                  <a href="#/note/${encodeURIComponent(n.id)}">
+                  <a href="#/note/${n.id}">
                     <div class="title">✶ ${n.title || 'Без названия'}</div>
                     <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
                   </a>
@@ -620,7 +633,7 @@
         <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
       </article>
       <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
+    mountComments('note:'+(n.id||n.slug)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
   /* ===== Проект ===== */
@@ -635,17 +648,37 @@
       updated = attributes.updated || '';
       body = mdBody || body;
     } catch(_) {}
+
+    // WIP-заметка по тегу wip
+    const wip = (notes||[]).find(n => (n.tags||[]).map(t=>String(t).toLowerCase()).includes('wip')) || null;
+
+    const headProse = `
+      <div class="prose">
+        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
+        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
+        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
+        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
+        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${
+          wip
+            ? `<a href="#/note/${encodeURIComponent(wip.id)}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`
+            : `роман и повесть фолк-хоррорная`
+        }</div>
+      </div>
+    `;
+
     app.innerHTML = `
       <section class="card">
         <a class="back" href="#/">← На главную</a>
         <h1>${title}</h1>
         ${updated ? `<div class="muted">обновлено: ${fmtHumanDate(updated)}</div>` : ''}
+        ${headProse}
         <div class="prose readbox" style="margin-top:10px">${mdToHtml(body)}</div>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент (как просила — не трогаю логику доступа) ===== */
+  /* ===== Пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -858,14 +891,14 @@
       const total=art.scrollHeight - window.innerHeight + 1;
       const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
       progress.style.width=(isFinite(pct)?pct:0)+'%';
-      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      const id=art.dataset.id || art.dataset.slug; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
       ticking=false;
     });
   }
   addEventListener('scroll', onScroll, {passive:true});
   function restoreScroll(){
     const art=document.querySelector('article'); if(!art) return;
-    const id=art.dataset.slug||art.dataset.id;
+    const id=art.dataset.id || art.dataset.slug;
     const y=+localStorage.getItem('read:'+id)||0;
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
@@ -910,11 +943,11 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(decodeURIComponent(mRead[1])); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(decodeURIComponent(mNote[1])); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(decodeURIComponent(mPerg[1])); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
   }
 
