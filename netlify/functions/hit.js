@@ -1,29 +1,44 @@
-// /netlify/functions/hit.js
+// netlify/functions/hit.js
 const { Deta } = require('deta');
-const deta = Deta(process.env.DETA_PROJECT_KEY);
-const db = deta.Base('pageviews');
 
 exports.handler = async (event) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': process.env.ALLOW_ORIGIN || '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
-  };
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
-  if (event.httpMethod !== 'POST')  return { statusCode: 405, headers, body: JSON.stringify({ error:'Method Not Allowed' }) };
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
+  }
 
   try {
     const { slug } = JSON.parse(event.body || '{}');
-    if (!slug) return { statusCode: 400, headers, body: JSON.stringify({ error:'Missing "slug"' }) };
+    if (!slug) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'missing slug' }) };
+    }
 
-    const key = slug.startsWith('/') ? slug : `/${slug}`;
-    let rec = await db.get(key);
-    if (!rec) { await db.put({ count: 1 }, key); rec = { count: 1 }; }
-    else { rec.count = (Number(rec.count)||0) + 1; await db.update({ count: rec.count }, key); }
+    const key = process.env.DETA_PROJECT_KEY;
+    if (!key) {
+      // Мягкий фолбэк: если ключ не задан, не падаем.
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        body: JSON.stringify({ count: 0 })
+      };
+    }
 
-    return { statusCode: 200, headers, body: JSON.stringify({ count: rec.count }) };
+    const deta = Deta(key);
+    const db = deta.Base('views');
+
+    const existing = await db.get(slug);
+    const count = (existing?.count || 0) + 1;
+    await db.put({ key: slug, count });
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      body: JSON.stringify({ count })
+    };
   } catch (e) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: String(e && e.message || e) }) };
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'internal', reason: String(e && e.message || e) })
+    };
   }
 };
