@@ -7,7 +7,7 @@
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
 
-  <!-- Open Graph / Twitter -->
+  <!-- OG/Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Кайнракс — рассказы">
   <meta property="og:title" content="Кайнракс — рассказы">
@@ -19,9 +19,6 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
-  <!-- Plausible -->
-  <script defer data-domain="kainrax.site" src="https://plausible.io/js/script.js"></script>
-
   <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
@@ -32,7 +29,6 @@
     --accent:#7dd3fc; --accent2:#a78bfa; --link:#93c5fd;
     --max:1024px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
     --code:#0a0e16; --mountain:#121723; --star:rgba(255,255,255,.9);
-    /* ветки */
     --surface:#10b981; --kainrax:#7dd3fc; --ibut:#f59e0b;
   }
   [data-theme="light"]{
@@ -51,22 +47,19 @@
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
-  /* едва заметный «шум» на ссылках при ховере */
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
 
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
-  /* сигилл-узор на карточках (тонкий + гекс-паттерн) */
   .card::after{
     content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.35;
     background-image:
       radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><path d='M80 6 L87 27 L109 31 L87 35 L80 56 L73 35 L51 31 L73 27 Z' fill='rgba(125,211,252,0.06)'/></svg>"),
       url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><defs><pattern id='hex' width='16' height='14' patternUnits='userSpaceOnUse' patternTransform='skewX(-12)'><path d='M4 0 L12 0 L16 7 L12 14 L4 14 L0 7 Z' fill='none' stroke='rgba(125,211,252,0.05)'/></pattern></defs><rect width='100%' height='100%' fill='url(%23hex)'/></svg>\");
-    background-repeat:no-repeat, repeat, repeat;
-    background-size:auto, 160px 160px, auto;
+    background-repeat:no-repeat, repeat, repeat; background-size:auto, 160px 160px, auto;
   }
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
@@ -78,12 +71,8 @@
   .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
   .brand{font-weight:800;letter-spacing:.2px}
   .brand a{color:var(--fg);display:inline-block;transform:translateZ(0)}
-  /* глич-микродрейф ✶ */
   .brand a:hover{ animation:kx-glitch .6s steps(2,end) }
-  @keyframes kx-glitch{
-    30%{ transform:translate(.4px,-.4px) skewX(.25deg) }
-    60%{ transform:translate(-.4px,.4px) skewY(.25deg) }
-  }
+  @keyframes kx-glitch{ 30%{ transform:translate(.4px,-.4px) skewX(.25deg) } 60%{ transform:translate(-.4px,.4px) skewY(.25deg) } }
 
   .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
@@ -97,11 +86,9 @@
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
 
-  /* диагональная полоска ветки */
   .story-item::before{
     content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
-    background:linear-gradient(12deg, var(--kainrax), transparent 60%);
-    border-top-left-radius:12px; transform:skewX(-12deg);
+    background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);
   }
   .story-item[data-arc="surface"]::before{ background:linear-gradient(12deg, var(--surface), transparent 60%) }
   .story-item[data-arc="kainrax"]::before{ background:linear-gradient(12deg, var(--kainrax), transparent 60%) }
@@ -130,7 +117,7 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  /* Линия Свода (энергетический скан) */
+  /* Линия свода */
   #sky-line {
     position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: 0.7; filter: blur(1px);
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%);
@@ -144,7 +131,6 @@
   }
   @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
-  /* читаемый бокс */
   .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
@@ -164,24 +150,20 @@
   [data-theme="cringe"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.85), transparent 60%), linear-gradient(#ffffff, #faf7ef)}
   .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
 
-  /* Маргиналии */
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
   .margin-notes{position:sticky;top:76px;align-self:start}
   .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
   .mnote .linklike{cursor:pointer; text-decoration:underline}
 
-  /* модалка доступа */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:20}
   .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);max-width:440px;width:92%}
   .seal{display:inline-block;min-width:64px;min-height:64px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff6b6b,#c81e1e);box-shadow:0 8px 24px rgba(0,0,0,.3);transform-origin:center;animation:seal 1.4s ease-in-out infinite}
   @keyframes seal{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.06)}}
 
-  /* админ-панель скрыта */
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminBtns{display:none}
 
-  /* таймлайн редакций */
   .edbar{position:relative;margin:8px 0 6px;height:4px;background:linear-gradient(90deg, rgba(0,0,0,.15), rgba(255,255,255,.12));border-radius:999px;overflow:hidden}
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
@@ -205,7 +187,8 @@
         <a class="btn" href="#/perg">Пергамент</a>
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/project">О проекте | планы</a>
-        <button id="themeBtn" title="Сменить тему">🌓</button>
+        <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
+        <button id="themeBtn" title="Сменить тему (T)">🌓</button>
         <span id="adminBtns">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn" href="/admin/#/collections/stories/new" target="_blank" rel="noopener">+ Рассказ</a>
@@ -220,22 +203,56 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== ГЛОБАЛЬНЫЕ НАСТРОЙКИ ДОСТУПА К ПЕРГАМЕНТУ ===== */
-  const PERG = {
-    CODE: 'Chronicle',  // явный код
-    CODE_HASH: null     // 'sha256:...'(hex) — если задашь, перекроет CODE
+  /* ===== Конфиг ===== */
+  const PERG = { CODE: 'Chronicle', CODE_HASH: null };
+
+  (function loadPlausibleOnProd(){
+    const PROD = ['kainrax.netlify.app','kainrax.site'];
+    if (PROD.includes(location.hostname)) {
+      const s=document.createElement('script'); s.defer=true;
+      s.setAttribute('data-domain', location.hostname);
+      s.src='https://plausible.io/js/script.js';
+      document.head.appendChild(s);
+    }
+  })();
+
+  /* ===== Счётчик просмотров (Netlify Function /.netlify/functions/hit) ===== */
+  window.hit = async function(slug, outEl){
+    try{
+      const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
+      const j=await r.json();
+      if(outEl) outEl.textContent = j?.count ?? '—';
+      return Number(j?.count ?? 0);
+    }catch(e){
+      console.warn('hit() failed:', e);
+      if(outEl) outEl.textContent='—';
+      return 0;
+    }
   };
 
-  /* ===== КОНСТАНТЫ/СОСТОЯНИЕ ===== */
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369"; // если не нужен аноним-коммент — обнули
-
+  /* ===== Состояние ===== */
+  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
-  /* ===== УТИЛЫ ===== */
-  const fmtHumanDate=iso=>{ try{const d=new Date(iso);return d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'});}catch(_){return iso} };
-  // «N-й день M-го года.» для YYYY-DOY
+  /* ===== Утилиты ===== */
+  function toDate(val){
+    if(!val) return null;
+    if(val instanceof Date) return val;
+    if(typeof val==='number') return new Date(val);
+    if(typeof val==='string'){
+      const s=val.trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z');
+      const d=new Date(s);
+      if(!isNaN(d)) return d;
+    }
+    return null;
+  }
+  function fmtHumanDate(v){
+    const d=toDate(v);
+    return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : '';
+  }
   function fmtPergDayYear(s){
     if(typeof s!=='string') return String(s||'');
     const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s);
@@ -249,27 +266,114 @@
     const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
 
-  /* ===== ДАННЫЕ ===== */
+  // простейший парсер фронтматтера
+  function parseFrontMatter(md){
+    const m = md.match(/^---\s*([\s\S]*?)\s*---\s*\n?([\s\S]*)$/);
+    if (!m) return { attributes:{}, body: md.trim() };
+    const yaml = m[1], body = m[2].trim();
+    const attrs = {};
+    yaml.split('\n').forEach(line=>{
+      const i=line.indexOf(':'); if(i<0) return;
+      const k=line.slice(0,i).trim(); let v=line.slice(i+1).trim();
+      if (/^\[.*\]$/.test(v)) { try { v = JSON.parse(v.replace(/'/g,'"')); } catch {} }
+      attrs[k]=v.replace(/^['"]|['"]$/g,'');
+    });
+    return { attributes: attrs, body };
+  }
+
+  async function loadMdIntoStory(s){
+    if (!s) return s;
+    let file = s.file;
+    if(!file){
+      const name=(s.slug||s.id||'').trim();
+      if(name) file = `content/stories/${name}.md`;
+    }
+    if(!file || s.text) return s;
+    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+    const { attributes, body } = parseFrontMatter(raw);
+    s.file       = file;
+    s.title      = s.title      || attributes.title || s.id;
+    s.date       = s.date       || attributes.date  || '';
+    s.minutes    = s.minutes    || attributes.minutes || Math.max(5, Math.round((body||'').length/1100));
+    s.arc        = s.arc        || attributes.arc   || 'kainrax';
+    s.tags       = s.tags       || attributes.tags  || [];
+    s.annotation = s.annotation || attributes.annotation || '';
+    s.text       = body || '';
+    return s;
+  }
+
+  async function loadMdIntoNote(n){
+    if (!n) return n;
+    let file = n.file;
+    if(!file){
+      const name=(n.slug||n.id||'').trim();
+      if(name) file = `content/notes/${name}.md`;
+    }
+    if(!file || n.text) return n;
+    const raw = await fetch(file,{cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject(r.status));
+    const { attributes, body } = parseFrontMatter(raw);
+    n.file       = file;
+    n.title      = n.title || attributes.title || n.id;
+    n.date       = n.date  || attributes.date  || '';
+    n.tags       = n.tags  || attributes.tags  || [];
+    n.annotation = n.annotation || attributes.annotation || '';
+    n.text       = body || '';
+    return n;
+  }
+
+  // Markdown → очень скромный HTML для project.md
+  function mdToHtml(md) {
+    let html = md
+      .replace(/^### (.*)$/gim, '<h3>$1</h3>')
+      .replace(/^## (.*)$/gim,  '<h2>$1</h2>')
+      .replace(/^# (.*)$/gim,   '<h1>$1</h1>')
+      .replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)(?!\s*<li>)/gims, '<ul>$1</ul>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    html = html.split(/\n{2,}/).map(b => /<(h\d|ul|ol|blockquote)/i.test(b) ? b : `<p>${b.replace(/\n/g,'<br>')}</p>`).join('\n');
+    return html;
+  }
+
+  /* ===== Загрузка данных ===== */
   let stories=[], notes=[], pergDocs=[];
-  async function safeJson(url, def){ try{ const r=await fetch(url,{cache:'no-store'}); if(!r.ok) return def; return await r.json(); }catch(_){ return def; } }
+  async function safeJson(url, def, label){
+    try{
+      const r=await fetch(url,{cache:'no-store', headers:{'Accept':'application/json'}});
+      if(!r.ok){ console.warn('[load]',label,'HTTP',r.status); return def; }
+      const ct=(r.headers.get('content-type')||'').toLowerCase();
+      if(ct.includes('application/json')) return await r.json();
+      const txt=await r.text(); try{ return JSON.parse(txt); }catch(_){ return def; }
+    }catch(e){ console.warn('[load]',label,'ошибка',e); return def; }
+  }
   async function loadContent(){
-    const j = await safeJson('content/index.json', {});
-    stories = Array.isArray(j.stories) ? j.stories : await safeJson('content/stories.json', []);
-    notes   = Array.isArray(j.notes)   ? j.notes   : await safeJson('content/notes.json',   []);
-    pergDocs = await safeJson('content/pergament/index.json', []);
+    // 1) функция
+    let j = await safeJson('/.netlify/functions/content-index', null, 'content-index function');
+    // 2) статический агрегатор
+    if (!j) j = await safeJson('content/index.json', null, 'content/index.json');
+    // 3) старые файлы
+    stories = Array.isArray(j?.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
+    notes   = Array.isArray(j?.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
+    // пергамент
+    pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
 
-    stories.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
-    notes.sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)));
+    // догадка путей для md, если не проставлены
+    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.slug||s.id}.md`; });
+    notes.forEach(n=>{ if(!n.file) n.file = `content/notes/${n.slug||n.id}.md`; });
 
+    // сортировки
+    stories.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
+    notes.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
-      const ad=(a.editions||[]), bd=(b.editions||[]);
-      const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
+      const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
       return String(bl).localeCompare(String(al));
     });
   }
 
-  /* ===== ТЕМА ===== */
+  /* ===== Тема ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
@@ -280,30 +384,24 @@
     el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
   }
   applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{
-    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
-    applyTheme();
-  };
+  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
-  /* ===== ADMIN MODE (Alt+Shift+A или ?admin) ===== */
+  /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
   addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
-
   function ensureAdminUI(){
     document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
     if(!isAdmin) adminDockHide();
-    // показываем просмотры только админке
-    document.querySelectorAll('[data-admin-only]').forEach(el=>{
-      el.style.display = isAdmin ? '' : 'none';
-    });
   }
 
-  /* ===== ROUTER ===== */
+  /* ===== Router ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== ВЬЮХИ ===== */
+  /* ===== Вьюхи ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
@@ -317,7 +415,7 @@
       map[id].items.push(s);
     }
     for(const k in map){
-      map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (new Date(a.date||0))-(new Date(b.date||0)) );
+      map[k].items.sort((a,b)=> (a.order||0)-(b.order||0) || (toDate(a.date)?.getTime()||0)-(toDate(b.date)?.getTime()||0) );
     }
     return Object.values(map);
   }
@@ -339,7 +437,7 @@
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
-              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или <code>content/stories.json</code>.</div>'}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Если уверена, что файлы есть, проверь функцию <code>content-index</code> и редиректы.</div>'}
           </div>
         </section>
 
@@ -360,6 +458,10 @@
         </aside>
       </div>`;
     adminDockHide(); ensureAdminUI();
+
+    // мягкая гидратация: подтягиваем мету первых 12 без перезагрузки
+    const need = items.filter(s=>!s.title || !s.date).slice(0,12);
+    if(need.length){ Promise.all(need.map(loadMdIntoStory)).then(()=>{ renderList(); }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
@@ -388,27 +490,11 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПРОСМОТРЫ (per-story) — только админ видит ===== */
-  const VIEW_NS = "kainrax.site";
-  function viewedKey(slug){ return 'viewed:'+slug }
-  function countKey(slug){ return 'story:'+slug }
-  async function incAndGetViews(slug){
-    const k = countKey(slug);
-    const ukey = viewedKey(slug);
-    const already = localStorage.getItem(ukey)==='1';
-    const endpoint = already
-      ? `https://api.countapi.xyz/get/${encodeURIComponent(VIEW_NS)}/${encodeURIComponent(k)}`
-      : `https://api.countapi.xyz/hit/${encodeURIComponent(VIEW_NS)}/${encodeURIComponent(k)}`;
-    try{
-      const r = await fetch(endpoint, {cache:'no-store'}); const j = await r.json();
-      if(!already) localStorage.setItem(ukey,'1');
-      return Number(j.value||0);
-    }catch(_){ return 0; }
-  }
-
-  function renderArticle(id){
+  async function renderArticle(id){
     const s=stories.find(x=>x.id===id||x.slug===id);
     if(!s){location.hash='#/'; return;}
+    try{ await loadMdIntoStory(s); }catch(e){ console.warn('md load fail', e); }
+
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
     const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
@@ -427,8 +513,8 @@
           </div>
           <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
 
-          ${getAnno(s) ?
-            `<details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
+          ${getAnno(s) ? `
+            <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
               <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
               <div style="margin-top:8px">${getAnno(s)}</div>
             </details>` : ''}
@@ -449,14 +535,10 @@
         <section id="comments"></section>
       </section>`;
 
-    // просмотры (покажем только админке)
-    (async()=>{
-      const vbox=document.getElementById('viewsBox');
-      if(!vbox) return;
-      const slugOrId=s.slug||s.id;
-      const v=await incAndGetViews(slugOrId);
-      vbox.textContent = `${v} просмотров`;
-      ensureAdminUI(); // переключит display в зависимости от isAdmin
+    (async () => {
+      const count = await window.hit('story:'+(s.slug||s.id));
+      const box = document.getElementById('viewsBox');
+      if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
     })();
 
     mountComments('story:'+(s.slug||s.id));
@@ -478,13 +560,72 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== ПЕРГАМЕНТ ===== */
-  function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-  function parseHashQuery(){
-    const h = location.hash.split('?')[1]||'';
-    const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v] = p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); });
-    return out;
+  /* ===== Заметки ===== */
+  function renderNotes(){
+    const items = notes || [];
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>Заметки</h1>
+        <div class="list">
+          ${
+            items.length
+              ? items.map(n => `
+                <div class="story-item" data-arc="${n.arc||'kainrax'}">
+                  <a href="#/note/${n.id}">
+                    <div class="title">✶ ${n.title || 'Без названия'}</div>
+                    <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
+                  </a>
+                  ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
+                </div>`).join('')
+              : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>'
+          }
+        </div>
+      </section>`;
+    adminDockHide(); ensureAdminUI();
   }
+
+  async function renderNote(id){
+    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
+    try{ await loadMdIntoNote(n); }catch(e){ console.warn('note md load fail', e); }
+    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
+      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
+        <div>
+          <h1>${n.title}</h1>
+          <div class="muted">${fmtHumanDate(n.date)}</div>
+          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+        </div>
+        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
+      </article>
+      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
+    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
+  }
+
+  /* ===== Проект ===== */
+  async function renderProject() {
+    let title = 'О проекте | планы';
+    let updated = '';
+    let body = 'Здесь будет описание проекта.';
+    try {
+      const raw = await fetch('content/project.md', { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject(r.status));
+      const { attributes, body: mdBody } = parseFrontMatter(raw);
+      title = attributes.title || title;
+      updated = attributes.updated || '';
+      body = mdBody || body;
+    } catch(_) {}
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>${title}</h1>
+        ${updated ? `<div class="muted">обновлено: ${fmtHumanDate(updated)}</div>` : ''}
+        <div class="prose readbox" style="margin-top:10px">${mdToHtml(body)}</div>
+      </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  /* ===== Пергамент ===== */
+  function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
+  function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
   function renderPergList(){
     const items = pergDocs;
@@ -505,20 +646,60 @@
     const id = (rawId||'').split('?')[0];
     const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
     if(!d){ location.hash = '#/perg'; return; }
-
     const editions = (d.editions||[]);
-    if(!editions.length){
-      app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`;
-      return;
-    }
-
+    if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
     const q = parseHashQuery();
     const chosenId = q.e || editions[editions.length-1].id;
     let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
     const lastEd = editions[editions.length-1];
     const isLast = (e===lastEd);
 
-    // проверка доступа для НЕ последней
+    async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    async function checkPergCode(input, ed){
+      const pass = (input||'').trim(); if(!pass) return false;
+      if(ed && ed.codeHash){
+        const [alg, hex] = String(ed.codeHash).split(':');
+        if((alg||'sha256').toLowerCase()==='sha256'){ const got = await sha256Hex(pass); return got.toLowerCase() === String(hex||'').toLowerCase(); }
+      }
+      if(ed && ed.code){ return pass === String(ed.code).trim(); }
+      if(PERG.CODE_HASH){
+        const [alg, hex] = String(PERG.CODE_HASH).split(':');
+        if((alg||'sha256').toLowerCase()==='sha256'){ const got = await sha256Hex(pass); return got.toLowerCase() === String(hex||'').toLowerCase(); }
+      }
+      if(PERG.CODE){ return pass === String(PERG.CODE).trim(); }
+      return false;
+    }
+    function showAccessModal(cfg, verify){
+      return new Promise(resolve=>{
+        const wrap=document.createElement('div'); wrap.className='modal';
+        wrap.innerHTML=`<div class="box">
+          <div style="display:flex; gap:12px; align-items:center">
+            <div class="seal" aria-hidden="true"></div>
+            <div>
+              <h3 style="margin:0 0 6px">${(cfg&&cfg.message)||'Ваш доступ?'}</h3>
+              <div class="muted" style="margin-bottom:10px">${cfg&&cfg.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.'}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px">
+            <input id="codeIn" type="password" placeholder="код" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)"/>
+            <button class="btn" id="okBtn">ОК</button>
+            <button class="btn" id="cancelBtn">Отмена</button>
+          </div>
+          <div class="muted" id="err" style="margin-top:8px;display:none">Неверный код</div>
+        </div>`;
+        document.body.appendChild(wrap);
+        const codeIn=wrap.querySelector('#codeIn');
+        const ok=wrap.querySelector('#okBtn');
+        const cancel=wrap.querySelector('#cancelBtn');
+        const err=wrap.querySelector('#err');
+        function close(val){ document.body.removeChild(wrap); resolve(val); }
+        cancel.onclick=()=> close(false);
+        ok.onclick=async()=>{ const pass = await verify(codeIn.value||''); if(pass){ close(true); } else { err.style.display='block'; codeIn.select(); } };
+        codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
+        setTimeout(()=>codeIn.focus(),0);
+      });
+    }
+
     async function ensureAccessForNonLast(ed){
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
@@ -530,23 +711,19 @@
       if(ok){ localStorage.setItem(key,'1'); return true; }
       return false;
     }
-
     const canOpen = await ensureAccessForNonLast(e);
     if(!canOpen){ location.hash = '#/perg'; return; }
 
-    // загрузка тела
     let body = '';
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
-    // селектор редакций + таймлайн
     const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
     const idx = editions.findIndex(x=>x.id===e.id);
     const frac = (idx+1)/editions.length*100;
     const lastLabel = fmtPergDayYear(lastEd.date||'');
     const currLabel = fmtPergDayYear(e.date||'');
 
-    // плашка «предыдущая редакция …»
     let prevBlock = '';
     let prevObj = null;
     if (isLast && editions.length > 1){
@@ -584,7 +761,6 @@
     const sel=document.getElementById('edSel');
     const edProgress=document.getElementById('edProgress');
     const edHint=document.querySelector('.edhint');
-
     function updateEdUI(nv){
       const ix = editions.findIndex(x=>x.id===nv);
       const e2 = editions[ix];
@@ -592,12 +768,8 @@
       if(edProgress) edProgress.style.width = f.toFixed(1)+'%';
       if(edHint) edHint.textContent = `${fmtPergDayYear(e2.date||'')} → последняя: ${lastLabel}`;
     }
+    if(sel){ sel.onchange=()=>{ const nv=sel.value; updateEdUI(nv); const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); }; }
 
-    if(sel){
-      sel.onchange=()=>{ const nv=sel.value; updateEdUI(nv); const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); };
-    }
-
-    // кликабельный маркер «предыдущая редакция»
     const prevBox=document.getElementById('prevBox');
     const mPrevLink=document.getElementById('mPrevLink');
     async function openPrev(){
@@ -620,97 +792,7 @@
     ensureAdminUI();
   }
 
-  /* ===== ДОСТУП: проверка кода ===== */
-  async function sha256Hex(text){ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); const arr = Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
-  async function checkPergCode(input, ed){
-    const pass = (input||'').trim(); if(!pass) return false;
-    if(ed && ed.codeHash){
-      const [alg, hex] = String(ed.codeHash).split(':');
-      if((alg||'sha256').toLowerCase()==='sha256'){ const got = await sha256Hex(pass); return got.toLowerCase() === String(hex||'').toLowerCase(); }
-    }
-    if(ed && ed.code){ return pass === String(ed.code).trim(); }
-    if(PERG.CODE_HASH){
-      const [alg, hex] = String(PERG.CODE_HASH).split(':');
-      if((alg||'sha256').toLowerCase()==='sha256'){ const got = await sha256Hex(pass); return got.toLowerCase() === String(hex||'').toLowerCase(); }
-    }
-    if(PERG.CODE){ return pass === String(PERG.CODE).trim(); }
-    return false;
-  }
-
-  function showAccessModal(cfg, verify){
-    return new Promise(resolve=>{
-      const wrap=document.createElement('div'); wrap.className='modal';
-      wrap.innerHTML=`<div class="box">
-        <div style="display:flex; gap:12px; align-items:center">
-          <div class="seal" aria-hidden="true"></div>
-          <div>
-            <h3 style="margin:0 0 6px">${(cfg&&cfg.message)||'Ваш доступ?'}</h3>
-            <div class="muted" style="margin-bottom:10px">${cfg&&cfg.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.'}</div>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:12px">
-          <input id="codeIn" type="password" placeholder="код" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)"/>
-          <button class="btn" id="okBtn">ОК</button>
-          <button class="btn" id="cancelBtn">Отмена</button>
-        </div>
-        <div class="muted" id="err" style="margin-top:8px;display:none">Неверный код</div>
-      </div>`;
-      document.body.appendChild(wrap);
-      const codeIn=wrap.querySelector('#codeIn');
-      const ok=wrap.querySelector('#okBtn');
-      const cancel=wrap.querySelector('#cancelBtn');
-      const err=wrap.querySelector('#err');
-      function close(val){ document.body.removeChild(wrap); resolve(val); }
-      cancel.onclick=()=> close(false);
-      ok.onclick=async()=>{ const pass = await verify(codeIn.value||''); if(pass){ close(true); } else { err.style.display='block'; codeIn.select(); } };
-      codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
-      setTimeout(()=>codeIn.focus(),0);
-    });
-  }
-
-  /* ===== ЗАМЕТКИ/PROJECT ===== */
-  function renderNotes(){ app.innerHTML=`<section class="card"><h1>Авторские заметки</h1>
-    <div class="list">${(notes||[]).map(n=>`
-      <div class="story-item" data-arc="kainrax"><a href="#/note/${n.id}">
-        <div class="title">✶ ${n.title}</div>
-        <div class="muted">${fmtHumanDate(n.date)}</div>
-      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
-
-  function renderNote(id){
-    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
-    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
-        <div>
-          <h1>${n.title}</h1>
-          <div class="muted">${fmtHumanDate(n.date)}</div>
-          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-        </div>
-        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-      </article>
-      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
-  }
-
-  function renderProject(){
-    const wip = (notes||[])
-      .filter(n => /(wip|планы|в работе|work|writing)/i.test([n.title, ...(n.tags||[])].join(' ')))
-      .sort((a,b)=> (new Date(b.date||0))-(new Date(a.date||0)))[0];
-
-    app.innerHTML=`<section class="card">
-      <h1>О проекте | планы</h1>
-      <div class="prose">
-        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? `<a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)}` : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`}</div>
-      </div>
-    </section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-
-  /* ===== КОММЕНТЫ ===== */
+  /* ===== Комментарии / утилиты ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -734,7 +816,6 @@
   function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
   function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
 
-  /* ===== АДМИН ПЛАВАЮЩАЯ КНОПКА ===== */
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
@@ -746,7 +827,6 @@
     adminDock.style.display='block';
   }
 
-  /* ===== ПРОГРЕСС + ВОССТ.СКРОЛЛ ===== */
   const progress=document.getElementById('progress'); let ticking=false;
   function onScroll(){
     if(ticking) return; ticking=true;
@@ -768,7 +848,6 @@
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ===== ЗВЁЗДЫ (фон) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -786,13 +865,12 @@
   }
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
-  /* ===== ЛИНИЯ СВОДА ===== */
   function initSkyLine() {
     const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
     function updatePosition() {
       const now = new Date();
       const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
-      const progress = msSinceMidnight / 86400000; // 0..1
+      const progress = msSinceMidnight / 86400000;
       skyLine.style.top = `${progress * 100}vh`;
       if (running) requestAnimationFrame(updatePosition);
     }
@@ -802,22 +880,23 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== РЕНДЕР ===== */
-  addEventListener('hashchange',()=>{ /* уже задано выше */ });
-  function render(){
+  /* ===== Рендерер маршрутов ===== */
+  async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ renderArticle(mRead[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPerg(mPerg[1]); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
   }
 
+  /* ===== Инициализация ===== */
   loadContent().then(()=>{
     applyTheme();
     render();
