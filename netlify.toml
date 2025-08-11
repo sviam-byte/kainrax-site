@@ -6,13 +6,17 @@
 [build.environment]
   NODE_VERSION = "18"
 
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["content/**"]  # <- упаковать контент в бандл функций
+
 # 1) функции не трогаем
 [[redirects]]
   from = "/.netlify/functions/*"
   to   = "/.netlify/functions/:splat"
   status = 200
 
-# 2) статический контент тоже отдать как файлы
+# 2) отдать статику из /content как есть
 [[redirects]]
   from = "/content/*"
   to   = "/content/:splat"
