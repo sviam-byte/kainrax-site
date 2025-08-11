@@ -237,9 +237,6 @@
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
   /* ===== Утилиты ===== */
-  const withTimeout = (p, ms = 2500) =>
-    Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
-
   function toDate(val){
     if(!val) return null;
     if(val instanceof Date) return val;
@@ -288,7 +285,7 @@
     if (!s) return s;
     let file = s.file;
     if(!file){
-      const name=(s.id||s.slug||'').trim();
+      const name=(s.slug||s.id||'').trim();
       if(name) file = `content/stories/${name}.md`;
     }
     if(!file || s.text) return s;
@@ -309,7 +306,7 @@
     if (!n) return n;
     let file = n.file;
     if(!file){
-      const name=(n.id||n.slug||'').trim();
+      const name=(n.slug||n.id||'').trim();
       if(name) file = `content/notes/${name}.md`;
     }
     if(!file || n.text) return n;
@@ -343,38 +340,43 @@
   /* ===== Загрузка данных ===== */
   let stories=[], notes=[], pergDocs=[];
   async function safeJson(url, def, label){
+    const ctrl = new AbortController();
+    const tid = setTimeout(()=>ctrl.abort('timeout'), 6500); // 6.5s: и хватит мучиться
     try{
-      const r=await fetch(url,{cache:'no-store', headers:{'Accept':'application/json'}});
+      const r=await fetch(url,{cache:'no-store',headers:{'Accept':'application/json'},signal:ctrl.signal});
+      clearTimeout(tid);
       if(!r.ok){ console.warn('[load]',label,'HTTP',r.status); return def; }
       const ct=(r.headers.get('content-type')||'').toLowerCase();
       if(ct.includes('application/json')) return await r.json();
       const txt=await r.text(); try{ return JSON.parse(txt); }catch(_){ return def; }
-    }catch(e){ console.warn('[load]',label,'ошибка',e); return def; }
+    }catch(e){ clearTimeout(tid); console.warn('[load]',label,'ошибка',e); return def; }
+  }
+  function dedupeSlugs(items){
+    const count = new Map();
+    for (const s of items){ const k=(s.slug||s.id||'').trim(); count.set(k,(count.get(k)||0)+1); }
+    for (const s of items){
+      const k=(s.slug||s.id||'').trim();
+      if (!k) { s.slug=s.id; continue; }
+      if ((count.get(k)||0) > 1) { s.slug = s.id; }
+    }
   }
   async function loadContent(){
-    // 1) функция на проде, но не дольше 2.5с
-    const CAN_FN = ['kainrax.netlify.app','kainrax.site'].includes(location.hostname);
-    let j = null;
-    if (CAN_FN) {
-      j = await withTimeout(
-        safeJson('/.netlify/functions/content-index', null, 'content-index function'),
-        2500
-      ).catch(()=>null);
-    }
-
+    // 1) функция
+    let j = await safeJson('/.netlify/functions/content-index', null, 'content-index function');
     // 2) статический агрегатор
     if (!j) j = await safeJson('content/index.json', null, 'content/index.json');
-
     // 3) старые файлы
     stories = Array.isArray(j?.stories) ? j.stories : await safeJson('content/stories.json', [], 'content/stories.json');
     notes   = Array.isArray(j?.notes)   ? j.notes   : await safeJson('content/notes.json',   [], 'content/notes.json');
-
     // пергамент
     pergDocs= await safeJson('content/pergament/index.json', [], 'content/pergament/index.json');
 
     // догадка путей для md, если не проставлены
-    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.id||s.slug}.md`; });
-    notes.forEach(n=>{ if(!n.file) n.file = `content/notes/${n.id||n.slug}.md`; });
+    stories.forEach(s=>{ if(!s.file) s.file = `content/stories/${s.slug||s.id}.md`; });
+    notes.forEach(n=>{ if(!n.file) n.file = `content/notes/${n.slug||n.id}.md`; });
+
+    // починить дубли slug (типовой косяк при копировании глав)
+    dedupeSlugs(stories);
 
     // сортировки
     stories.sort((a,b)=> (toDate(b.date)?.getTime()||0) - (toDate(a.date)?.getTime()||0));
@@ -445,7 +447,7 @@
           <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read/${encodeURIComponent(s.id)}">
+                <a href="#/read/${s.slug || s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
@@ -493,7 +495,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read/${encodeURIComponent(s.id)}">
+          <a href="#/read/${s.slug || s.id}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
@@ -503,24 +505,19 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  function findStory(key){
-    // читаем по id; если вдруг в адрес вставили slug — попробуем по slug
-    return stories.find(x=>x.id===key) || stories.find(x=>x.slug===key);
-  }
-
-  async function renderArticle(key){
-    const s=findStory(key);
+  async function renderArticle(id){
+    const s=stories.find(x=>x.id===id||x.slug===id);
     if(!s){location.hash='#/'; return;}
     try{ await loadMdIntoStory(s); }catch(e){ console.warn('md load fail', e); }
 
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
-    const order=a.items; const pos=Math.max(0, order.findIndex(v=> v.id===s.id));
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
-      <article class="with-margin" data-id="${s.id}" data-slug="${s.id}">
+      <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <div class="prose readbox">
           <h1>${s.title}</h1>
           <div class="muted">
@@ -541,8 +538,8 @@
 
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${encodeURIComponent(prev.id)}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${encodeURIComponent(next.id)}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read/${prev.slug || prev.id}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${next.slug || next.id}">${next.title} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -554,14 +551,14 @@
       </section>`;
 
     (async () => {
-      const count = await window.hit('story:'+s.id);
+      const count = await window.hit('story:'+(s.slug||s.id));
       const box = document.getElementById('viewsBox');
       if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
     })();
 
-    mountComments('story:'+s.id);
+    mountComments('story:'+(s.slug||s.id));
     setTimeout(restoreScroll,0);
-    adminDockFor('story', s.id);
+    adminDockFor('story', s.slug||s.id);
     ensureAdminUI();
   }
 
@@ -571,7 +568,7 @@
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${encodeURIComponent(s.id)}">
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.slug || s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
@@ -590,7 +587,7 @@
             items.length
               ? items.map(n => `
                 <div class="story-item" data-arc="${n.arc||'kainrax'}">
-                  <a href="#/note/${encodeURIComponent(n.id)}">
+                  <a href="#/note/${n.id}">
                     <div class="title">✶ ${n.title || 'Без названия'}</div>
                     <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
                   </a>
@@ -607,7 +604,7 @@
     const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
     try{ await loadMdIntoNote(n); }catch(e){ console.warn('note md load fail', e); }
     app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.id}">
+      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
         <div>
           <h1>${n.title}</h1>
           <div class="muted">${fmtHumanDate(n.date)}</div>
@@ -616,15 +613,14 @@
         <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
       </article>
       <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+n.id); setTimeout(restoreScroll,0); adminDockFor('note', n.id); ensureAdminUI();
+    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
   /* ===== Проект ===== */
   async function renderProject() {
-    // базовые данные из content/project.md (если есть)
     let title = 'О проекте | планы';
     let updated = '';
-    let body = '';
+    let body = 'Здесь будет описание проекта.';
     try {
       const raw = await fetch('content/project.md', { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject(r.status));
       const { attributes, body: mdBody } = parseFrontMatter(raw);
@@ -632,38 +628,27 @@
       updated = attributes.updated || '';
       body = mdBody || body;
     } catch(_) {}
-
-    // пробуем найти «работается сейчас» среди заметок (tag: wip | work | draft)
-    const wip = (notes||[]).find(n =>
-      (n.tags||[]).some(t => /^(wip|work|draft|в работе|work-in-progress)$/i.test(String(t)))
-    );
-
+    const intro = `
+      <div class="prose">
+        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
+        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
+        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
+        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
+        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> роман и фолк-хоррор-повесть</div>
+      </div>`;
     app.innerHTML = `
       <section class="card">
         <a class="back" href="#/">← На главную</a>
         <h1>${title}</h1>
         ${updated ? `<div class="muted">обновлено: ${fmtHumanDate(updated)}</div>` : ''}
-
-        <div class="prose readbox" style="margin-top:10px">
-          <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-          <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-          <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-          <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-          <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-          <div class="anno-box"><strong>Прямо сейчас пишется:</strong>
-            ${
-              wip
-                ? `<a href="#/note/${encodeURIComponent(wip.id)}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`
-                : `роман и фолк-хоррорная повесть`
-            }
-          </div>
-          ${body ? mdToHtml(body) : ''}
-        </div>
+        ${intro}
+        <div class="prose readbox" style="margin-top:10px">${mdToHtml(body)}</div>
       </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент (как было, «не трогать») ===== */
+  /* ===== Пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -741,6 +726,7 @@
     }
 
     async function ensureAccessForNonLast(ed){
+      const isLast = (ed===lastEd);
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
       if(localStorage.getItem(key)==='1') return true;
@@ -758,16 +744,16 @@
     try{ body = await fetch(e.file, {cache:'no-store'}).then(r=>r.ok?r.text():Promise.reject()); }
     catch(_){ body = '(не удалось загрузить текст)'; }
 
-    const options = (d.editions||[]).map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
-    const idx = (d.editions||[]).findIndex(x=>x.id===e.id);
-    const frac = (idx+1)/(d.editions||[]).length*100;
-    const lastLabel = fmtPergDayYear((d.editions||[])[(d.editions||[]).length-1].date||'');
+    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
+    const idx = editions.findIndex(x=>x.id===e.id);
+    const frac = (idx+1)/editions.length*100;
+    const lastLabel = fmtPergDayYear(lastEd.date||'');
     const currLabel = fmtPergDayYear(e.date||'');
 
     let prevBlock = '';
     let prevObj = null;
-    if (isLast && (d.editions||[]).length > 1){
-      prevObj = (d.editions||[])[(d.editions||[]).length-2];
+    if (e===lastEd && editions.length > 1){
+      prevObj = editions[editions.length-2];
       prevBlock = `<div class="anno-box" id="prevBox" style="margin-top:10px;cursor:pointer">
         <strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prevObj.date||'')} — <u>доступ по коду</u>
       </div>`;
@@ -789,8 +775,8 @@
         </div>
         <aside class="margin-notes">
           ${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}
-          ${!isLast && e ? `<div class="mnote">Эта версия защищена: подтверждение кода обязательно.</div>`:''}
-          ${isLast && prevObj ? `<div class="mnote"><span class="linklike" id="mPrevLink">Предыдущая редакция: ${fmtPergDayYear(prevObj.date||'')} (клик — ввести код)</span></div>`:''}
+          ${(e!==lastEd) ? `<div class="mnote">Эта версия защищена: подтверждение кода обязательно.</div>`:''}
+          ${(e===lastEd && prevObj) ? `<div class="mnote"><span class="linklike" id="mPrevLink">Предыдущая редакция: ${fmtPergDayYear(prevObj.date||'')} (клик — ввести код)</span></div>`:''}
         </aside>
       </article>
 
@@ -802,9 +788,9 @@
     const edProgress=document.getElementById('edProgress');
     const edHint=document.querySelector('.edhint');
     function updateEdUI(nv){
-      const ix = (d.editions||[]).findIndex(x=>x.id===nv);
-      const e2 = (d.editions||[])[ix];
-      const f = (ix+1)/(d.editions||[]).length*100;
+      const ix = editions.findIndex(x=>x.id===nv);
+      const e2 = editions[ix];
+      const f = (ix+1)/editions.length*100;
       if(edProgress) edProgress.style.width = f.toFixed(1)+'%';
       if(edHint) edHint.textContent = `${fmtPergDayYear(e2.date||'')} → последняя: ${lastLabel}`;
     }
@@ -826,13 +812,13 @@
     if(prevBox) prevBox.addEventListener('click', openPrev);
     if(mPrevLink) mPrevLink.addEventListener('click', openPrev);
 
-    mountComments('perg:'+(d.id)+':'+(e.id||''));
+    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||''));
     setTimeout(restoreScroll,0);
-    adminDockFor('perg', d.id);
+    adminDockFor('perg', d.slug||d.id);
     ensureAdminUI();
   }
 
-  /* ===== Комменты / утилиты ===== */
+  /* ===== Комментарии / утилиты ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -859,11 +845,11 @@
   const adminDock=document.getElementById('adminDock');
   const editThisBtn=document.getElementById('editThisBtn');
   function adminDockHide(){ adminDock.style.display='none'; }
-  function adminDockFor(kind, id){
+  function adminDockFor(kind, slug){
     if (!isAdmin) return adminDockHide();
-    if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${id}`;
-    else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${id}`;
-    else if(kind==='perg') editThisBtn.href=`/admin/#/collections/pergament/entries/${id}`;
+    if(kind==='story') editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
+    else if(kind==='note') editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
+    else if(kind==='perg') editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
     adminDock.style.display='block';
   }
 
@@ -928,46 +914,26 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(decodeURIComponent(mRead[1])); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(decodeURIComponent(mNote[1])); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
   }
 
   /* ===== Инициализация ===== */
-  // сначала рисуем каркас, потом подтаскиваем контент
+  // ВАЖНО: сначала рисуем UI, потом грузим данные. Иначе при залипшей функции будет черный экран.
   applyTheme();
   render();
   ensureAdminUI();
   resize();
-  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!prefersReduced) requestAnimationFrame(drawStars);
   initSkyLine();
 
-  loadContent().then(()=>{ render(); }).catch(()=>{ /* оставим скелет */ });
+  // Грузим данные параллельно и по готовности перерисовываем.
+  loadContent().then(()=>{ render(); ensureAdminUI(); }).catch((e)=>{ console.warn('loadContent failed', e); });
 
-  // маленькая красная полоска при фатальных JS-ошибках, чтобы было видно «что упало»
-  window.addEventListener('error', (e) => {
-    if (!document.getElementById('fatal')) {
-      const d=document.createElement('div');
-      d.id='fatal';
-      d.style.cssText='position:fixed;left:0;right:0;top:0;background:#300;color:#fff;padding:8px 12px;z-index:9999;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace';
-      d.textContent='JS error: ' + (e.error?.message || e.message);
-      document.body.appendChild(d);
-    }
-  });
-  window.addEventListener('unhandledrejection', (e) => {
-    if (!document.getElementById('fatal')) {
-      const d=document.createElement('div');
-      d.id='fatal';
-      d.style.cssText='position:fixed;left:0;right:0;top:0;background:#300;color:#fff;padding:8px 12px;z-index:9999;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace';
-      d.textContent='Promise rejection: ' + (e.reason?.message || String(e.reason));
-      document.body.appendChild(d);
-    }
-  });
   </script>
 </body>
 </html>
- 
