@@ -424,15 +424,33 @@
     const q=state.q;
     const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
     const arcs = buildArcs();
+
+    // выбираем WIP: сначала тег 'wip', иначе последняя заметка
+    const wip = (notes||[]).find(n => (n.tags||[]).map(t=>String(t).toLowerCase()).includes('wip')) || (notes||[])[0] || null;
+
     app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
-          <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
-          <div class="list">
+
+          <div class="prose">
+            <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
+            <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
+            <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
+            <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+            <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
+            <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${
+              wip
+                ? `<a href="#/note/${encodeURIComponent(wip.id)}">${wip.title}</a> · ${fmtHumanDate(wip.date)}`
+                : `повесть о Цветке, ИБУТ и пара рассказов; собирается роман`
+            }</div>
+          </div>
+
+          <div class="muted" style="margin-top:8px">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+          <div class="list" style="margin-top:8px">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read/${s.slug || s.id}">
+                <a href="#/read/${encodeURIComponent(s.id)}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
@@ -480,7 +498,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read/${s.slug || s.id}">
+          <a href="#/read/${encodeURIComponent(s.id)}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
@@ -490,14 +508,18 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  async function renderArticle(id){
-    const s=stories.find(x=>x.id===id||x.slug===id);
+  async function renderArticle(rawId){
+    const key = String(rawId||'').trim().toLowerCase();
+    const s=stories.find(x =>
+      String(x.id||'').toLowerCase() === key ||
+      String(x.slug||'').toLowerCase() === key
+    );
     if(!s){location.hash='#/'; return;}
     try{ await loadMdIntoStory(s); }catch(e){ console.warn('md load fail', e); }
 
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
-    const order=a.items; const pos=Math.max(0, order.findIndex(v=> (v.id===s.id) || (v.slug && v.slug===s.slug)));
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> String(v.id||'').toLowerCase()===String(s.id||'').toLowerCase()));
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
@@ -523,8 +545,8 @@
 
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.slug || prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.slug || next.id}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read/${encodeURIComponent(prev.id)}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${encodeURIComponent(next.id)}">${next.title} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -553,7 +575,7 @@
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.slug || s.id}">
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${encodeURIComponent(s.id)}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
@@ -572,7 +594,7 @@
             items.length
               ? items.map(n => `
                 <div class="story-item" data-arc="${n.arc||'kainrax'}">
-                  <a href="#/note/${n.id}">
+                  <a href="#/note/${encodeURIComponent(n.id)}">
                     <div class="title">✶ ${n.title || 'Без названия'}</div>
                     <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
                   </a>
@@ -605,14 +627,7 @@
   async function renderProject() {
     let title = 'О проекте | планы';
     let updated = '';
-    let body = <div class="prose">
-        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
-        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? <a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)} : повесть о Цветке, ИБУТ и пара рассказов; собирается роман}</div>
-      </div>;
+    let body = 'Здесь будет описание проекта.';
     try {
       const raw = await fetch('content/project.md', { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject(r.status));
       const { attributes, body: mdBody } = parseFrontMatter(raw);
@@ -630,7 +645,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент ===== */
+  /* ===== Пергамент (как просила — не трогаю логику доступа) ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -895,11 +910,11 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(decodeURIComponent(mRead[1])); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(decodeURIComponent(mNote[1])); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(decodeURIComponent(mPerg[1])); return; }
     renderList();
   }
 
