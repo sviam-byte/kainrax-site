@@ -605,7 +605,14 @@
   async function renderProject() {
     let title = 'О проекте | планы';
     let updated = '';
-    let body = 'Здесь будет описание проекта.';
+    let body = <div class="prose">
+        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
+        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
+        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
+        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
+        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> ${wip ? <a href="#/note/${wip.id}">${wip.title}</a> · ${fmtHumanDate(wip.date)} : повесть о Цветке, ИБУТ и пара рассказов; собирается роман}</div>
+      </div>;
     try {
       const raw = await fetch('content/project.md', { cache: 'no-store' }).then(r => r.ok ? r.text() : Promise.reject(r.status));
       const { attributes, body: mdBody } = parseFrontMatter(raw);
