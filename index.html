@@ -432,7 +432,7 @@
           <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read/${s.id}">
+                <a href="#/read/${s.slug || s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
@@ -480,7 +480,7 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read/${s.id}">
+          <a href="#/read/${s.slug || s.id}">
             <div class="title">✶ ${i+1}. ${s.title}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
@@ -523,8 +523,8 @@
 
           <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
           <div style="display:flex;justify-content:space-between;gap:10px">
-            ${prev?`<a class="btn" href="#/read/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
-            ${next?`<a class="btn" href="#/read/${next.id}">${next.title} →</a>`:'<span></span>'}
+            ${prev?`<a class="btn" href="#/read/${prev.slug || prev.id}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read/${next.slug || next.id}">${next.title} →</a>`:'<span></span>'}
           </div>
         </div>
         <aside class="margin-notes"></aside>
@@ -553,7 +553,7 @@
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
       <div class="list">${items.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.id}">
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read/${s.slug || s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
