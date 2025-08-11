@@ -46,11 +46,28 @@
   </main>
 
   <script type="module">
-    (function sky(){const el=document.getElementById('sky-line');let run=true;function t(){const n=new Date();const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();el.style.top=(ms/86400000*100)+'vh';if(run) requestAnimationFrame(t)}document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(t)});requestAnimationFrame(t)})();
+    // Полоса неба
+    (function sky(){
+      const el=document.getElementById('sky-line'); let run=true;
+      function tick(){
+        const n=new Date();
+        const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
+        el.style.top=(ms/86400000*100)+'vh';
+        if(run) requestAnimationFrame(tick);
+      }
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)});
+      requestAnimationFrame(tick);
+    })();
 
+    // Тема
     const THEMES=['subsurface','sepia','glitch'], themeKey='kx-theme';
     (function initTheme(){let t='subsurface';try{t=localStorage.getItem(themeKey)||t}catch(_){ }applyTheme(t)})();
-    function applyTheme(t){ if(!THEMES.includes(t)) t='subsurface'; document.documentElement.setAttribute('data-theme',t); const m=document.querySelector('meta[name="theme-color"]'); if(m){const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; m.setAttribute('content', bg)} }
+    function applyTheme(t){
+      if(!THEMES.includes(t)) t='subsurface';
+      document.documentElement.setAttribute('data-theme',t);
+      const m=document.querySelector('meta[name="theme-color"]');
+      if(m){const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; m.setAttribute('content', bg)}
+    }
 
     // Даты 429/430 + "430-218 22:17"
     function fmtDayYear(s){
@@ -73,11 +90,22 @@
       return s;
     }
 
+    // Утилиты
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
-    function getId(){ return decodeURIComponent(location.hash.replace(/^#\/?/,'')).trim() }
     async function getJSON(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(r.status); return await r.json() }
     function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
 
+    // Парсер хеша: "#/id?c=cid" -> { id, params }
+    function parseHash(){
+      const raw = (location.hash || '').slice(1).replace(/^\//,''); // убираем # и ведущий /
+      const [idPart, qStr] = raw.split('?');
+      return {
+        id: decodeURIComponent(idPart || '').trim(),
+        params: new URLSearchParams(qStr || '')
+      };
+    }
+
+    // Эмодзи автора
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
     function authorEmoji(name){ const i=hashStr(name||'anon')%EMO.length; return EMO[i] }
@@ -100,7 +128,10 @@
     }
 
     async function render(){
-      const box=document.getElementById('post'); const id=getId(); if(!id){ box.textContent='Тема не указана.'; return }
+      const box=document.getElementById('post');
+      const { id, params } = parseHash();
+      if(!id){ box.textContent='Тема не указана.'; return }
+
       try{
         const t = await getJSON(`/content/threads/${id}.json`);
         document.title = `${t.title||id} — Доска сектора`;
@@ -131,7 +162,7 @@
             </div>
           `;
         } else {
-          // 2) Фолбэк: «дети»-комменты из индекса
+          // 2) Фолбэк: «дети» из индекса (если используешь отдельные файлы-комменты)
           try{
             const idx = await getJSON('/content/threads-index.json');
             const kids = idx.filter(x=>x.parentId === t.id);
@@ -155,15 +186,14 @@
           }catch(_){ relatedBox.innerHTML = '' }
         }
 
-        // Якорь ?c=ID — прокрутка и подсветка
-        const raw = location.hash.replace(/^#\/?/, '');
-        const [, q] = raw.split('?');
-        if (q){
-          const p = new URLSearchParams(q);
-          const target = p.get('c');
-          if (target){
-            const el = document.querySelector(`[data-cid="${CSS.escape(target)}"]`);
-            if (el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.style.outline='1px solid var(--ring)'; setTimeout(()=>el.style.outline='none', 1600); }
+        // Якорь на комментарий: ?c=ID
+        const target = params.get('c');
+        if (target){
+          const el = document.querySelector(`[data-cid="${CSS.escape(target)}"]`);
+          if (el){
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.outline = '1px solid var(--ring)';
+            setTimeout(()=> el.style.outline = 'none', 1600);
           }
         }
 
