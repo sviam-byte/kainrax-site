@@ -48,12 +48,13 @@
     .kx-head{
       position:sticky; top:0; z-index:10;
       display:flex; align-items:center; justify-content:space-between;
-      padding:10px 16px; background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
+      gap:10px; padding:10px 16px;
+      background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
       backdrop-filter:saturate(1.1) blur(6px);
       border-bottom:1px solid rgba(255,255,255,.05);
     }
     .kx-brand{font-weight:700; letter-spacing:.4px; color:var(--text)}
-    .kx-nav{display:flex; gap:8px; align-items:center}
+    .kx-nav{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
     .kx-btn{
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 12px; border-radius:12px; background:var(--tag);
@@ -62,18 +63,8 @@
     }
     .kx-btn:hover{transform:translateY(-1px)}
     .is-active{outline:2px solid var(--ring)}
-
-    /* CTA «Подписаться» */
-    .kx-cta{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0)), var(--tag-on);
-      border-color:rgba(255,255,255,.12);
-      font-weight:600;
-    }
-
-    /* Иконка Telegram как svg */
-    .tg-ico{
-      width:16px; height:16px; display:inline-block; vertical-align:-2px;
-    }
+    .kx-cta{ background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0)), var(--tag-on); border-color:rgba(255,255,255,.12); font-weight:600; }
+    .tg-ico{ width:16px; height:16px; display:inline-block; vertical-align:-2px; }
 
     .kx-themes{display:flex; gap:6px; padding-left:6px}
     .kx-pill{
@@ -109,9 +100,7 @@
       position:fixed; left:0; right:0; height:3px; z-index:0; pointer-events:none; opacity:.7; filter:blur(1px);
       background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%);
     }
-
-    html[data-theme="glitch"] .kx-link{position:relative; display:block;
-      background:linear-gradient(0deg, rgba(255,255,255,.012), rgba(255,255,255,0))}
+    html[data-theme="glitch"] .kx-link{position:relative; display:block; background:linear-gradient(0deg, rgba(255,255,255,.012), rgba(255,255,255,0))}
     html[data-theme="glitch"] .kx-link::after{
       content:""; position:absolute; inset:0; mix-blend-mode:screen; opacity:.07;
       background:
@@ -120,7 +109,6 @@
       pointer-events:none;
     }
 
-    /* Теги-фильтры */
     .kx-board{display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px}
     .kx-board .kx-tag{cursor:pointer}
   </style>
@@ -129,28 +117,24 @@
   <div id="sky-line" aria-hidden="true"></div>
 
   <header class="kx-head">
-    <a class="kx-brand" href="https://kainrax.netlify.app/">Кайнракс ✶</a>
+    <a class="kx-brand" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">Кайнракс ✶</a>
     <nav class="kx-nav">
-      <a class="kx-btn" href="https://kainrax.netlify.app/">К проекту</a>
+      <!-- Нормальная ссылка «к рассказам» -->
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">← к рассказам</a>
       <a class="kx-btn is-active" href="/index.html">Темы</a>
 
-      <!-- Кнопка «Подписаться» -->
+      <!-- Кнопка «Подписаться» (ТГ) -->
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться на канал в Telegram">
-        <!-- Встроенная иконка Telegram -->
-        <svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M9.75 15.5 9.9 12.7l6.1-5.52c.28-.25-.07-.37-.43-.17l-7.54 4.75-3.16-1c-.69-.22-.7-.68.15-1.02l12.34-4.76c.57-.21 1.12.14.93 1.02l-2.1 9.89c-.14.65-.52.8-1.05.5l-2.91-2.15-1.4 1.36c-.16.16-.3.3-.6.3z" fill="currentColor"/>
-        </svg>
+        <svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.75 15.5 9.9 12.7l6.1-5.52c.28-.25-.07-.37-.43-.17l-7.54 4.75-3.16-1c-.69-.22-.7-.68.15-1.02l12.34-4.76c.57-.21 1.12.14.93 1.02l-2.1 9.89c-.14.65-.52.8-1.05.5l-2.91-2.15-1.4 1.36c-.16.16-.3.3-.6.3z" fill="currentColor"/></svg>
         <span>Подписаться</span>
       </a>
-
-      <!-- Иконка-ТГ отдельно, если хочется компактно -->
+      <!-- Короткая иконка ТГ -->
       <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Открыть Telegram-канал">
-        <svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M9.75 15.5 9.9 12.7l6.1-5.52c.28-.25-.07-.37-.43-.17l-7.54 4.75-3.16-1c-.69-.22-.7-.68.15-1.02l12.34-4.76c.57-.21 1.12.14.93 1.02l-2.1 9.89c-.14.65-.52.8-1.05.5l-2.91-2.15-1.4 1.36c-.16.16-.3.3-.6.3z" fill="currentColor"/>
-        </svg>
+        <svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.75 15.5 9.9 12.7l6.1-5.52c.28-.25-.07-.37-.43-.17l-7.54 4.75-3.16-1c-.69-.22-.7-.68.15-1.02l12.34-4.76c.57-.21 1.12.14.93 1.02l-2.1 9.89c-.14.65-.52.8-1.05.5l-2.91-2.15-1.4 1.36c-.16.16-.3.3-.6.3z" fill="currentColor"/></svg>
         <span>TG</span>
       </a>
 
+      <!-- Переключатель тем (пилюли + хоткей T) -->
       <div class="kx-themes" id="themePicker" aria-label="Темы оформления">
         <button class="kx-pill" data-theme="subsurface">Subsurface Lab</button>
         <button class="kx-pill" data-theme="sepia">Archive Sepia</button>
@@ -182,7 +166,7 @@
       requestAnimationFrame(tick);
     })();
 
-    // Темы с памятью
+    // Темы + хоткей T
     const THEMES=['subsurface','sepia','glitch'];
     const themeKey='kx-theme';
     function applyTheme(t){
@@ -203,6 +187,13 @@
       document.getElementById('themePicker').addEventListener('click', e=>{
         const btn=e.target.closest('.kx-pill'); if(!btn) return;
         applyTheme(btn.dataset.theme);
+      });
+      // Хоткей T: циклически
+      document.addEventListener('keyup', (e)=>{
+        if ((e.key||'').toLowerCase()!=='t') return;
+        const cur = document.documentElement.getAttribute('data-theme') || 'subsurface';
+        const next = THEMES[(THEMES.indexOf(cur)+1)%THEMES.length];
+        applyTheme(next);
       });
     })();
 
@@ -247,7 +238,7 @@
       return `<article class="kx-thread">
         <a class="kx-link" href="/thread.html#/${encodeURIComponent(t.id)}">
           <h3 class="kx-title">✶ ${escapeHTML(t.title||'Без названия')}</h3>
-          <div class="kx-sub muted">${when} · ${escapeHTML(t.author||'anon')} · сектор: ${escapeHTML(t.sector||'—')}${t.board?` · раздел: ${escapeHTML(t.board)}`:''}</div>
+          <div class="kx-sub kx-muted">${when} · ${escapeHTML(t.author||'anon')} · сектор: ${escapeHTML(t.sector||'—')}${t.board?` · раздел: ${escapeHTML(t.board)}`:''}</div>
           <p class="kx-preview">${escapeHTML(preview)}</p>
           <div class="kx-tags">${tags}</div>
         </a>
@@ -275,8 +266,7 @@
     renderBoards();
     renderList();
 
-    // Комментариев нет и не будет. Спи спокойно.
+    // (Пре-)заглушка: без комментов, как и задумано.
   </script>
 </body>
 </html>
- 
