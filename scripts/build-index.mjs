@@ -4,13 +4,15 @@ import path from 'path';
 
 const ROOT = process.cwd();
 const CONTENT = path.join(ROOT, 'content');
-const OUT_INDEX = path.join(CONTENT, 'index.json');
+const OUT_INDEX   = path.join(CONTENT, 'index.json');
 const OUT_STORIES = path.join(CONTENT, 'stories.json');
-const OUT_NOTES = path.join(CONTENT, 'notes.json');
+const OUT_NOTES   = path.join(CONTENT, 'notes.json');
 
 async function readDirFiles(dir) {
   const ents = await fs.readdir(dir, { withFileTypes: true });
-  return ents.filter(e => e.isFile() && e.name.endsWith('.md')).map(e => path.join(dir, e.name));
+  return ents
+    .filter(e => e.isFile() && e.name.toLowerCase().endsWith('.md'))
+    .map(e => path.join(dir, e.name));
 }
 
 function parseFrontMatter(md) {
@@ -24,7 +26,7 @@ function parseFrontMatter(md) {
 }
 
 function parseYAML(yaml) {
-  // Мини-парсер под наш формат: "key: value", списки:
+  // Мини-парсер под формат: "key: value", списки:
   // key:\n  - a\n  - b
   const meta = {};
   const lines = yaml.replace(/\t/g, '  ').split(/\r?\n/);
@@ -37,7 +39,7 @@ function parseYAML(yaml) {
     const key = m[1]; let val = m[2];
 
     // список
-    if (val === '' && lines[i + 1] && lines[i + 1].match(/^\s*-\s+/)) {
+    if (val === '' && lines[i + 1] && /^\s*-\s+/.test(lines[i + 1])) {
       const arr = [];
       i++;
       while (i < lines.length) {
@@ -50,11 +52,11 @@ function parseYAML(yaml) {
       continue;
     }
 
-    // многострочный блок '|' — схлопываем в одну строку
+    // многострочный блок '|'
     if (val === '|') {
       i++;
       const buf = [];
-      while (i < lines.length && !lines[i].match(/^[A-Za-z0-9_-]+:\s*/)) {
+      while (i < lines.length && !/^[A-Za-z0-9_-]+:\s*/.test(lines[i])) {
         buf.push(lines[i]);
         i++;
       }
@@ -69,8 +71,7 @@ function parseYAML(yaml) {
 }
 
 function unquote(s) {
-  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'")))
-    return s.slice(1, -1);
+  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) return s.slice(1, -1);
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;       // дата ISO как строка
   if (/^\d+(\.\d+)?$/.test(s)) return Number(s);     // числа
   if (s === 'true') return true;
@@ -78,53 +79,68 @@ function unquote(s) {
   return s;
 }
 
-function pick(obj, extra = {}) {
-  // Нормализуем поля и удаляем пустое
+function normalizeItem(obj, extra = {}) {
   const o = { ...obj, ...extra };
-  ['id','slug','title','date','minutes','arc','annotation'].forEach(k=>{
-    if (o[k] === undefined) return;
+  ['slug','title','date','arc','annotation'].forEach(k => {
     if (typeof o[k] === 'string') o[k] = o[k].trim();
   });
-  if (!Array.isArray(o.tags)) o.tags = (o.tags && typeof o.tags === 'string')
-    ? o.tags.split(',').map(s=>s.trim()).filter(Boolean) : (o.tags||[]);
+  if (!Array.isArray(o.tags)) {
+    o.tags = (o.tags && typeof o.tags === 'string')
+      ? o.tags.split(',').map(s => s.trim()).filter(Boolean)
+      : (o.tags || []);
+  }
+  // минутки по длине текста, если не задано
+  if (!o.minutes) {
+    const len = (o.text || '').length;
+    o.minutes = Math.max(5, Math.round(len / 1100));
+  }
+  // дефолтная ветка для рассказов
+  if (!o.arc) o.arc = 'kainrax';
   return o;
 }
 
 async function loadCollection(subdir, isStory) {
   const dir = path.join(CONTENT, subdir);
-  const files = await readDirFiles(dir);
+  let files = [];
+  try { files = await readDirFiles(dir); } catch {}
   const items = [];
   for (const file of files) {
     const raw = await fs.readFile(file, 'utf8');
     const [meta, body] = parseFrontMatter(raw);
     const base = path.basename(file, '.md');
-    const id = meta.id || base;
+
+    // ВАЖНО: id берём ТОЛЬКО из имени файла, чтобы всегда был уникален.
+    // slug можно переопределять во фронтматтере, но по умолчанию = base.
+    const id   = base;
     const slug = meta.slug || base;
 
-    const item = pick(meta, {
+    const item = normalizeItem(meta, {
       id, slug,
       text: body,
+      file: `content/${subdir}/${base}.md`,
     });
 
-    if (isStory && !item.arc) item.arc = 'kainrax';
     items.push(item);
   }
-  // сортировка по дате (сначала новые)
-  items.sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
+  // сортировка по дате (новые сверху)
+  items.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   return items;
 }
 
-async function main(){
+async function main() {
   await fs.mkdir(CONTENT, { recursive: true });
   const stories = await loadCollection('stories', true);
   const notes   = await loadCollection('notes', false);
 
   const payload = { stories, notes };
-  await fs.writeFile(OUT_INDEX, JSON.stringify(payload, null, 2), 'utf8');
+  await fs.writeFile(OUT_INDEX,   JSON.stringify(payload, null, 2), 'utf8');
   await fs.writeFile(OUT_STORIES, JSON.stringify(stories, null, 2), 'utf8');
-  await fs.writeFile(OUT_NOTES, JSON.stringify(notes, null, 2), 'utf8');
+  await fs.writeFile(OUT_NOTES,   JSON.stringify(notes,   null, 2), 'utf8');
 
-  console.log(`Built:\n - ${path.relative(ROOT, OUT_INDEX)}\n - ${path.relative(ROOT, OUT_STORIES)}\n - ${path.relative(ROOT, OUT_NOTES)}`);
+  console.log(`Built:
+ - ${path.relative(ROOT, OUT_INDEX)}
+ - ${path.relative(ROOT, OUT_STORIES)}
+ - ${path.relative(ROOT, OUT_NOTES)}`);
 }
 
-main().catch(e=>{ console.error(e); process.exit(2); });
+main().catch(e => { console.error(e); process.exit(2); });
