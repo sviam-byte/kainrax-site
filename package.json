@@ -1,14 +1,13 @@
 {
-  "name": "kainrax-site",
+  "name": "kainrax-forum",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "node scripts/build-index.mjs"
-  },
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
   "dependencies": {
-    "gray-matter": "^4.0.3"
+    "deta": "^1.1.0"
   },
-  "engines": {
-    "node": ">=20"
+  "scripts": {
+    "build": "echo \"no build\"",
+    "postinstall": "echo \"deps ok\""
   }
 }
