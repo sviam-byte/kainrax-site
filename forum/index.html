@@ -137,4 +137,55 @@
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
     function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
 
-    // Состояни
+    // Состояние
+    const box=document.getElementById('threads'), filt=document.getElementById('filters');
+    const qInp=document.getElementById('q'), qClr=document.getElementById('clearQ');
+    let allItems=[], currentBoard='', query='';
+
+    async function loadIndex(){
+      try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw 0; return await r.json() }catch(_){ return [] }
+    }
+
+    function card(t){
+      const when=fmtDayYear(t.created);
+      const preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+(t.body&&t.body.length>200?'…':'');
+      const name=esc(t.author||'anon'); const aId=encodeURIComponent(t.author_id||slugify(name));
+      const emo=authorEmoji(name);
+      const tags=(t.tags||[]).map(x=>`<span class="kx-tag">${esc(x)}</span>`).join(' ');
+      return `<article class="kx-thread">
+        <a class="kx-link" href="/thread.html#/${encodeURIComponent(t.id)}"><h3 class="kx-title">✶ ${esc(t.title||'Без названия')}</h3></a>
+        <div class="kx-sub">${when} · <a href="/author.html#/${aId}" title="Все посты автора">${emo} ${name}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}</div>
+        <p class="kx-preview">${esc(preview)}</p>
+        <div class="kx-tags">${tags}</div>
+      </article>`;
+    }
+
+    function matches(t){
+      if ((t.board||'') === 'комментарии') return false; // комменты-файлы не показываем как темы
+      if(currentBoard && (t.board||'')!==currentBoard) return false;
+      if(!query) return true;
+      const hay = [t.title,t.body,(t.tags||[]).join(' '),t.author,t.sector,t.id].join(' ').toLowerCase();
+      return hay.includes(query);
+    }
+
+    function render(){
+      const items = allItems.filter(matches);
+      box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-muted">Ничего не найдено.</div>`;
+    }
+
+    function renderBoards(){
+      const boards = Array.from(new Set(allItems.map(x=>x.board).filter(b=>b && b!=='комментарии'))).sort();
+      if(!boards.length){ filt.innerHTML=''; return; }
+      const chip = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" data-board="${esc(b)}">${esc(b)}</span>`;
+      filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" data-board="">Все</span>` + boards.map(chip).join('');
+      filt.onclick = e=>{ const el=e.target.closest('.kx-tag'); if(!el) return; currentBoard = el.dataset.board || ''; renderBoards(); render(); };
+    }
+
+    allItems = await loadIndex();
+    renderBoards(); render();
+
+    qInp.addEventListener('input', ()=>{ query=qInp.value.trim().toLowerCase(); render(); });
+    qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); });
+  </script>
+</body>
+</html>
