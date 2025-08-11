@@ -6,7 +6,19 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# SPA-маршруты (если используешь #/ — можно и без этого блока)
+# Сначала явно пропускаем функции как есть
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to   = "/.netlify/functions/:splat"
+  status = 200
+
+# И контент-JSON пусть отдается как файлы
+[[redirects]]
+  from = "/content/*"
+  to   = "/content/:splat"
+  status = 200
+
+# А уж потом все остальное на SPA
 [[redirects]]
   from = "/*"
   to   = "/index.html"
