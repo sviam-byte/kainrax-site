@@ -1,7 +1,16 @@
 [build]
+  # Корень сайта — папка forum в репозитории
   base = "forum"
-  publish = "forum"
-  command = "npm ci && npm run build"
+
+  # Публикуем саму базовую папку, а не "forum/forum"
+  publish = "."
+
+  # Твоя сборка не требует зависимостей — просто запускаем скрипт
+  command = "npm run build"
+
+  # Чётко закрепим версию Node, чтобы не ловить сюрпризы
+  [build.environment]
+    NODE_VERSION = "20"
 
 # Короткие URL на тред
 [[redirects]]
