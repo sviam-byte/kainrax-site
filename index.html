@@ -6,7 +6,32 @@
   <title>Кайнракс — рассказы</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
-  <script defer src="/assets/metrika.js?v=1"></script>
+  <!-- В <head> -->
+  <script>
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j=0;j<document.scripts.length;j++){ if(document.scripts[j].src===r){ return; } }
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
+  
+    ym(103716449, 'init', {
+      webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer'
+    });
+  
+    // SPA-хит: первый и на каждую смену хеша
+    (function(){
+      var last = location.href;
+      function hit(){ try{ ym(103716449,'hit', location.href, { referer:last, title:document.title }); last = location.href; }catch(e){} }
+      if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
+      addEventListener('hashchange', hit);
+    })();
+  </script>
+  
+  <!-- В самом начале <body> -->
+  <noscript>
+    <div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div>
+  </noscript>
 
 
   <!-- OG/Twitter -->
