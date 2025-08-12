@@ -1,68 +1,64 @@
-// /assets/metrika.js
+// assets/metrika.js — ES5-совместимая версия
 ;(function () {
-  const ID = 103716449;
+  var ID = 103716449;
 
-  // прод-домены; допускаем любые *.netlify.app (на случай алиаса/превью)
-  const HOST_OK =
-    ['kainrax.site', 'kainrax.netlify.app'].includes(location.hostname) ||
-    /\.netlify\.app$/i.test(location.hostname);
+  // какие домены считаем «боевыми»
+  var HOST_OK =
+    location.hostname === 'kainrax.site' ||
+    location.hostname === 'www.kainrax.site' ||
+    location.hostname === 'kainrax.netlify.app' ||
+    /\.netlify\.app$/i.test(location.hostname); // предпросмотры
 
-  // всегда создаём stub, чтобы typeof ym === 'function' даже в dev
+  // всегда делаем stub, чтобы ym существовал даже если дальше выйдем
   if (!window.ym) {
     window.ym = function () { (ym.a = ym.a || []).push(arguments); };
     ym.l = +new Date();
   }
 
-  // флажок для быстрой проверки в консоли
+  // быстрый флаг для проверки в консоли
   window.__ymStatus = HOST_OK ? 'prod-wait' : 'dev-stub';
 
+  // на небоевых доменах ничего не грузим
   if (!HOST_OK) {
-    console.debug('[metrika] dev stub only on', location.hostname);
-    return; // не грузим счётчик на неподходящих доменах
+    try { console.debug('[metrika] dev stub only on', location.hostname); } catch (e) {}
+    return;
   }
 
-  // защита от двойной вставки
-  if (![...document.scripts].some(s => s.src.includes('mc.yandex.ru/metrika/tag.js'))) {
-    const s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://mc.yandex.ru/metrika/tag.js';
-    s.onload = boot;
-    s.onerror = () => { console.warn('[metrika] tag.js blocked/failed'); };
-    document.head.appendChild(s);
-  } else {
-    boot();
+  // загрузка тега (без spread/includes)
+  var hasTag = false;
+  var i, s;
+  for (i = 0; i < document.scripts.length; i++) {
+    s = document.scripts[i];
+    if (s && s.src && s.src.indexOf('mc.yandex.ru/metrika/tag.js') > -1) { hasTag = true; break; }
   }
 
-  function boot () {
-    if (window.__ymBooted) return;
-    window.__ymBooted = true;
-
-    const opts = {
+  function boot() {
+    var opts = {
       ssr: true, webvisor: true, clickmap: true, trackLinks: true,
       accurateTrackBounce: true, ecommerce: 'dataLayer'
     };
+    ym(ID, 'init', opts);
 
-    try {
-      ym(ID, 'init', opts);
-      window.__ymStatus = 'prod-inited';
-      console.debug('[metrika] inited on', location.hostname);
-    } catch (e) {
-      console.warn('[metrika] init error', e);
-      return;
-    }
-
-    // первый хит + SPA-хиты по hashchange
-    let last = document.referrer || location.href;
-    function hit () {
-      const href = location.href;
-      try { ym(ID, 'hit', href, { referer: last, title: document.title }); }
-      catch (_) {}
+    var last = location.href;
+    function hit() {
+      var href = location.href;
+      ym(ID, 'hit', href, { referer: last, title: document.title });
       last = href;
     }
     hit();
-    addEventListener('hashchange', hit);
+    window.addEventListener('hashchange', hit);
+    window.ymHit = hit; // ручной форс-хит, удобно в консоли
+    window.__ymStatus = 'prod-inited';
+  }
 
-    // ручной тест: window.ymHit()
-    window.ymHit = () => ym(ID, 'hit', location.href + '?manual=' + Date.now());
+  if (!hasTag) {
+    var tag = document.createElement('script');
+    tag.async = true;
+    tag.src = 'https://mc.yandex.ru/metrika/tag.js';
+    tag.onload = boot;
+    tag.onerror = function () { try { console.warn('[metrika] tag.js blocked/failed'); } catch(e){} };
+    document.head.appendChild(tag);
+  } else {
+    boot();
   }
 })();
