@@ -4,5 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-index.mjs"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
