@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Доска сектора — Кайнракс</title>
   <meta name="theme-color" content="#0b0f14" />
+
+  <!-- Yandex.Metrika counter -->
+  <script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=103711087', 'ym');
+    ym(103711087, 'init', { ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true });
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/103711087" style="position:absolute; left:-9999px;" alt=""/></div></noscript>
+  <!-- /Yandex.Metrika counter -->
+
   <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
   <style>
@@ -134,7 +148,7 @@
       });
     })();
 
-    // Даты: ISO → 429/430; формат "430-218 22:17" поддерживается
+    // Даты: ISO → 429/430; поддержка "430-218 22:17"
     function fmtDayYear(s){
       if(!s) return '';
       const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
@@ -160,7 +174,7 @@
     function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
     async function loadIndex(){ try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw 0; return await r.json() }catch(_){ return [] } }
 
-    // Стабильный эмодзи-«аватар»
+    // Эмодзи-«аватар»
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
     function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
@@ -199,13 +213,11 @@
 
     function render(){
       let items = allItems.filter(matches);
-
       if (currentSort === 'popular') {
         items.sort((a,b)=> (b.commentCount||0) - (a.commentCount||0) || (new Date(b.created) - new Date(a.created)));
       } else {
         items.sort((a,b)=> new Date(b.created) - new Date(a.created));
       }
-
       box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-muted">Ничего не найдено.</div>`;
     }
 
