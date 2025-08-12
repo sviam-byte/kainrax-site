@@ -1,19 +1,33 @@
 [build]
   base = "forum"
-  publish = "."
-  command = "node scripts/build-index.mjs"
+  publish = "forum"
+  command = "npm ci && npm run build"
 
-[build.environment]
-  NODE_VERSION = "20"
-
-# короткие URL на тред
+# Короткие URL на тред
 [[redirects]]
   from = "/t/:id"
   to = "/thread.html#/:id"
   status = 302
 
-# кэш индекса на минуту
+# Кэш индекса на минуту
 [[headers]]
   for = "/content/threads-index.json"
   [headers.values]
   Cache-Control = "public, max-age=60, must-revalidate"
+
+# Глобальные заголовки безопасности + разрешения для Метрики
+[[headers]]
+  for = "/*"
+  [headers.values]
+  Content-Security-Policy = """
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://mc.yandex.ru;
+    connect-src 'self' https://mc.yandex.ru;
+    img-src 'self' data: https://mc.yandex.ru;
+    style-src 'self' 'unsafe-inline';
+    base-uri 'self';
+    frame-ancestors 'self'
+  """
+  Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+  X-Content-Type-Options = "nosniff"
+  Referrer-Policy = "strict-origin-when-cross-origin"
