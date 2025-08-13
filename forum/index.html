@@ -4,130 +4,181 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Доска сектора — Кайнракс</title>
+  <meta name="description" content="Быт, странности, техузлы. Каждая карточка — отдельная ветка обсуждений внутри мира Кайнракс." />
   <meta name="theme-color" content="#0b0f14" />
-
-  <script src="/assets/metrika.js"></script>
-
-
 
   <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
+
+  <!-- МЕТРИКА (если есть) -->
+  <script src="/assets/metrika.js" defer></script>
+
   <style>
     :root{
-      --bg:#0b0f14; --bg-soft:#0f1620; --panel:#0e141d; --text:#e6edf5; --muted:#9fb0c7;
-      --brand:#7dd3fc; --tag:#112131; --tag-on:#183140; --ring:#7dd3fc; --card:#0e141d; --link:#bfe9ff;
+      --bg:#0b0f14; --bg-soft:#0f1620; --panel:#0e141d; --card:#0e141d; --text:#e6edf5; --muted:#9fb0c7;
+      --brand:#7dd3fc; --tag:#112131; --tag-on:#183140; --ring:#7dd3fc; --link:#bfe9ff;
       --gap:12px; --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
+      --border:rgba(255,255,255,.08);
     }
-    html[data-theme="sepia"]{ --bg:#0e0b09; --bg-soft:#14100d; --panel:#16120d; --card:#17120e; --text:#ece3d3; --muted:#bdae95; --brand:#d2b48c; --link:#f3d7a6; --tag:#2a2218; --tag-on:#3a2f21; --ring:#d6b778; }
-    html[data-theme="glitch"]{ --bg:#07090d; --bg-soft:#0b0f16; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6; --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa; }
+    /* Светлая тема (перепрошита) */
+    html[data-theme="sepia"]{
+      --bg:#f8f4ec; --bg-soft:#f2eadf; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --brand:#d6b778; --tag:#efe3cc; --tag-on:#e6d8be; --ring:#d6b778; --link:#0b66d3;
+      --shadow:0 1px 0 rgba(0,0,0,.03) inset, 0 8px 30px rgba(0,0,0,.08);
+      --border:rgba(0,0,0,.08);
+    }
+    /* Глитч-тема */
+    html[data-theme="glitch"]{
+      --bg:#07090d; --bg-soft:#0b0f16; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6;
+      --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa; --border:rgba(255,255,255,.08);
+    }
 
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
     a{color:var(--link);text-decoration:none}
     a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--ring); outline-offset:2px}
 
-    .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid rgba(255,255,255,.05)}
+    /* Шапка */
+    .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--border)}
+    html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,255,255,0))}
     .kx-brand{font-weight:800;color:var(--text)}
     .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow);color:var(--text)}
+    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid var(--border);box-shadow:var(--shadow);color:var(--text)}
     .kx-btn:hover{transform:translateY(-1px)}
     .is-active{outline:2px solid var(--ring)}
-    .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:rgba(255,255,255,.12);font-weight:600}
+    .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:var(--border);font-weight:600}
 
+    /* Переключатель тем */
     .kx-themes{display:flex;gap:6px}
-    .kx-pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+    .kx-pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid var(--border);cursor:pointer}
     .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
 
+    /* Оболочка */
     .kx-shell{max-width:1100px;margin:0 auto;padding:16px}
-    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+
     h1{margin:0 0 6px 0;font-size:22px}
     .kx-muted{color:var(--muted);font-size:14px}
 
+    /* Панель действий */
     .bar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
     #filters{display:flex;gap:6px;flex-wrap:wrap}
-    .search{flex:1;min-width:220px;display:flex;gap:8px}
-    .search input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:var(--card);color:var(--text)}
-
     #sorters{display:flex;gap:8px;flex-wrap:wrap}
     #sorters .kx-btn.is-active{outline:1px solid var(--ring);background:var(--tag-on);color:var(--text)}
+    .search{flex:1;min-width:220px;display:flex;gap:8px}
+    .search input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
 
+    /* Сетка тем */
     .kx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
-    .kx-thread{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
-    .kx-thread .kx-title{margin:2px 0 4px 0;font-size:18px}
+    .kx-thread{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
+    .kx-title{margin:2px 0 4px 0;font-size:18px}
     .kx-sub{font-size:12px;color:var(--muted)}
     .kx-preview{margin:8px 0 10px 0}
     .kx-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-    .kx-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid rgba(255,255,255,.06)}
+    .kx-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid var(--border);cursor:pointer}
     .kx-tag--on{background:var(--tag-on);color:var(--text)}
 
-    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
+    /* Глитч-подложка для ссылок в теме glitch */
     html[data-theme="glitch"] .kx-link{position:relative;display:block;background:linear-gradient(0deg,rgba(255,255,255,.012),rgba(255,255,255,0))}
     html[data-theme="glitch"] .kx-link::after{content:"";position:absolute;inset:0;mix-blend-mode:screen;opacity:.07;background:repeating-linear-gradient(180deg,rgba(167,139,250,.25) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(125,211,252,.15) 0 2px,transparent 2px 4px);pointer-events:none}
+
+    /* Линия неба */
+    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
+
+    /* Скелетон */
+    .skeleton{border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.08), rgba(255,255,255,.04));animation:sh 1.4s infinite}
+    html[data-theme="sepia"] .skeleton{background:linear-gradient(90deg, rgba(0,0,0,.04), rgba(0,0,0,.08), rgba(0,0,0,.04))}
+    @keyframes sh{0%{background-position:-200px 0}100%{background-position:200px 0}}
+    .kx-skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
+    .kx-skeleton-card{height:140px;border:1px solid var(--border)}
+
+    /* Сообщения */
+    .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
   </style>
 </head>
 <body>
   <div id="sky-line" aria-hidden="true"></div>
 
-  <header class="kx-head">
+  <header class="kx-head" role="banner">
     <a class="kx-brand" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">Кайнракс ✶</a>
-    <nav class="kx-nav">
+    <nav class="kx-nav" role="navigation" aria-label="Основная">
       <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">← к рассказам</a>
-      <a class="kx-btn is-active" href="/index.html">Темы</a>
+      <a class="kx-btn is-active" href="/index.html" aria-current="page">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
       <a class="kx-btn" href="/tags.html">Теги</a>
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться">Подписаться</a>
       <div class="kx-themes" id="themePicker" aria-label="Темы">
-        <button class="kx-pill" data-theme="subsurface">Subsurface Lab</button>
-        <button class="kx-pill" data-theme="sepia">Archive Sepia</button>
-        <button class="kx-pill" data-theme="glitch">Glitch Basilica</button>
+        <button class="kx-pill" data-theme="subsurface" type="button">Subsurface Lab</button>
+        <button class="kx-pill" data-theme="sepia" type="button">Archive Sepia</button>
+        <button class="kx-pill" data-theme="glitch" type="button">Glitch Basilica</button>
       </div>
     </nav>
   </header>
 
-  <main class="kx-shell">
-    <section class="kx-panel">
-      <h1>Доска сектора</h1>
-      <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка.</p>
+  <main class="kx-shell" id="main" tabindex="-1">
+    <section class="kx-panel" aria-labelledby="h1">
+      <h1 id="h1">Доска сектора</h1>
+      <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Используй фильтры, поиск и сортировку.</p>
 
-      <div class="bar">
-        <div id="filters"></div>
+      <div class="bar" role="group" aria-label="Инструменты">
+        <div id="filters" role="tablist" aria-label="Разделы"></div>
 
         <div id="sorters" role="group" aria-label="Сортировка">
-          <button class="kx-btn" data-sort="newest" aria-pressed="true">Сначала новые</button>
-          <button class="kx-btn" data-sort="popular" aria-pressed="false">Популярные</button>
+          <button class="kx-btn" data-sort="newest" aria-pressed="true" type="button">Сначала новые</button>
+          <button class="kx-btn" data-sort="popular" aria-pressed="false" type="button">Популярные</button>
         </div>
 
-        <div class="search">
-          <input id="q" type="search" placeholder="поиск по заголовку, тексту, тегам, автору…" autocomplete="off">
-          <button class="kx-btn" id="clearQ">Сброс</button>
+        <div class="search" role="search">
+          <input id="q" type="search" placeholder="поиск по заголовку, тексту, тегам, автору…  (нажми /)" autocomplete="off" aria-label="Поиск по темам" />
+          <button class="kx-btn" id="clearQ" type="button" aria-label="Сбросить поиск">Сброс</button>
         </div>
       </div>
 
-      <div id="threads" class="kx-grid"></div>
+      <div id="threads" class="kx-grid" aria-live="polite"></div>
+      <div id="status" class="kx-msg" hidden></div>
+
+      <div id="skeleton" class="kx-skeleton-grid" aria-hidden="true">
+        <div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div>
+      </div>
     </section>
   </main>
 
   <script type="module">
-    // Полоса неба
+    // ===== Полоса неба =====
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
-      function tick(){ const n=new Date(); const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds(); el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(tick); }
+      function tick(){
+        const n=new Date();
+        const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
+        el.style.top=(ms/86400000*100)+'vh';
+        if(run) requestAnimationFrame(tick);
+      }
       document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)});
       requestAnimationFrame(tick);
     })();
 
-    // Темы + хоткей T
-    const THEMES=['subsurface','sepia','glitch']; const themeKey='kx-theme';
+    // ===== Тема + хоткей T =====
+    const THEMES=['subsurface','sepia','glitch'];
+    const themeKey='kx-theme';
     function applyTheme(t){
       if(!THEMES.includes(t)) t='subsurface';
       document.documentElement.setAttribute('data-theme', t);
-      try{ localStorage.setItem(themeKey, t) }catch(_){}
+      try{ localStorage.setItem(themeKey, t) }catch(_){ }
+      // Подсветка кнопок
       document.querySelectorAll('.kx-pill').forEach(b=> b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false');
+      // Обновить meta theme-color под фон
       const meta=document.querySelector('meta[name="theme-color"]');
       if(meta){ const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; meta.setAttribute('content', bg); }
     }
     (function initTheme(){
-      let t='subsurface'; try{ t=localStorage.getItem(themeKey)||t }catch(_){}
+      let t='subsurface';
+      try{ t=localStorage.getItem(themeKey)||t }catch(_){ }
       applyTheme(t);
       document.getElementById('themePicker').addEventListener('click', e=>{
         const btn=e.target.closest('.kx-pill'); if(!btn) return; applyTheme(btn.dataset.theme);
@@ -139,7 +190,7 @@
       });
     })();
 
-    // Даты: ISO → 429/430; поддержка "430-218 22:17"
+    // ===== Дата: ISO → «день/год», поддержка «430-218 22:17» =====
     function fmtDayYear(s){
       if(!s) return '';
       const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
@@ -160,31 +211,52 @@
       return s;
     }
 
-    // Утилиты
-    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+    // ===== Утилиты =====
+    const qs = (s,root=document)=>root.querySelector(s);
+    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[ch]))}
     function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
-    async function loadIndex(){ try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw 0; return await r.json() }catch(_){ return [] } }
+    async function loadIndex(){ try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json() }catch(err){ console.error(err); return {error: String(err), items: []} } }
+    function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms) } }
 
     // Эмодзи-«аватар»
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
     function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
 
-    // Состояние
-    const box=document.getElementById('threads'), filt=document.getElementById('filters');
-    const qInp=document.getElementById('q'), qClr=document.getElementById('clearQ');
-    const sortersBox=document.getElementById('sorters');
+    // ===== Состояние =====
+    const box=qs('#threads'), filt=qs('#filters');
+    const qInp=qs('#q'), qClr=qs('#clearQ');
+    const sortersBox=qs('#sorters');
+    const statusBox=qs('#status');
+    const skeleton=qs('#skeleton');
+
     const sortKey='kx-sort';
     let allItems=[], currentBoard='', query='';
     let currentSort='newest';
-    try{ currentSort = localStorage.getItem(sortKey) || 'newest'; }catch(_){}
+    try{ currentSort = localStorage.getItem(sortKey) || 'newest'; }catch(_){ }
+
+    // URL <-> state
+    function readURL(){
+      const u=new URL(location.href);
+      currentBoard=u.searchParams.get('board')||'';
+      query=(u.searchParams.get('q')||'').toLowerCase();
+      const s=u.searchParams.get('sort'); if(s==='popular'||s==='newest') currentSort=s;
+      qInp.value=query;
+    }
+    function writeURL(){
+      const u=new URL(location.href);
+      if(currentBoard) u.searchParams.set('board', currentBoard); else u.searchParams.delete('board');
+      if(query) u.searchParams.set('q', query); else u.searchParams.delete('q');
+      u.searchParams.set('sort', currentSort);
+      history.replaceState(null,'',u);
+    }
 
     function card(t){
       const when=fmtDayYear(t.created);
       const preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+(t.body&&t.body.length>200?'…':'');
       const name=esc(t.author||'anon'); const aId=encodeURIComponent(t.author_id||slugify(name));
       const emo=authorEmoji(name);
-      const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}">${esc(x)}</a>`).join(' ');
+      const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}" title="Посты с тегом ${esc(x)}">${esc(x)}</a>`).join(' ');
       const cc = t.commentCount||0;
       return `<article class="kx-thread">
         <a class="kx-link" href="/thread.html#/${encodeURIComponent(t.id)}"><h3 class="kx-title">✶ ${esc(t.title||'Без названия')}</h3></a>
@@ -209,15 +281,17 @@
       } else {
         items.sort((a,b)=> new Date(b.created) - new Date(a.created));
       }
-      box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-muted">Ничего не найдено.</div>`;
+      box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-msg">Ничего не найдено. Попробуй другой запрос или раздел.</div>`;
+      writeURL();
     }
 
     function renderBoards(){
       const boards = Array.from(new Set(allItems.map(x=>x.board).filter(b=>b && b!=='комментарии'))).sort();
       if(!boards.length){ filt.innerHTML=''; return; }
-      const chip = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" data-board="${esc(b)}">${esc(b)}</span>`;
-      filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" data-board="">Все</span>` + boards.map(chip).join('');
+      const chip = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${b===currentBoard?'true':'false'}" tabindex="0" data-board="${esc(b)}">${esc(b)}</span>`;
+      filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${!currentBoard?'true':'false'}" tabindex="0" data-board="">Все</span>` + boards.map(chip).join('');
       filt.onclick = e=>{ const el=e.target.closest('.kx-tag'); if(!el) return; currentBoard = el.dataset.board || ''; renderBoards(); render(); };
+      filt.onkeydown = e=>{ if(e.key==='Enter' || e.key===' '){ const el=e.target.closest('.kx-tag'); if(!el) return; currentBoard = el.dataset.board || ''; renderBoards(); render(); e.preventDefault(); } };
     }
 
     function syncSortUI(){
@@ -228,18 +302,46 @@
       });
     }
 
-    allItems = await loadIndex();
-    renderBoards(); syncSortUI(); render();
+    // ===== Инициализация =====
+    readURL();
+    syncSortUI();
 
-    qInp.addEventListener('input', ()=>{ query=qInp.value.trim().toLowerCase(); render(); });
-    qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); });
+    // Скелетон вкл
+    skeleton.hidden=false; box.innerHTML='';
+
+    const payload = await loadIndex();
+    if(payload && payload.error){
+      statusBox.hidden=false;
+      statusBox.textContent = 'Не удалось получить /content/threads-index.json — ' + payload.error + '. Проверь путь и CORS.';
+    }
+    allItems = Array.isArray(payload) ? payload : Array.isArray(payload.items) ? payload.items : [];
+
+    renderBoards(); render();
+    skeleton.hidden=true;
+
+    // ===== События =====
+    const applySearch = debounce(()=>{ query=qInp.value.trim().toLowerCase(); render(); }, 120);
+    qInp.addEventListener('input', applySearch);
+    qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); qInp.focus(); });
 
     sortersBox.addEventListener('click', e=>{
       const btn=e.target.closest('button[data-sort]'); if(!btn) return;
       currentSort = btn.dataset.sort;
-      try{ localStorage.setItem(sortKey, currentSort) }catch(_){}
+      try{ localStorage.setItem(sortKey, currentSort) }catch(_){ }
       syncSortUI(); render();
     });
+
+    // Хоткеи: / — поиск, Esc — очистить, T — тема
+    document.addEventListener('keydown', e=>{
+      const key=(e.key||'').toLowerCase();
+      if(key==='/' && document.activeElement!==qInp){ qInp.focus(); qInp.select(); e.preventDefault(); }
+      else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); } }
+    });
+
+    // Фикс: если hash был, переведём в параметры (для старых ссылок вида #/board)
+    if(location.hash && !location.search){
+      const m=location.hash.match(/^#\/(.+)$/); if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); }
+    }
   </script>
 </body>
 </html>
