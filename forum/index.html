@@ -55,7 +55,7 @@
     .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
 
     /* Оболочка */
-    .kx-shell{max-width:1100px;margin:0 авто;padding:16px}
+    .kx-shell{max-width:1100px;margin:0 auto;padding:16px}
     .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
 
     h1{margin:0 0 6px 0;font-size:22px}
@@ -96,7 +96,7 @@
     /* Сообщения */
     .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
 
-    /* ABOUT: раскрывашка под заголовком, «чуть выделенней» */
+    /* ABOUT: раскрывашка под заголовком, центр и компактная кнопка */
     .kx-about{margin:10px 0 14px}
     .kx-about details{
       position:relative;
@@ -105,8 +105,9 @@
       background:var(--card);
       box-shadow:var(--shadow);
       overflow:hidden;
+      max-width:760px;
+      margin:0 auto;
     }
-    /* тонкая бренд-полоса слева */
     .kx-about details::before{
       content:"";
       position:absolute; inset:0 auto 0 0; width:4px;
@@ -115,13 +116,20 @@
     }
     .kx-about summary{
       list-style:none; cursor:pointer; user-select:none;
-      padding:12px 14px; display:flex; align-items:center; gap:10px; font-weight:600;
+      padding:9px 12px;
+      display:flex; align-items:center; gap:8px;
+      font-weight:600; font-size:15px;
     }
     .kx-about summary::-webkit-details-marker{display:none}
-    .kx-about .caret{transition:transform .18s ease; font-size:14px; line-height:1; opacity:.85}
+    .kx-about .caret{transition:transform .18s ease; font-size:12px; line-height:1; opacity:.85}
     .kx-about details[open] .caret{transform:rotate(90deg)}
-    .kx-about .body{padding:0 14px 14px; color:var(--muted)}
-    .kx-badge{font-size:12px; padding:4px 8px; border-radius:999px; background:var(--tag); border:1px solid var(--border); color:var(--muted); margin-right:6px}
+    .kx-about .body{padding:0 12px 12px; color:var(--muted)}
+    .kx-badge{
+      font-size:12px; padding:4px 8px; border-radius:999px;
+      background:var(--tag); border:1px solid var(--border); color:var(--muted);
+      margin-right:6px;
+    }
+
     @media (max-width:480px){
       .kx-head{gap:8px}
       .kx-nav{gap:6px}
@@ -387,9 +395,11 @@
     // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — открыть «о проекте»
     document.addEventListener('keydown', e=>{
       const key=(e.key||'').toLowerCase();
-      if(key==='/' && document.activeElement!==qInp){ qInp.focus(); qInp.select(); e.preventDefault(); }
+      const tag=(e.target && (e.target.tagName||'')).toLowerCase();
+      const typing = tag==='input' || tag==='textarea' || (e.target && e.target.isContentEditable);
+      if(key==='/' && !typing){ qInp.focus(); qInp.select(); e.preventDefault(); }
       else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); } }
-      else if(key==='?'){
+      else if(key==='?' && !typing){
         const box = document.getElementById('aboutBox');
         if(box && !box.open){ box.open = true; document.getElementById('aboutTitle')?.focus?.(); }
       }
