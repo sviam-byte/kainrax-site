@@ -20,7 +20,7 @@
       --gap:12px; --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
       --border:rgba(255,255,255,.08);
     }
-    /* Светлая тема (перепрошита) */
+    /* Светлая тема */
     html[data-theme="sepia"]{
       --bg:#f8f4ec; --bg-soft:#f2eadf; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
       --brand:#d6b778; --tag:#efe3cc; --tag-on:#e6d8be; --ring:#d6b778; --link:#0b66d3;
@@ -96,26 +96,33 @@
     /* Сообщения */
     .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
 
-    /* ABOUT: стили модального окна */
-    dialog.kx-modal{
+    /* ABOUT: раскрывашка на главной */
+    .kx-about{margin:10px 0 14px}
+    .kx-about details{
       border:1px solid var(--border);
-      border-radius:16px;
-      padding:16px;
-      max-width: min(720px, 92vw);
-      width: 92vw;
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: var(--shadow);
+      border-radius:var(--r);
+      background:var(--card);
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
-    dialog.kx-modal::backdrop{
-      background: rgba(0,0,0,.5);
-      backdrop-filter: blur(2px);
+    .kx-about summary{
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      display:flex; align-items:center; gap:10px;
+      font-weight:600;
+      user-select:none;
     }
-    .kx-modal h2{margin:0 0 8px 0;font-size:20px}
-    .kx-modal p{margin:8px 0}
-    .kx-modal ul{margin:8px 0 0 18px}
-    .kx-modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-    .kx-badge{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--tag);border:1px solid var(--border);color:var(--muted)}
+    .kx-about summary::-webkit-details-marker{display:none}
+    .kx-about .caret{
+      transition:transform .18s ease;
+      font-size:14px;
+      line-height:1;
+      opacity:.85;
+    }
+    .kx-about details[open] .caret{transform:rotate(90deg)}
+    .kx-about .body{padding:0 14px 14px;color:var(--muted)}
+    .kx-badge{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--tag);border:1px solid var(--border);color:var(--muted);margin-right:6px}
     @media (max-width:480px){
       .kx-head{gap:8px}
       .kx-nav{gap:6px}
@@ -134,10 +141,6 @@
       <a class="kx-btn is-active" href="/index.html" aria-current="page">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
       <a class="kx-btn" href="/tags.html">Теги</a>
-
-      <!-- ABOUT: кнопка открытия модалки -->
-      <button class="kx-btn" id="aboutBtn" type="button" aria-haspopup="dialog" aria-controls="aboutDlg">Что здесь происходит?</button>
-
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться">Подписаться</a>
       <div class="kx-themes" id="themePicker" aria-label="Темы">
         <button class="kx-pill" data-theme="subsurface" type="button">Subsurface Lab</button>
@@ -151,6 +154,27 @@
     <section class="kx-panel" aria-labelledby="h1">
       <h1 id="h1">Доска сектора</h1>
       <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Используй фильтры, поиск и сортировку.</p>
+
+      <!-- ABOUT: раскрывающийся блок прямо на главной -->
+      <div class="kx-about" id="about">
+        <details id="aboutBox" aria-labelledby="aboutTitle">
+          <summary>
+            <span class="caret" aria-hidden="true">▸</span>
+            <span id="aboutTitle">Что здесь происходит?</span>
+          </summary>
+          <div class="body">
+            <p><span class="kx-badge">in-world проект</span><span class="kx-badge">форум мира «Кайнракс»</span></p>
+            <p>Это внутренняя «доска» вымышленного мира Кайнракс. Посты пишут персонажи, карточка = ветка обсуждения. Ты читаешь прямо изнутри мира.</p>
+            <ul>
+              <li><strong>Как читать:</strong> открывай карточки, внутри — полный текст, таймлайн и комменты персонажей.</li>
+              <li><strong>Поиск и фильтры:</strong> работают по названию, тексту, тегам и авторам.</li>
+              <li><strong>Даты:</strong> вид «N-й день 430-го года» или реальное время.</li>
+            </ul>
+            <p class="kx-muted">Дисклеймер: совпадения случайны, сбор персональных данных не ведётся; может быть включена анонимная метрика.</p>
+            <p>Ещё: <a href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">основные рассказы</a> · <a href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Telegram</a></p>
+          </div>
+        </details>
+      </div>
 
       <div class="bar" role="group" aria-label="Инструменты">
         <div id="filters" role="tablist" aria-label="Разделы"></div>
@@ -180,26 +204,6 @@
     </section>
   </main>
 
-  <!-- ABOUT: модальное окно с описанием проекта -->
-  <dialog id="aboutDlg" class="kx-modal" aria-labelledby="aboutTitle">
-    <h2 id="aboutTitle">Что здесь происходит</h2>
-    <p class="kx-muted kx-badge">вымышленный форум вымышленного мира</p>
-    <p>Перед тобой внутренняя «доска» мира Кайнракс. Каждый пост — запись от персонажа, каждая карточка — отдельная ветка обсуждений. Это художественный проект в формате in-world.</p>
-    <ul>
-      <li><strong>Как читать:</strong> открывай карточки, внутри — полный текст, таймлайн и комментарии персонажей.</li>
-      <li><strong>Фильтры и поиск:</strong> работают по названию, тексту, тегам и авторам.</li>
-      <li><strong>Даты:</strong> показываются как «N-й день 430-го года» или реальное время.</li>
-    </ul>
-    <p class="kx-muted">Дисклеймер: все совпадения случайны. Сбор персональных данных не ведётся; может быть подключена анонимная метрика.</p>
-    <p>
-      Ещё: <a href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">основные рассказы</a> ·
-      <a href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Telegram</a>
-    </p>
-    <div class="actions">
-      <button class="kx-btn" type="button" data-close>Понятно</button>
-    </div>
-  </dialog>
-
   <script type="module">
     // ===== Полоса неба =====
     (function initSkyLine(){
@@ -221,9 +225,7 @@
       if(!THEMES.includes(t)) t='subsurface';
       document.documentElement.setAttribute('data-theme', t);
       try{ localStorage.setItem(themeKey, t) }catch(_){ }
-      // Подсветка кнопок
       document.querySelectorAll('.kx-pill').forEach(b=> b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false');
-      // Обновить meta theme-color под фон
       const meta=document.querySelector('meta[name="theme-color"]');
       if(meta){ const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; meta.setAttribute('content', bg); }
     }
@@ -382,30 +384,33 @@
       syncSortUI(); render();
     });
 
-    // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — помощь
+    // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — помощь (ABOUT)
     document.addEventListener('keydown', e=>{
       const key=(e.key||'').toLowerCase();
       if(key==='/' && document.activeElement!==qInp){ qInp.focus(); qInp.select(); e.preventDefault(); }
       else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); } }
+      else if(key==='?'){
+        const box = document.getElementById('aboutBox');
+        if(box && !box.open){ box.open = true; document.getElementById('aboutTitle')?.focus?.(); }
+      }
     });
 
-    // ===== ABOUT: логика модального окна =====
+    // ===== ABOUT: запоминание состояния + автопоказ по URL =====
     (function initAbout(){
-      const btn = document.getElementById('aboutBtn');
-      const dlg = document.getElementById('aboutDlg');
-      if(!btn || !dlg) return;
-      const closeBtn = dlg.querySelector('[data-close]');
-      btn.addEventListener('click', ()=> dlg.showModal());
-      closeBtn?.addEventListener('click', ()=> dlg.close());
-      // Клик по фону закрывает
-      dlg.addEventListener('click', e=>{
-        const r = dlg.getBoundingClientRect();
-        const inBox = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-        if(!inBox) dlg.close();
-      });
-      // Горячая клавиша ?
-      document.addEventListener('keydown', e=>{
-        if(e.key === '?'){ e.preventDefault(); dlg.showModal(); }
+      const box = document.getElementById('aboutBox');
+      if(!box) return;
+      const key = 'kx-about-open';
+      // восстановление
+      try{
+        const saved = localStorage.getItem(key);
+        if(saved==='1') box.open = true;
+      }catch(_){}
+      // по URL
+      const u = new URL(location.href);
+      if(u.hash==='#about' || u.searchParams.get('about')==='1'){ box.open = true; }
+      // сохранение
+      box.addEventListener('toggle', ()=>{
+        try{ localStorage.setItem(key, box.open ? '1':'0'); }catch(_){}
       });
     })();
 
