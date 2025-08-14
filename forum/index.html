@@ -12,7 +12,7 @@
   <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
 
-  <!-- МЕТРИКА (если есть) -->
+  <!-- МЕТРИКА ТОЛЬКО defer -->
   <script src="/assets/metrika.js" defer></script>
 
   <style>
@@ -37,10 +37,8 @@
     body{
       margin:0;background:var(--bg);color:var(--text);
       font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
-      -webkit-text-size-adjust:100%;
-      text-size-adjust:100%;
-      overscroll-behavior-y:none;
-      scrollbar-gutter: stable both-edges;
+      -webkit-text-size-adjust:100%; text-size-adjust:100%;
+      overscroll-behavior-y:none; scrollbar-gutter: stable both-edges;
     }
     *{box-sizing:border-box}
     img,svg,video{max-width:100%;height:auto}
@@ -48,7 +46,6 @@
     a:hover{text-decoration:underline}
     :focus-visible{outline:2px solid var(--ring); outline-offset:2px}
 
-    /* Шапка */
     .kx-head{
       position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;
       padding:10px 16px;
@@ -60,47 +57,35 @@
     html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,255,255,0))}
     .kx-brand{font-weight:800;color:var(--text);white-space:nowrap}
     .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .kx-btn{
-      display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;
-      background:var(--tag);border:1px solid var(--border);box-shadow:var(--shadow);color:var(--text);
-      min-height:40px
-    }
+    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--tag);border:1px solid var(--border);box-shadow:var(--shadow);color:var(--text);min-height:40px}
     .kx-btn:hover{transform:translateY(-1px)}
     .is-active{outline:2px solid var(--ring)}
     .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:var(--border);font-weight:600}
 
-    /* Переключатель тем */
     .kx-themes{display:flex;gap:6px}
     .kx-pill{font-size:12px;padding:8px 12px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid var(--border);cursor:pointer}
     .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
 
-    /* Оболочка */
     .kx-shell{max-width:1100px;margin:0 auto;padding:16px}
-    .kx-panel{
-      background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);
-      border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px
-    }
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
 
     h1{margin:0 0 6px 0;font-size:22px}
     .kx-muted{color:var(--muted);font-size:14px}
 
-    /* Панель действий */
     .bar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
     #filters{display:flex;gap:6px;flex-wrap:wrap}
     #sorters{display:flex;gap:8px;flex-wrap:wrap}
     #sorters .kx-btn.is-active{outline:1px solid var(--ring);background:var(--tag-on);color:var(--text)}
     .search{flex:1;min-width:180px;display:flex;gap:8px}
-    .search input{
-      flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
-      background:var(--card);color:var(--text);min-height:40px
-    }
+    .search input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);min-height:40px}
 
-    /* Сетка тем: мягкие брейки для мобил */
     .kx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
-    @media (max-width: 380px){
-      .kx-grid{grid-template-columns:1fr}
+    @media (max-width: 380px){ .kx-grid{grid-template-columns:1fr} }
+
+    .kx-thread{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);
+      content-visibility:auto; contain-intrinsic-size: 180px;
     }
-    .kx-thread{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
     .kx-title{margin:2px 0 4px 0;font-size:18px}
     .kx-sub{font-size:12px;color:var(--muted)}
     .kx-preview{margin:8px 0 10px 0}
@@ -108,19 +93,13 @@
     .kx-tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid var(--border);cursor:pointer}
     .kx-tag--on{background:var(--tag-on);color:var(--text)}
 
-    /* Глитч-подложка */
     html[data-theme="glitch"] .kx-link{position:relative;display:block;background:linear-gradient(0deg,rgba(255,255,255,.012),rgba(255,255,255,0))}
     html[data-theme="glitch"] .kx-link::after{content:"";position:absolute;inset:0;mix-blend-mode:screen;opacity:.07;background:
       repeating-linear-gradient(180deg,rgba(167,139,250,.25) 0 1px,transparent 1px 3px),
       repeating-linear-gradient(90deg,rgba(125,211,252,.15) 0 2px,transparent 2px 4px);pointer-events:none}
 
-    /* Линия неба: svh для iOS, vh — фоллбек */
-    #sky-line{
-      position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);
-      background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)
-    }
+    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
 
-    /* Скелетон */
     .skeleton{border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.08), rgba(255,255,255,.04));animation:sh 1.4s infinite;background-size:200px 100%}
     html[data-theme="sepia"] .skeleton{background:linear-gradient(90deg, rgba(0,0,0,.04), rgba(0,0,0,.08), rgba(0,0,0,.04));background-size:200px 100%}
     @keyframes sh{0%{background-position:-200px 0}100%{background-position:200px 0}}
@@ -128,10 +107,8 @@
     @media (max-width:380px){.kx-skeleton-grid{grid-template-columns:1fr}}
     .kx-skeleton-card{height:140px;border:1px solid var(--border)}
 
-    /* Сообщения */
     .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
 
-    /* Мобильные доработки */
     @media (max-width:640px){
       .kx-head{gap:8px}
       .kx-brand{font-size:16px}
@@ -141,10 +118,7 @@
       .kx-panel{padding:12px}
       .kx-title{font-size:16px}
     }
-
-    @media (prefers-reduced-motion: reduce){
-      *{animation:none !important; transition:none !important}
-    }
+    @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
   </style>
 </head>
 <body>
@@ -189,47 +163,41 @@
       <div id="status" class="kx-msg" hidden></div>
 
       <div id="skeleton" class="kx-skeleton-grid" aria-hidden="true">
-        <div class="kx-skeleton-card skeleton"></div>
-        <div class="kx-skeleton-card skeleton"></div>
-        <div class="kx-skeleton-card skeleton"></div>
-        <div class="kx-skeleton-card skeleton"></div>
-        <div class="kx-skeleton-card skeleton"></div>
-        <div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div>
       </div>
     </section>
   </main>
 
   <script type="module">
-    // ===== Утилиты DOM =====
+    // ===== Утилиты
     const qs = (s,root=document)=>root.querySelector(s);
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[ch]))}
     function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
     function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms) } }
 
-    // ===== Полоса неба (svh/фоллбек) =====
+    // ===== Полоса неба
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
-      const getUnit = CSS && CSS.supports && CSS.supports('height: 100svh') ? 'svh' : 'vh';
+      const unit = (CSS && CSS.supports && CSS.supports('height: 100svh')) ? 'svh' : 'vh';
       function tick(){
         const n=new Date();
         const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
-        el.style.top=(ms/86400000*100)+ (getUnit==='svh' ? 'svh' : 'vh');
+        el.style.top=(ms/86400000*100)+unit;
         if(run) requestAnimationFrame(tick);
       }
-      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)}, {passive:true});
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)},{passive:true});
       requestAnimationFrame(tick);
     })();
 
-    // ===== Тема + хоткей T =====
+    // ===== Тема + хоткей
     const THEMES=['subsurface','sepia','glitch'];
     const themeKey='kx-theme';
     function applyTheme(t){
       if(!THEMES.includes(t)) t='subsurface';
       document.documentElement.setAttribute('data-theme', t);
       try{ localStorage.setItem(themeKey, t) }catch(_){}
-      // Подсветка кнопок
       document.querySelectorAll('.kx-pill').forEach(b=> b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false');
-      // Обновить meta theme-color
       const meta=document.querySelector('meta[name="theme-color"]');
       if(meta){
         const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14';
@@ -250,7 +218,7 @@
       });
     })();
 
-    // ===== Дата: ISO → «день/год» или «430-218 22:17» =====
+    // ===== Формат даты
     function fmtDayYear(s){
       if(!s) return '';
       const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
@@ -271,24 +239,67 @@
       return s;
     }
 
-    // ===== Эмодзи-аватар =====
+    // ===== Эмодзи-аватар
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
     function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
 
-    // ===== Состояние =====
+    // ===== Состояние
     const box=qs('#threads'), filt=qs('#filters');
     const qInp=qs('#q'), qClr=qs('#clearQ');
     const sortersBox=qs('#sorters');
     const statusBox=qs('#status');
     const skeleton=qs('#skeleton');
-
     const sortKey='kx-sort';
     let allItems=[], currentBoard='', query='';
     let currentSort='newest';
     try{ currentSort = localStorage.getItem(sortKey) || 'newest'; }catch(_){}
 
-    // URL <-> state
+    // ===== Кеш: cache-first + SWR
+    const INDEX_URL='/content/threads-index.json';
+    async function getIndex(){
+      // 1) попытка из CacheStorage
+      if('caches' in window){
+        const cache = await caches.open('kx-v1');
+        const cached = await cache.match(INDEX_URL);
+        if(cached){
+          cached.json().then(data=>{
+            if(Array.isArray(allItems) && allItems.length===0){
+              // первичный быстрый рендер из кеша
+              applyData(data);
+            }
+          });
+          // Фоновой догрузкой обновим кеш
+          fetch(INDEX_URL, {cache:'no-cache'}).then(r=>{
+            if(r.ok){ cache.put(INDEX_URL, r.clone()); r.json().then(applyData); }
+          }).catch(()=>{});
+          return; // уже отрендерили из кеша
+        } else {
+          // ничего в кеше — тянем и кладем
+          const r = await fetch(INDEX_URL, {cache:'no-cache'});
+          if(!r.ok) throw new Error('HTTP '+r.status);
+          await cache.put(INDEX_URL, r.clone());
+          const json = await r.json();
+          applyData(json);
+          return;
+        }
+      }
+      // Без CacheStorage: обычный fetch с кешом браузера
+      const r=await fetch(INDEX_URL, {cache:'force-cache'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const json = await r.json();
+      applyData(json);
+    }
+
+    function applyData(payload){
+      const items = Array.isArray(payload) ? payload : Array.isArray(payload.items) ? payload.items : [];
+      if(!items.length) return;
+      allItems = items;
+      renderBoards(); render();
+      skeleton.hidden=true;
+    }
+
+    // ===== URL <-> state
     function readURL(){
       const u=new URL(location.href);
       currentBoard=u.searchParams.get('board')||'';
@@ -328,72 +339,65 @@
     }
 
     function render(){
+      if(!allItems.length) return;
       let items = allItems.filter(matches);
       if (currentSort === 'popular') {
         items.sort((a,b)=> (b.commentCount||0) - (a.commentCount||0) || (new Date(b.created) - new Date(a.created)));
       } else {
         items.sort((a,b)=> new Date(b.created) - new Date(a.created));
       }
-      box.innerHTML = items.length ? items.map(card).join('') : `<div class="kx-msg">Ничего не найдено. Попробуй другой запрос или раздел.</div>`;
+      // Ленивый «пакетный» рендер: сразу первые 24, остальное постепенно
+      const chunk = 24;
+      const first = items.slice(0, chunk);
+      const rest = items.slice(chunk);
+      qs('#threads').innerHTML = first.length ? first.map(card).join('') : `<div class="kx-msg">Ничего не найдено. Попробуй другой запрос или раздел.</div>`;
       writeURL();
+      if(rest.length){
+        let i=0;
+        const addMore = ()=>{
+          const part = rest.slice(i, i+24).map(card).join('');
+          if(part){ qs('#threads').insertAdjacentHTML('beforeend', part); i+=24; requestIdleCallback? requestIdleCallback(addMore): setTimeout(addMore, 16); }
+        };
+        addMore();
+      }
     }
 
     function renderBoards(){
       const boards = Array.from(new Set(allItems.map(x=>x.board).filter(b=>b && b!=='комментарии'))).sort();
-      if(!boards.length){ filt.innerHTML=''; return; }
+      if(!boards.length){ qs('#filters').innerHTML=''; return; }
       const chip = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${b===currentBoard?'true':'false'}" tabindex="0" data-board="${esc(b)}">${esc(b)}</span>`;
+      const filt = qs('#filters');
       filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${!currentBoard?'true':'false'}" tabindex="0" data-board="">Все</span>` + boards.map(chip).join('');
       const activate = (b)=>{ currentBoard = b || ''; renderBoards(); render(); };
       filt.onclick = e=>{ const el=e.target.closest('.kx-tag'); if(!el) return; activate(el.dataset.board||''); };
-      filt.onkeydown = e=>{
-        if(e.key==='Enter' || e.key===' '){
-          const el=e.target.closest('.kx-tag'); if(!el) return; activate(el.dataset.board||''); e.preventDefault();
-        }
-      };
+      filt.onkeydown = e=>{ if(e.key==='Enter' || e.key===' '){ const el=e.target.closest('.kx-tag'); if(!el) return; activate(el.dataset.board||''); e.preventDefault(); } };
     }
 
     function syncSortUI(){
-      sortersBox.querySelectorAll('button[data-sort]').forEach(btn=>{
+      qs('#sorters').querySelectorAll('button[data-sort]').forEach(btn=>{
         const on = btn.dataset.sort === currentSort;
         btn.classList.toggle('is-active', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
     }
 
-    // ===== Загрузка индекса (safe для iOS: без top-level await) =====
-    async function loadIndex(){
-      try{
-        const r=await fetch('/content/threads-index.json',{cache:'no-store'});
-        if(!r.ok) throw new Error('HTTP '+r.status);
-        return await r.json();
-      }catch(err){
-        console.error(err);
-        return {error: String(err), items: []};
-      }
-    }
+    // ===== Инициализация
+    (function init(){
+      // скелетон сразу
+      qs('#skeleton').hidden=false; qs('#threads').innerHTML='';
+      // начальные настройки
+      readURL(); syncSortUI();
+      // загрузка индекса: cache-first
+      getIndex().catch(err=>{
+        qs('#status').hidden=false;
+        qs('#status').textContent = 'Ошибка загрузки индекса — ' + err;
+        qs('#skeleton').hidden=true;
+      });
 
-    // ===== Инициализация =====
-    async function initApp(){
-      readURL();
-      syncSortUI();
-      skeleton.hidden=false; box.innerHTML='';
-
-      const payload = await loadIndex();
-      if(payload && payload.error){
-        statusBox.hidden=false;
-        statusBox.textContent = 'Не удалось получить /content/threads-index.json — ' + payload.error + '. Проверь путь и CORS.';
-      }
-      allItems = Array.isArray(payload) ? payload : Array.isArray(payload.items) ? payload.items : [];
-
-      renderBoards(); render();
-      skeleton.hidden=true;
-
-      // События
       const applySearch = debounce(()=>{ query=qInp.value.trim().toLowerCase(); render(); }, 120);
       qInp.addEventListener('input', applySearch, {passive:true});
       qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); qInp.focus(); });
-
-      sortersBox.addEventListener('click', e=>{
+      qs('#sorters').addEventListener('click', e=>{
         const btn=e.target.closest('button[data-sort]'); if(!btn) return;
         currentSort = btn.dataset.sort;
         try{ localStorage.setItem(sortKey, currentSort) }catch(_){}
@@ -411,10 +415,7 @@
         const m=location.hash.match(/^#\/(.+)$/);
         if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); }
       }
-    }
-
-    initApp();
+    })();
   </script>
 </body>
 </html>
- 
