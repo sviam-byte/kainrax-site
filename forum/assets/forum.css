@@ -34,3 +34,72 @@ a{color:#93c5fd;text-decoration:none}
 .kx-tag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
 .kx-hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 code{background:rgba(255,255,255,.05);padding:.1em .4em;border-radius:6px;border:1px solid var(--line)}
+
+/* ---- Посты и медиа для треда ---- */
+.post { 
+  padding: 1rem 1.25rem; 
+  background: var(--card, rgba(16,21,32,.95)); 
+  border-radius: 14px; 
+  box-shadow: 0 12px 36px rgba(0,0,0,.45); 
+  border: 1px solid var(--line, #223042);
+}
+.post + .post { margin-top: 1rem; }
+
+.post-head { margin-bottom: .5rem; }
+.post-title { margin: 0; font-size: 1.1rem; line-height: 1.35; }
+.post-meta { font-size: .85rem; opacity: .75; color: var(--muted, #9aa5b1); }
+
+.post-body { line-height: 1.65; }
+.post-body p { margin: .6rem 0; }
+
+.post-media { margin-top: 1rem; }
+.post-media figure { 
+  margin: 0 0 .75rem 0; 
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06); 
+  border-radius: 10px; 
+  overflow: hidden;
+}
+.post-media img { display: block; width: 100%; height: auto; }
+.post-media figcaption { 
+  padding: .5rem .75rem; 
+  font-size: .9rem; 
+  color: var(--muted, #9aa5b1); 
+  text-align: center; 
+}
+/* ---- Посты и медиа для треда ---- */
+.post { 
+  padding: 1rem 1.25rem; 
+  background: var(--card, rgba(16,21,32,.95)); 
+  border-radius: 14px; 
+  box-shadow: 0 12px 36px rgba(0,0,0,.45); 
+  border: 1px solid var(--line, #223042);
+}
+.post + .post { margin-top: 1rem; }
+
+.post-head { margin-bottom: .5rem; }
+.post-title { margin: 0; font-size: 1.1rem; line-height: 1.35; }
+.post-meta { font-size: .85rem; opacity: .75; color: var(--muted, #9aa5b1); }
+
+.post-body { line-height: 1.65; }
+.post-body p { margin: .6rem 0; }
+
+.post-media { margin-top: 1rem; position: relative; z-index: 1; }
+.post-media figure { 
+  margin: 0 0 .75rem 0; 
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06); 
+  border-radius: 10px; 
+  overflow: hidden;
+}
+.post-media img { display: block; width: 100%; height: auto; }
+.post-media figcaption { 
+  padding: .5rem .75rem; 
+  font-size: .9rem; 
+  color: var(--muted, #9aa5b1); 
+  text-align: center; 
+}
+/* чтобы декоративный оверлей kx-panel не затенял контент */
+.kx-panel::after { z-index: 0; }
+/* если хочешь совсем без оверлея на посте, раскомментируй: */
+/* .post.kx-panel::after { display:none; } */
