@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Кайрнакс — админка</title>
+  <style>
+    body{margin:0;background:#0b0f14;color:#e6e6e6;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
+    .wrap{max-width:720px;margin:12vh auto;padding:24px;background:#111827;border:1px solid #243447;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.45);text-align:center}
+    .muted{color:#9aa5b1}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Загрузка админки…</h1>
+    <p class="muted">Если не открылось — обнови страницу.</p>
+  </div>
+
+  <!-- Identity только тут -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    if (window.netlifyIdentity) {
+      netlifyIdentity.on('init', () => {});
+      netlifyIdentity.on('login', () => {});   // остаёмся в /admin
+      netlifyIdentity.on('logout', () => {});  // остаёмся в /admin
+      netlifyIdentity.on('error', () => {});   // без перезагрузок
+    }
+  </script>
+
+  <!-- Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+</body>
+</html>

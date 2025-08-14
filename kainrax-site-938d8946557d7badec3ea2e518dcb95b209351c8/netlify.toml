@@ -1,0 +1,30 @@
+# netlify.toml
+[build]
+  command   = "node scripts/build-index.mjs"
+  publish   = "."
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["content/**"]
+
+# functions — как были
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to   = "/.netlify/functions/:splat"
+  status = 200
+
+# статика из /content
+[[redirects]]
+  from = "/content/*"
+  to   = "/content/:splat"
+  status = 200
+
+# SPA
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200
