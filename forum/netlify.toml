@@ -1,36 +1,71 @@
 [build]
-  # Корень сайта — папка forum в репозитории
+  # Заходим в папку forum
   base = "forum"
 
-  # Публикуем саму базовую папку, а не "forum/forum"
+  # Публикуем содержимое forum/
   publish = "."
 
-  # Твоя сборка не требует зависимостей — просто запускаем скрипт
-  command = "npm run build"
+  # Для статического сайта сборка не нужна. Если очень хочется — оставь no-op.
+  command = "echo 'static deploy'"
 
-  # Чётко закрепим версию Node, чтобы не ловить сюрпризы
   [build.environment]
     NODE_VERSION = "20"
 
-# Короткие URL на тред
+# Короткие URL на тред: БЕЗ хеша в to. Хеш – дело клиента.
 [[redirects]]
   from = "/t/:id"
-  to = "/thread.html#/:id"
+  to   = "/thread.html?id=:id"
   status = 302
+
+# (Опционально) Красивые URL /thread/:id, чтобы открывались напрямую
+[[redirects]]
+  from = "/thread/:id"
+  to   = "/thread.html?id=:id"
+  status = 200
+
+# ВАЖНО: контент и ассеты всегда отдаются как файлы, без SPA-перехвата
+[[redirects]]
+  from = "/content/*"
+  to   = "/content/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/assets/*"
+  to   = "/assets/:splat"
+  status = 200
+
+# (Опционально) Если у тебя есть SPA-фоллбек — ставь его САМЫМ последним.
+# [[redirects]]
+#   from = "/*"
+#   to   = "/index.html"
+#   status = 200
 
 # Кэш индекса на минуту
 [[headers]]
   for = "/content/threads-index.json"
   [headers.values]
+  Content-Type  = "application/json; charset=utf-8"
   Cache-Control = "public, max-age=60, must-revalidate"
 
-# Глобальные заголовки безопасности + разрешения для Метрики
+# Жёсткий кеш ассетов
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+# HTML без кеша
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+# CSP и прочие заголовки
 [[headers]]
   for = "/*"
   [headers.values]
   Content-Security-Policy = """
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://mc.yandex.ru;
+    script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://yastatic.net;
     connect-src 'self' https://mc.yandex.ru;
     img-src 'self' data: https://mc.yandex.ru;
     style-src 'self' 'unsafe-inline';
