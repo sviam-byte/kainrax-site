@@ -2,11 +2,14 @@
 <html lang="ru" data-theme="subsurface">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Профиль автора — Доска сектора</title>
   <meta name="theme-color" content="#0b0f14"/>
+  <meta name="color-scheme" content="dark light"/>
+  <meta name="format-detection" content="telephone=no"/>
 
-  <script src="/assets/metrika.js"></script>
+  <!-- метрика, если есть -->
+  <script src="/assets/metrika.js" defer></script>
 
   <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
@@ -15,81 +18,146 @@
     :root{
       --bg:#0b0f14; --panel:#0e141d; --card:#0e141d; --text:#e6edf5; --muted:#9fb0c7;
       --tag:#112131; --tag-on:#183140; --link:#bfe9ff; --ring:#7dd3fc; --brand:#7dd3fc;
-      --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35)
+      --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
+      --border:rgba(255,255,255,.06);
     }
     html[data-theme="sepia"]{
       --bg:#f8f4ec; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
       --brand:#d6b778; --link:#0b66d3; --tag:#efe3cc; --tag-on:#e6d8be; --ring:#d6b778;
-      --shadow:0 1px 0 rgba(0,0,0,.03) inset, 0 8px 30px rgba(0,0,0,.08)
+      --shadow:0 1px 0 rgba(0,0,0,.03) inset, 0 8px 30px rgba(0,0,0,.08);
+      --border:rgba(0,0,0,.08);
     }
     html[data-theme="glitch"]{
       --bg:#07090d; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6;
-      --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa
+      --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa;
+      --border:rgba(255,255,255,.08);
     }
 
     html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      -webkit-text-size-adjust:100%;
+      text-size-adjust:100%;
+      overscroll-behavior-y:none;
+      scrollbar-gutter:stable both-edges;
+    }
+    *{box-sizing:border-box}
+    img,svg,video{max-width:100%;height:auto}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    :focus-visible{outline:2px solid var(--ring); outline-offset:2px}
 
-    .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid rgba(255,255,255,.05)}
-    html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));border-bottom:1px solid rgba(0,0,0,.08)}
-    .kx-brand{font-weight:800;color:var(--text)}
+    /* Шапка */
+    .kx-head{
+      position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 16px;
+      background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));
+      backdrop-filter:saturate(1.1) blur(6px);
+      -webkit-backdrop-filter:saturate(1.1) blur(6px);
+      border-bottom:1px solid var(--border)
+    }
+    html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0))}
+    .kx-brand{font-weight:800;color:var(--text);white-space:nowrap}
     .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow);color:var(--text)}
-    .kx-btn:hover{transform:translateY(-1px)} .is-active{outline:2px solid var(--ring)}
-    html[data-theme="sepia"] .kx-btn,
-    html[data-theme="sepia"] .kx-tag,
-    html[data-theme="sepia"] .item,
-    html[data-theme="sepia"] .kx-panel{border-color:rgba(0,0,0,.08)}
+    .kx-btn{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--tag);
+      border:1px solid var(--border);box-shadow:var(--shadow);color:var(--text);min-height:40px
+    }
+    .kx-btn:hover{transform:translateY(-1px)}
+    .is-active{outline:2px solid var(--ring)}
 
     .kx-themes{display:flex;gap:6px}
-    .kx-pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+    .kx-pill{font-size:12px;padding:8px 12px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid var(--border);cursor:pointer}
     .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
 
+    /* Каркас */
     .kx-shell{max-width:1000px;margin:0 auto;padding:16px}
-    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+
     .grid{display:grid;grid-template-columns:1fr;gap:12px}
     @media(min-width:980px){.grid{grid-template-columns:1fr 1fr}}
-    .kx-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid rgba(255,255,255,.06)}
-    .item{border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px;background:var(--card)}
+
+    .kx-tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid var(--border)}
+    .item{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--card)}
     .muted{color:var(--muted);font-size:13px}
 
+    /* Полоса неба с svh-фоллбеком */
     #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
   </style>
 </head>
 <body>
   <div id="sky-line" aria-hidden="true"></div>
 
-  <header class="kx-head">
+  <header class="kx-head" role="banner">
     <a class="kx-brand" href="/index.html">Доска Кайнракс</a>
-    <nav class="kx-nav">
+    <nav class="kx-nav" role="navigation" aria-label="Основная">
       <a class="kx-btn" href="/index.html">Темы</a>
-      <a class="kx-btn is-active" href="/people.html">Все люди</a>
+      <a class="kx-btn is-active" href="/people.html" aria-current="page">Все люди</a>
       <a class="kx-btn" href="/tags.html">Теги</a>
       <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
       <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Подписаться</a>
       <div class="kx-themes" id="themePicker" aria-label="Темы">
-        <button class="kx-pill" data-theme="subsurface">Subsurface</button>
-        <button class="kx-pill" data-theme="sepia">Sepia</button>
-        <button class="kx-pill" data-theme="glitch">Glitch</button>
+        <button class="kx-pill" data-theme="subsurface" type="button">Subsurface</button>
+        <button class="kx-pill" data-theme="sepia" type="button">Sepia</button>
+        <button class="kx-pill" data-theme="glitch" type="button">Glitch</button>
       </div>
     </nav>
   </header>
 
-  <main class="kx-shell">
-    <section class="kx-panel" id="box">Загрузка…</section>
+  <main class="kx-shell" id="main" tabindex="-1">
+    <section class="kx-panel" id="box" aria-live="polite">Загрузка…</section>
   </main>
 
   <script type="module">
-    // Полоса неба
+    // ===== Утилиты =====
+    const qs = (s,root=document)=>root.querySelector(s);
+    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[ch]))}
+    function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
+    function parseHash(){const raw=(location.hash||'').slice(1).replace(/^\//,''); return decodeURIComponent(raw||'').trim()}
+    function jsonFetch(u){ return fetch(u,{cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }) }
+
+    // День/год формат: поддержка ISO и "430-218 22:17"
+    function fmtDayYear(s){
+      if(!s) return '';
+      const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
+      if (m){
+        const yy=+m[1], doy=+m[2];
+        const hh=m[3]?m[3].padStart(2,'0'):'00', mm=m[4]?m[4]:'00';
+        return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
+      }
+      const d = new Date(s);
+      if (!isNaN(d)){
+        const ry = d.getUTCFullYear();
+        const wy = ry===2024 ? 429 : ry===2025 ? 430 : (ry - 1595);
+        const start=new Date(Date.UTC(ry,0,1));
+        const doy=Math.floor((d - start)/86400000)+1;
+        const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+        return `${doy}-й день ${wy}-го года, ${hh}:${mm}`;
+      }
+      return s;
+    }
+
+    // Эмодзи-аватар
+    const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
+    function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
+    function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
+
+    // ===== Полоса неба: svh/фоллбек =====
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
-      function tick(){ const n=new Date(); const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds(); el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(tick); }
-      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)});
+      const unit = (CSS && CSS.supports && CSS.supports('height: 100svh')) ? 'svh' : 'vh';
+      function tick(){
+        const n=new Date();
+        const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
+        el.style.top=(ms/86400000*100)+unit;
+        if(run) requestAnimationFrame(tick);
+      }
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)},{passive:true});
       requestAnimationFrame(tick);
     })();
 
-    // Темы + хоткей T
+    // ===== Темы + хоткей T =====
     const THEMES=['subsurface','sepia','glitch']; const themeKey='kx-theme';
     function applyTheme(t){
       if(!THEMES.includes(t)) t='subsurface';
@@ -104,7 +172,7 @@
       applyTheme(t);
       document.getElementById('themePicker').addEventListener('click', e=>{
         const btn=e.target.closest('.kx-pill'); if(!btn) return; applyTheme(btn.dataset.theme);
-      });
+      }, {passive:true});
       document.addEventListener('keyup', e=>{
         if((e.key||'').toLowerCase()!=='t') return;
         const cur=document.documentElement.getAttribute('data-theme')||'subsurface';
@@ -112,47 +180,52 @@
       });
     })();
 
-    // Утилиты
-    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
-    function slugify(s){return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64)}
-    function parseHash(){const raw=(location.hash||'').slice(1).replace(/^\//,''); return decodeURIComponent(raw||'').trim()}
-    function fmtDayYear(s){
-      if(!s) return '';
-      const m=String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
-      if(m){const yy=+m[1],doy=+m[2];const hh=m[3]?m[3].padStart(2,'0'):'00',mm=m[4]?m[4]:'00';return `${doy}-й день ${yy}-го года, ${hh}:${mm}`}
-      const d=new Date(s); if(!isNaN(d)){const ry=d.getUTCFullYear(); const wy=ry===2024?429:ry===2025?430:(ry-1595); const start=new Date(Date.UTC(ry,0,1)); const doy=Math.floor((d-start)/86400000)+1; const hh=String(d.getHours()).padStart(2,'0'),mm=String(d.getMinutes()).padStart(2,'0'); return `${doy}-й день ${wy}-го года, ${hh}:${mm}`} return s;
+    // ===== Рендер профиля: ТОЛЬКО strict author_id =====
+    function tplPost(t){
+      return `<div class="item">
+        <div><a href="/thread.html#/${encodeURIComponent(t.id)}"><strong>${esc(t.title||'Без названия')}</strong></a></div>
+        <div class="muted">${fmtDayYear(t.created)} · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''} · комментариев: ${t.commentCount||0}</div>
+      </div>`;
     }
-    const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
-    function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
-    function authorEmoji(name){return EMO[hashStr(name||'anon')%EMO.length]}
-    async function j(u){const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw 0; return r.json()}
+
+    function tplComment(c){
+      return `<div class="item">
+        <div class="muted">${fmtDayYear(c.created)} · в теме: <a href="/thread.html#/${encodeURIComponent(c.thread_id)}?c=${encodeURIComponent(c.comment_id||'')}">${esc(c.thread_title||c.thread_id)}</a></div>
+        <div style="margin-top:6px;white-space:pre-wrap">${esc((c.body||'').slice(0,800))}${(c.body||'').length>800?'…':''}</div>
+      </div>`;
+    }
 
     async function render(){
-      const aid = parseHash(); const box=document.getElementById('box');
-      if(!aid){ box.textContent='Автор не указан.'; return }
-      const [threads, comments] = await Promise.all([
-        j('/content/threads-index.json'),
-        j('/content/comments-index.json')
-      ]);
-      const authored = threads.filter(t=> (t.board||'')!=='комментарии' && (t.author_id||slugify(t.author))===aid)
-                              .sort((a,b)=> new Date(b.created)-new Date(a.created));
-      const comms = comments.filter(c=> (c.author_id||slugify(c.author))===aid)
-                            .sort((a,b)=> new Date(b.created)-new Date(a.created));
+      const aid = parseHash();
+      const box = qs('#box');
+      if(!aid){ box.innerHTML = `<p class="muted">Автор не указан. Открой по ссылке вида <code>/people.html#/author_id</code>.</p>`; return; }
 
+      // грузим индексы
+      let threads, comments;
+      try{
+        const [t,c] = await Promise.all([
+          jsonFetch('/content/threads-index.json'),
+          jsonFetch('/content/comments-index.json')
+        ]);
+        threads = Array.isArray(t)? t : (t && Array.isArray(t.items) ? t.items : []);
+        comments = Array.isArray(c)? c : (c && Array.isArray(c.items) ? c.items : []);
+      }catch(err){
+        box.innerHTML = `<div class="item"><strong>Ошибка загрузки</strong><div class="muted">${esc(String(err))}</div></div>`;
+        return;
+      }
+
+      // строгий матч по author_id
+      const authored = threads
+        .filter(x => (x.board||'')!=='комментарии' && (x.author_id||'') === aid)
+        .sort((a,b)=> new Date(b.created) - new Date(a.created));
+
+      const comms = comments
+        .filter(x => (x.author_id||'') === aid)
+        .sort((a,b)=> new Date(b.created) - new Date(a.created));
+
+      // имя автора: берем из первого совпадения; если нет — показываем aid
       const displayName = authored[0]?.author || comms[0]?.author || aid;
       const emo = authorEmoji(displayName);
-
-      const postsHtml = authored.map(t=>`
-        <div class="item">
-          <div><a href="/thread.html#/${encodeURIComponent(t.id)}"><strong>${esc(t.title)}</strong></a></div>
-          <div class="muted">${fmtDayYear(t.created)} · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''} · комментариев: ${t.commentCount||0}</div>
-        </div>`).join('');
-
-      const commHtml = comms.map(c=>`
-        <div class="item">
-          <div class="muted">${fmtDayYear(c.created)} · в теме: <a href="/thread.html#/${encodeURIComponent(c.thread_id)}?c=${encodeURIComponent(c.comment_id)}">${esc(c.thread_title||c.thread_id)}</a></div>
-          <div style="margin-top:6px;white-space:pre-wrap">${esc((c.body||'').slice(0,800))}${(c.body||'').length>800?'…':''}</div>
-        </div>`).join('');
 
       box.innerHTML = `
         <h1>${emo} ${esc(displayName)}</h1>
@@ -160,11 +233,11 @@
         <div class="grid">
           <section>
             <h3>Посты</h3>
-            ${postsHtml || '<div class="muted">Постов нет.</div>'}
+            ${authored.length ? authored.map(tplPost).join('') : '<div class="muted">Постов нет.</div>'}
           </section>
           <section>
             <h3>Комментарии</h3>
-            ${commHtml || '<div class="muted">Комментариев нет.</div>'}
+            ${comms.length ? comms.map(tplComment).join('') : '<div class="muted">Комментариев нет.</div>'}
           </section>
         </div>
       `;
