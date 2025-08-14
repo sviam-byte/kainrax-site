@@ -3,13 +3,16 @@ function paragraphs(text) {
   const safe = (text || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;");
-  return safe.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+  return safe
+    .split(/\n{2,}/)
+    .map(p => `<p>${p.replace(/\n/g, "<br>")}</p>`)
+    .join("");
 }
 
 // Рендер одного поста из JSON (с поддержкой media)
 function renderPost(post) {
   const article = document.createElement("article");
-  article.className = "post";
+  article.className = "post kx-panel"; // добавил kx-panel для твоего оформления
 
   // Заголовок и мета
   const head = document.createElement("header");
@@ -55,7 +58,7 @@ function renderPost(post) {
         if (m.caption) figure.appendChild(cap);
         mediaWrap.appendChild(figure);
       }
-      // захочешь — добавь сюда поддержу audio/video/doc
+      // захочешь — добавь сюда поддержку audio/video/doc
     });
 
     article.appendChild(mediaWrap);
@@ -70,8 +73,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const feed = document.getElementById("feed");
   if (!feed) return;
 
-  // Путь подстрой под свою структуру. Если ты на /forum/index.html,
-  // то «content/threads/0049-rain-analysis.json» будет ок.
+  // Путь подстрой под свою структуру.
+  // Если эта страница лежит в /forum/, то такой путь верный:
   const res = await fetch("content/threads/0049-rain-analysis.json");
   const post = await res.json();
   feed.appendChild(renderPost(post));
