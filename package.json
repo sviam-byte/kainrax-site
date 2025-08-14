@@ -1,14 +1,13 @@
 {
   "name": "kainrax-site",
   "private": true,
-  "type": "commonjs",
-  "engines": { "node": ">=18" },
+  "engines": { "node": "18.x" },
   "dependencies": {
-    "deta": "^1.1.0",
-    "gray-matter": "^4.0.3"
+    "gray-matter": "^4.0.3",
+    "deta": "^1.1.0"
   },
   "scripts": {
-    "build": "echo \"no build\"",
-    "postinstall": "echo \"deps ok\""
+    "build": "echo no build",
+    "postinstall": "echo deps ok"
   }
 }
