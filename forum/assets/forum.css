@@ -1,0 +1,105 @@
+:root{
+  --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1; --line:#223042;
+  --card:rgba(16,21,32,.95); --accent:#7dd3fc; --accent2:#a78bfa;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial}
+a{color:#93c5fd;text-decoration:none}
+.kx-head{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter:blur(8px)}
+.kx-brand{font-weight:800;letter-spacing:.2px;color:var(--fg)}
+.kx-nav{display:flex;gap:8px}
+.kx-btn{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.kx-btn:hover{transform:translateY(-1px);filter:saturate(1.05)}
+.kx-btn.is-active{border-color:rgba(125,211,252,.5)}
+.kx-shell{max-width:980px;margin:16px auto;padding:0 16px}
+.kx-panel{position:relative;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:0 12px 36px rgba(0,0,0,.45);overflow:hidden}
+.kx-panel::after{
+  content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.35;
+  background-image:
+    radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><path d='M80 6 L87 27 L109 31 L87 35 L80 56 L73 35 L51 31 L73 27 Z' fill='rgba(125,211,252,0.06)'/></svg>");
+  background-repeat:no-repeat, repeat;
+  background-size:auto, 160px 160px;
+}
+.kx-muted,.muted{color:var(--muted)}
+.kx-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:860px){ .kx-grid{grid-template-columns:1fr 1fr} }
+.kx-thread{border:1px solid rgba(125,211,252,.18);border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);padding:12px}
+.kx-thread .kx-link{display:block;color:var(--fg)}
+.kx-title{margin:0 0 4px;font-weight:800}
+.kx-sub{font-size:13px;margin-bottom:6px}
+.kx-preview{margin:6px 0 8px}
+.kx-tags{display:flex;flex-wrap:wrap;gap:6px}
+.kx-tag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
+.kx-hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+code{background:rgba(255,255,255,.05);padding:.1em .4em;border-radius:6px;border:1px solid var(--line)}
+
+/* ---- Посты и медиа для треда ---- */
+.post { 
+  padding: 1rem 1.25rem; 
+  background: var(--card, rgba(16,21,32,.95)); 
+  border-radius: 14px; 
+  box-shadow: 0 12px 36px rgba(0,0,0,.45); 
+  border: 1px solid var(--line, #223042);
+}
+.post + .post { margin-top: 1rem; }
+
+.post-head { margin-bottom: .5rem; }
+.post-title { margin: 0; font-size: 1.1rem; line-height: 1.35; }
+.post-meta { font-size: .85rem; opacity: .75; color: var(--muted, #9aa5b1); }
+
+.post-body { line-height: 1.65; }
+.post-body p { margin: .6rem 0; }
+
+.post-media { margin-top: 1rem; }
+.post-media figure { 
+  margin: 0 0 .75rem 0; 
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06); 
+  border-radius: 10px; 
+  overflow: hidden;
+}
+.post-media img { display: block; width: 100%; height: auto; }
+.post-media figcaption { 
+  padding: .5rem .75rem; 
+  font-size: .9rem; 
+  color: var(--muted, #9aa5b1); 
+  text-align: center; 
+}
+/* ---- Посты и медиа для треда ---- */
+.post { 
+  padding: 1rem 1.25rem; 
+  background: var(--card, rgba(16,21,32,.95)); 
+  border-radius: 14px; 
+  box-shadow: 0 12px 36px rgba(0,0,0,.45); 
+  border: 1px solid var(--line, #223042);
+}
+.post + .post { margin-top: 1rem; }
+
+.post-head { margin-bottom: .5rem; }
+.post-title { margin: 0; font-size: 1.1rem; line-height: 1.35; }
+.post-meta { font-size: .85rem; opacity: .75; color: var(--muted, #9aa5b1); }
+
+.post-body { line-height: 1.65; }
+.post-body p { margin: .6rem 0; }
+
+.post-media { margin-top: 1rem; position: relative; z-index: 1; }
+.post-media figure { 
+  margin: 0 0 .75rem 0; 
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06); 
+  border-radius: 10px; 
+  overflow: hidden;
+}
+.post-media img { display: block; width: 100%; height: auto; }
+.post-media figcaption { 
+  padding: .5rem .75rem; 
+  font-size: .9rem; 
+  color: var(--muted, #9aa5b1); 
+  text-align: center; 
+}
+/* чтобы декоративный оверлей kx-panel не затенял контент */
+.kx-panel::after { z-index: 0; }
+/* если хочешь совсем без оверлея на посте, раскомментируй: */
+/* .post.kx-panel::after { display:none; } */
