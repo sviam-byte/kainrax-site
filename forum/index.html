@@ -95,6 +95,33 @@
 
     /* Сообщения */
     .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
+
+    /* ABOUT: стили модального окна */
+    dialog.kx-modal{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      max-width: min(720px, 92vw);
+      width: 92vw;
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+    dialog.kx-modal::backdrop{
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(2px);
+    }
+    .kx-modal h2{margin:0 0 8px 0;font-size:20px}
+    .kx-modal p{margin:8px 0}
+    .kx-modal ul{margin:8px 0 0 18px}
+    .kx-modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+    .kx-badge{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--tag);border:1px solid var(--border);color:var(--muted)}
+    @media (max-width:480px){
+      .kx-head{gap:8px}
+      .kx-nav{gap:6px}
+      .kx-btn{padding:7px 10px}
+      .kx-pill{padding:5px 8px}
+    }
   </style>
 </head>
 <body>
@@ -107,6 +134,10 @@
       <a class="kx-btn is-active" href="/index.html" aria-current="page">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
       <a class="kx-btn" href="/tags.html">Теги</a>
+
+      <!-- ABOUT: кнопка открытия модалки -->
+      <button class="kx-btn" id="aboutBtn" type="button" aria-haspopup="dialog" aria-controls="aboutDlg">Что здесь происходит?</button>
+
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться">Подписаться</a>
       <div class="kx-themes" id="themePicker" aria-label="Темы">
         <button class="kx-pill" data-theme="subsurface" type="button">Subsurface Lab</button>
@@ -148,6 +179,26 @@
       </div>
     </section>
   </main>
+
+  <!-- ABOUT: модальное окно с описанием проекта -->
+  <dialog id="aboutDlg" class="kx-modal" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">Что здесь происходит</h2>
+    <p class="kx-muted kx-badge">вымышленный форум вымышленного мира</p>
+    <p>Перед тобой внутренняя «доска» мира Кайнракс. Каждый пост — запись от персонажа, каждая карточка — отдельная ветка обсуждений. Это художественный проект в формате in-world.</p>
+    <ul>
+      <li><strong>Как читать:</strong> открывай карточки, внутри — полный текст, таймлайн и комментарии персонажей.</li>
+      <li><strong>Фильтры и поиск:</strong> работают по названию, тексту, тегам и авторам.</li>
+      <li><strong>Даты:</strong> показываются как «N-й день 430-го года» или реальное время.</li>
+    </ul>
+    <p class="kx-muted">Дисклеймер: все совпадения случайны. Сбор персональных данных не ведётся; может быть подключена анонимная метрика.</p>
+    <p>
+      Ещё: <a href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">основные рассказы</a> ·
+      <a href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Telegram</a>
+    </p>
+    <div class="actions">
+      <button class="kx-btn" type="button" data-close>Понятно</button>
+    </div>
+  </dialog>
 
   <script type="module">
     // ===== Полоса неба =====
@@ -331,12 +382,32 @@
       syncSortUI(); render();
     });
 
-    // Хоткеи: / — поиск, Esc — очистить, T — тема
+    // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — помощь
     document.addEventListener('keydown', e=>{
       const key=(e.key||'').toLowerCase();
       if(key==='/' && document.activeElement!==qInp){ qInp.focus(); qInp.select(); e.preventDefault(); }
       else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); } }
     });
+
+    // ===== ABOUT: логика модального окна =====
+    (function initAbout(){
+      const btn = document.getElementById('aboutBtn');
+      const dlg = document.getElementById('aboutDlg');
+      if(!btn || !dlg) return;
+      const closeBtn = dlg.querySelector('[data-close]');
+      btn.addEventListener('click', ()=> dlg.showModal());
+      closeBtn?.addEventListener('click', ()=> dlg.close());
+      // Клик по фону закрывает
+      dlg.addEventListener('click', e=>{
+        const r = dlg.getBoundingClientRect();
+        const inBox = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        if(!inBox) dlg.close();
+      });
+      // Горячая клавиша ?
+      document.addEventListener('keydown', e=>{
+        if(e.key === '?'){ e.preventDefault(); dlg.showModal(); }
+      });
+    })();
 
     // Фикс: если hash был, переведём в параметры (для старых ссылок вида #/board)
     if(location.hash && !location.search){
