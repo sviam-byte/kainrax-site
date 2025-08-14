@@ -55,7 +55,7 @@
     .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
 
     /* Оболочка */
-    .kx-shell{max-width:1100px;margin:0 auto;padding:16px}
+    .kx-shell{max-width:1100px;margin:0 авто;padding:16px}
     .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
 
     h1{margin:0 0 6px 0;font-size:22px}
@@ -96,33 +96,32 @@
     /* Сообщения */
     .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
 
-    /* ABOUT: раскрывашка на главной */
+    /* ABOUT: раскрывашка под заголовком, «чуть выделенней» */
     .kx-about{margin:10px 0 14px}
     .kx-about details{
+      position:relative;
       border:1px solid var(--border);
       border-radius:var(--r);
       background:var(--card);
       box-shadow:var(--shadow);
       overflow:hidden;
     }
+    /* тонкая бренд-полоса слева */
+    .kx-about details::before{
+      content:"";
+      position:absolute; inset:0 auto 0 0; width:4px;
+      background:linear-gradient(180deg, var(--brand), transparent);
+      opacity:.65; pointer-events:none;
+    }
     .kx-about summary{
-      list-style:none;
-      cursor:pointer;
-      padding:12px 14px;
-      display:flex; align-items:center; gap:10px;
-      font-weight:600;
-      user-select:none;
+      list-style:none; cursor:pointer; user-select:none;
+      padding:12px 14px; display:flex; align-items:center; gap:10px; font-weight:600;
     }
     .kx-about summary::-webkit-details-marker{display:none}
-    .kx-about .caret{
-      transition:transform .18s ease;
-      font-size:14px;
-      line-height:1;
-      opacity:.85;
-    }
+    .kx-about .caret{transition:transform .18s ease; font-size:14px; line-height:1; opacity:.85}
     .kx-about details[open] .caret{transform:rotate(90deg)}
-    .kx-about .body{padding:0 14px 14px;color:var(--muted)}
-    .kx-badge{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--tag);border:1px solid var(--border);color:var(--muted);margin-right:6px}
+    .kx-about .body{padding:0 14px 14px; color:var(--muted)}
+    .kx-badge{font-size:12px; padding:4px 8px; border-radius:999px; background:var(--tag); border:1px solid var(--border); color:var(--muted); margin-right:6px}
     @media (max-width:480px){
       .kx-head{gap:8px}
       .kx-nav{gap:6px}
@@ -153,20 +152,19 @@
   <main class="kx-shell" id="main" tabindex="-1">
     <section class="kx-panel" aria-labelledby="h1">
       <h1 id="h1">Доска сектора</h1>
-      <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Используй фильтры, поиск и сортировку.</p>
 
-      <!-- ABOUT: раскрывающийся блок прямо на главной -->
+      <!-- ABOUT: сразу под заголовком -->
       <div class="kx-about" id="about">
         <details id="aboutBox" aria-labelledby="aboutTitle">
           <summary>
             <span class="caret" aria-hidden="true">▸</span>
-            <span id="aboutTitle">Что здесь происходит?</span>
+            <span id="aboutTitle">Что здесь вообще происходит?</span>
           </summary>
           <div class="body">
             <p><span class="kx-badge">in-world проект</span><span class="kx-badge">форум мира «Кайнракс»</span></p>
-            <p>Это внутренняя «доска» вымышленного мира Кайнракс. Посты пишут персонажи, карточка = ветка обсуждения. Ты читаешь прямо изнутри мира. Осторожней; не позволь этому миру проникнуть в тебя.</p>
+            <p>Это внутренняя «доска» вымышленного мира Кайнракс. Посты пишут персонажи, карточка = ветка обсуждения. Ты читаешь прямо изнутри мира.</p>
             <ul>
-              <li><strong>Как читать:</strong> открывай карточки, внутри — полный текст, таймлайн и комменты персонажей. У некоторых персонажей на доске (например, Асси, Гидеон) есть собственные рассказы.</li>
+              <li><strong>Как читать:</strong> открывай карточки, внутри — полный текст, таймлайн и комменты персонажей.</li>
               <li><strong>Поиск и фильтры:</strong> работают по названию, тексту, тегам и авторам.</li>
               <li><strong>Даты:</strong> вид «N-й день 430-го года» или реальное время.</li>
             </ul>
@@ -175,6 +173,8 @@
           </div>
         </details>
       </div>
+
+      <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Используй фильтры, поиск и сортировку.</p>
 
       <div class="bar" role="group" aria-label="Инструменты">
         <div id="filters" role="tablist" aria-label="Разделы"></div>
@@ -384,7 +384,7 @@
       syncSortUI(); render();
     });
 
-    // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — помощь (ABOUT)
+    // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — открыть «о проекте»
     document.addEventListener('keydown', e=>{
       const key=(e.key||'').toLowerCase();
       if(key==='/' && document.activeElement!==qInp){ qInp.focus(); qInp.select(); e.preventDefault(); }
