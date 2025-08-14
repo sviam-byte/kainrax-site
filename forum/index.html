@@ -1,76 +1,139 @@
 <!doctype html>
 <html lang="ru" data-theme="subsurface">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Доска сектора</title>
-  <meta name="theme-color" content="#0b0f14"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Доска сектора — Кайнракс</title>
+  <meta name="description" content="Быт, странности, техузлы. Каждая карточка — отдельная ветка обсуждений внутри мира Кайнракс." />
+  <meta name="theme-color" content="#0b0f14" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="format-detection" content="telephone=no" />
 
+  <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
+
+  <!-- МЕТРИКА ТОЛЬКО defer -->
   <script src="/assets/metrika.js" defer></script>
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E"/>
-  <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png"/>
-
   <style>
-    :root{ --bg:#0b0f14; --panel:#0e141d; --card:#0e141d; --text:#e6edf5; --muted:#9fb0c7;
-      --tag:#112131; --tag-on:#183140; --link:#bfe9ff; --ring:#7dd3fc; --brand:#7dd3fc;
-      --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35) }
-    html[data-theme="sepia"]{ --bg:#f8f4ec; --panel:#fff; --card:#fff; --text:#1f2937; --muted:#6b7280;
-      --brand:#d6b778; --link:#0b66d3; --tag:#efe3cc; --tag-on:#e6d8be; --ring:#d6b778; --shadow:0 1px 0 rgba(0,0,0,.03) inset, 0 8px 30px rgba(0,0,0,.08) }
-    html[data-theme="glitch"]{ --bg:#07090d; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6;
-      --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa }
+    :root{
+      --bg:#0b0f14; --bg-soft:#0f1620; --panel:#0e141d; --card:#0e141d; --text:#e6edf5; --muted:#9fb0c7;
+      --brand:#7dd3fc; --tag:#112131; --tag-on:#183140; --ring:#7dd3fc; --link:#bfe9ff;
+      --gap:12px; --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
+      --border:rgba(255,255,255,.08);
+    }
+    html[data-theme="sepia"]{
+      --bg:#f8f4ec; --bg-soft:#f2eadf; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --brand:#d6b778; --tag:#efe3cc; --tag-on:#e6d8be; --ring:#d6b778; --link:#0b66d3;
+      --shadow:0 1px 0 rgba(0,0,0,.03) inset, 0 8px 30px rgba(0,0,0,.08);
+      --border:rgba(0,0,0,.08);
+    }
+    html[data-theme="glitch"]{
+      --bg:#07090d; --bg-soft:#0b0f16; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6;
+      --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa; --border:rgba(255,255,255,.08);
+    }
 
-    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);
-      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      -webkit-text-size-adjust:100%; text-size-adjust:100%;
+      overscroll-behavior-y:none; scrollbar-gutter: stable both-edges;
+    }
+    *{box-sizing:border-box}
+    img,svg,video{max-width:100%;height:auto}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
     :focus-visible{outline:2px solid var(--ring); outline-offset:2px}
 
-    .kx-head{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:rgba(0,0,0,.65);border-bottom:1px solid rgba(255,255,255,.05)}
-    @media (min-width: 900px){ @supports (backdrop-filter: blur(6px)){
-      .kx-head{background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));
-      backdrop-filter:saturate(1.1) blur(6px); -webkit-backdrop-filter:saturate(1.1) blur(6px)} } }
-    html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));border-bottom:1px solid rgba(0,0,0,.08)}
-    .kx-brand{font-weight:800;color:var(--text)}
+    .kx-head{
+      position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 16px;
+      background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));
+      backdrop-filter:saturate(1.1) blur(6px);
+      -webkit-backdrop-filter:saturate(1.1) blur(6px);
+      border-bottom:1px solid var(--border)
+    }
+    html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,255,255,0))}
+    .kx-brand{font-weight:800;color:var(--text);white-space:nowrap}
     .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow);color:var(--text)}
-    .kx-btn:hover{transform:translateY(-1px)} .is-active{outline:2px solid var(--ring)}
-    .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:rgba(255,255,255,.12);font-weight:600}
+    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--tag);border:1px solid var(--border);box-shadow:var(--shadow);color:var(--text);min-height:40px}
+    .kx-btn:hover{transform:translateY(-1px)}
+    .is-active{outline:2px solid var(--ring)}
+    .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:var(--border);font-weight:600}
+
+    .kx-themes{display:flex;gap:6px}
+    .kx-pill{font-size:12px;padding:8px 12px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid var(--border);cursor:pointer}
+    .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
 
     .kx-shell{max-width:1100px;margin:0 auto;padding:16px}
-    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+
+    h1{margin:0 0 6px 0;font-size:22px}
     .kx-muted{color:var(--muted);font-size:14px}
 
     .bar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
     #filters{display:flex;gap:6px;flex-wrap:wrap}
     #sorters{display:flex;gap:8px;flex-wrap:wrap}
     #sorters .kx-btn.is-active{outline:1px solid var(--ring);background:var(--tag-on);color:var(--text)}
-    .search{flex:1;min-width:220px;display:flex;gap:8px}
-    .search input{flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:var(--card);color:var(--text)}
+    .search{flex:1;min-width:180px;display:flex;gap:8px}
+    .search input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);min-height:40px}
 
-    .kx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
-    .kx-thread{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);content-visibility:auto;contain-intrinsic-size:160px}
+    .kx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
+    @media (max-width: 380px){ .kx-grid{grid-template-columns:1fr} }
+
+    .kx-thread{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);
+      content-visibility:auto; contain-intrinsic-size: 180px;
+    }
     .kx-title{margin:2px 0 4px 0;font-size:18px}
     .kx-sub{font-size:12px;color:var(--muted)}
     .kx-preview{margin:8px 0 10px 0}
     .kx-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-    .kx-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid rgba(255,255,255,.06);cursor:pointer}
+    .kx-tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid var(--border);cursor:pointer}
     .kx-tag--on{background:var(--tag-on);color:var(--text)}
-    #status{margin-top:12px}
+
+    html[data-theme="glitch"] .kx-link{position:relative;display:block;background:linear-gradient(0deg,rgba(255,255,255,.012),rgba(255,255,255,0))}
+    html[data-theme="glitch"] .kx-link::after{content:"";position:absolute;inset:0;mix-blend-mode:screen;opacity:.07;background:
+      repeating-linear-gradient(180deg,rgba(167,139,250,.25) 0 1px,transparent 1px 3px),
+      repeating-linear-gradient(90deg,rgba(125,211,252,.15) 0 2px,transparent 2px 4px);pointer-events:none}
+
     #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
+
+    .skeleton{border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.08), rgba(255,255,255,.04));animation:sh 1.4s infinite;background-size:200px 100%}
+    html[data-theme="sepia"] .skeleton{background:linear-gradient(90deg, rgba(0,0,0,.04), rgba(0,0,0,.08), rgba(0,0,0,.04));background-size:200px 100%}
+    @keyframes sh{0%{background-position:-200px 0}100%{background-position:200px 0}}
+    .kx-skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
+    @media (max-width:380px){.kx-skeleton-grid{grid-template-columns:1fr}}
+    .kx-skeleton-card{height:140px;border:1px solid var(--border)}
+
+    .kx-msg{padding:14px;border:1px dashed var(--border);border-radius:10px;background:var(--card);color:var(--muted)}
+
+    @media (max-width:640px){
+      .kx-head{gap:8px}
+      .kx-brand{font-size:16px}
+      .kx-nav{gap:6px}
+      .kx-btn{padding:8px 10px;min-height:36px}
+      .kx-shell{padding:12px}
+      .kx-panel{padding:12px}
+      .kx-title{font-size:16px}
+    }
+    @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
   </style>
 </head>
 <body>
   <div id="sky-line" aria-hidden="true"></div>
 
   <header class="kx-head" role="banner">
-    <a class="kx-brand" href="/index.html">Доска Кайнракс</a>
+    <a class="kx-brand" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">Кайнракс ✶</a>
     <nav class="kx-nav" role="navigation" aria-label="Основная">
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">← к рассказам</a>
       <a class="kx-btn is-active" href="/index.html" aria-current="page">Темы</a>
       <a class="kx-btn" href="/people.html">Все люди</a>
       <a class="kx-btn" href="/tags.html">Теги</a>
       <a class="kx-btn kx-cta" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow" aria-label="Подписаться">Подписаться</a>
       <div class="kx-themes" id="themePicker" aria-label="Темы">
-        <button class="kx-pill" data-theme="subsurface" type="button">Subsurface</button>
+        <button class="kx-pill" data-theme="subsurface" type="button">Subsurface Lab</button>
         <button class="kx-pill" data-theme="sepia" type="button">Archive Sepia</button>
         <button class="kx-pill" data-theme="glitch" type="button">Glitch Basilica</button>
       </div>
@@ -80,7 +143,7 @@
   <main class="kx-shell" id="main" tabindex="-1">
     <section class="kx-panel" aria-labelledby="h1">
       <h1 id="h1">Доска сектора</h1>
-      <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Фильтры, поиск, сортировка — справа.</p>
+      <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Используй фильтры, поиск и сортировку.</p>
 
       <div class="bar" role="group" aria-label="Инструменты">
         <div id="filters" role="tablist" aria-label="Разделы"></div>
@@ -91,171 +154,267 @@
         </div>
 
         <div class="search" role="search">
-          <input id="q" type="search" placeholder="поиск по заголовку, тексту, тегам, автору…  (нажми /)" autocomplete="off" aria-label="Поиск по темам"/>
+          <input id="q" type="search" placeholder="поиск по заголовку, тексту, тегам, автору…  (нажми /)" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Поиск по темам" />
           <button class="kx-btn" id="clearQ" type="button" aria-label="Сбросить поиск">Сброс</button>
         </div>
       </div>
 
       <div id="threads" class="kx-grid" aria-live="polite"></div>
-      <div id="status" class="kx-panel kx-muted" hidden></div>
+      <div id="status" class="kx-msg" hidden></div>
+
+      <div id="skeleton" class="kx-skeleton-grid" aria-hidden="true">
+        <div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div>
+        <div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div><div class="kx-skeleton-card skeleton"></div>
+      </div>
     </section>
   </main>
 
-  <script>
-    /* — Полоса неба — */
-    (function(){
-      var el=document.getElementById('sky-line'), run=true;
-      function tick(){ var n=new Date(); var ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds(); el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(tick) }
-      document.addEventListener('visibilitychange',function(){ run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick) });
+  <script type="module">
+    // ===== Утилиты
+    const qs = (s,root=document)=>root.querySelector(s);
+    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[ch]))}
+    function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
+    function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms) } }
+
+    // ===== Полоса неба
+    (function initSkyLine(){
+      const el=document.getElementById('sky-line'); let run=true;
+      const unit = (CSS && CSS.supports && CSS.supports('height: 100svh')) ? 'svh' : 'vh';
+      function tick(){
+        const n=new Date();
+        const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds();
+        el.style.top=(ms/86400000*100)+unit;
+        if(run) requestAnimationFrame(tick);
+      }
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)},{passive:true});
       requestAnimationFrame(tick);
     })();
 
-    /* — Темы — */
-    (function(){
-      var THEMES=['subsurface','sepia','glitch'], key='kx-theme';
-      function applyTheme(t){
-        if(THEMES.indexOf(t)===-1) t='subsurface';
-        document.documentElement.setAttribute('data-theme', t);
-        try{ localStorage.setItem(key, t) }catch(_){}
-        Array.prototype.forEach.call(document.querySelectorAll('.kx-pill'), function(b){ b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false' });
-        var meta=document.querySelector('meta[name="theme-color"]');
-        if(meta){ var bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; meta.setAttribute('content', bg) }
+    // ===== Тема + хоткей
+    const THEMES=['subsurface','sepia','glitch'];
+    const themeKey='kx-theme';
+    function applyTheme(t){
+      if(!THEMES.includes(t)) t='subsurface';
+      document.documentElement.setAttribute('data-theme', t);
+      try{ localStorage.setItem(themeKey, t) }catch(_){}
+      document.querySelectorAll('.kx-pill').forEach(b=> b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false');
+      const meta=document.querySelector('meta[name="theme-color"]');
+      if(meta){
+        const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14';
+        meta.setAttribute('content', bg);
       }
-      var t='subsurface'; try{ t=localStorage.getItem(key)||t }catch(_){}
+    }
+    (function initTheme(){
+      let t='subsurface';
+      try{ t=localStorage.getItem(themeKey)||t }catch(_){}
       applyTheme(t);
-      document.getElementById('themePicker').addEventListener('click', function(e){ var btn=e.target.closest('.kx-pill'); if(!btn) return; applyTheme(btn.dataset.theme) });
-      document.addEventListener('keyup', function(e){ if((e.key||'').toLowerCase()!=='t') return; var cur=document.documentElement.getAttribute('data-theme')||'subsurface'; var i=THEMES.indexOf(cur); applyTheme(THEMES[(i+1)%THEMES.length]) });
+      document.getElementById('themePicker').addEventListener('click', e=>{
+        const btn=e.target.closest('.kx-pill'); if(!btn) return; applyTheme(btn.dataset.theme);
+      }, {passive:true});
+      document.addEventListener('keyup', e=>{
+        if((e.key||'').toLowerCase()!=='t') return;
+        const cur=document.documentElement.getAttribute('data-theme')||'subsurface';
+        const next=THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]; applyTheme(next);
+      });
     })();
 
-    /* — Утилиты — */
-    function esc(s){return (String(s||'')).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
-    function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
+    // ===== Формат даты
     function fmtDayYear(s){
       if(!s) return '';
-      var m=String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
-      if(m){ var yy=+m[1],doy=+m[2]; var hh=m[3]?(''+m[3]).padStart(2,'0'):'00', mm=m[4]?m[4]:'00'; return doy+'-й день '+yy+'-го года, '+hh+':'+mm }
-      var d=new Date(s); if(!isNaN(d)){ var ry=d.getUTCFullYear(); var wy=ry===2024?429:ry===2025?430:(ry-1595); var start=new Date(Date.UTC(ry,0,1)); var doy=Math.floor((d-start)/86400000)+1; var hh=(''+d.getHours()).padStart(2,'0'), mm=(''+d.getMinutes()).padStart(2,'0'); return doy+'-й день '+wy+'-го года, '+hh+':'+mm } return s;
+      const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
+      if (m){
+        const yy=+m[1], doy=+m[2];
+        const hh=m[3]?m[3].padStart(2,'0'):'00', mm=m[4]?m[4]:'00';
+        return `${doy}-й день ${yy}-го года, ${hh}:${mm}`;
+      }
+      const d = new Date(s);
+      if (!isNaN(d)){
+        const ry = d.getUTCFullYear();
+        const wy = ry===2024 ? 429 : ry===2025 ? 430 : (ry - 1595);
+        const start=new Date(Date.UTC(ry,0,1));
+        const doy=Math.floor((d - start)/86400000)+1;
+        const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+        return `${doy}-й день ${wy}-го года, ${hh}:${mm}`;
+      }
+      return s;
     }
-    var EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
-    function hashStr(s){var h=2166136261>>>0; s=String(s||''); for(var i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
-    function authorEmoji(name){ return EMO[hashStr(name||'anon')%EMO.length] }
 
-    function getJSON(url){
-      return fetch(url,{cache:'force-cache'}).then(function(r){
-        if(!r.ok) throw new Error('HTTP '+r.status+' '+url);
-        var ct=(r.headers.get('content-type')||'').toLowerCase();
-        if(ct.indexOf('application/json')===-1 && ct.indexOf('+json')===-1) throw new Error('NOT_JSON '+url);
-        return r.json();
-      }).catch(function(err){
-        if(url.charAt(0)==='/' ){
-          return fetch('.'+url,{cache:'force-cache'}).then(function(r2){
-            if(!r2.ok) throw err;
-            var ct2=(r2.headers.get('content-type')||'').toLowerCase();
-            if(ct2.indexOf('application/json')===-1 && ct2.indexOf('+json')===-1) throw err;
-            return r2.json();
+    // ===== Эмодзи-аватар
+    const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
+    function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
+    function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
+
+    // ===== Состояние
+    const box=qs('#threads'), filt=qs('#filters');
+    const qInp=qs('#q'), qClr=qs('#clearQ');
+    const sortersBox=qs('#sorters');
+    const statusBox=qs('#status');
+    const skeleton=qs('#skeleton');
+    const sortKey='kx-sort';
+    let allItems=[], currentBoard='', query='';
+    let currentSort='newest';
+    try{ currentSort = localStorage.getItem(sortKey) || 'newest'; }catch(_){}
+
+    // ===== Кеш: cache-first + SWR
+    const INDEX_URL='/content/threads-index.json';
+    async function getIndex(){
+      // 1) попытка из CacheStorage
+      if('caches' in window){
+        const cache = await caches.open('kx-v1');
+        const cached = await cache.match(INDEX_URL);
+        if(cached){
+          cached.json().then(data=>{
+            if(Array.isArray(allItems) && allItems.length===0){
+              // первичный быстрый рендер из кеша
+              applyData(data);
+            }
           });
+          // Фоновой догрузкой обновим кеш
+          fetch(INDEX_URL, {cache:'no-cache'}).then(r=>{
+            if(r.ok){ cache.put(INDEX_URL, r.clone()); r.json().then(applyData); }
+          }).catch(()=>{});
+          return; // уже отрендерили из кеша
+        } else {
+          // ничего в кеше — тянем и кладем
+          const r = await fetch(INDEX_URL, {cache:'no-cache'});
+          if(!r.ok) throw new Error('HTTP '+r.status);
+          await cache.put(INDEX_URL, r.clone());
+          const json = await r.json();
+          applyData(json);
+          return;
         }
-        throw err;
-      });
+      }
+      // Без CacheStorage: обычный fetch с кешом браузера
+      const r=await fetch(INDEX_URL, {cache:'force-cache'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const json = await r.json();
+      applyData(json);
     }
 
-    /* — Состояние и URL — */
-    var box=document.getElementById('threads');
-    var filtBox=document.getElementById('filters');
-    var sortersBox=document.getElementById('sorters');
-    var qInp=document.getElementById('q'), qClr=document.getElementById('clearQ');
-    var statusBox=document.getElementById('status');
+    function applyData(payload){
+      const items = Array.isArray(payload) ? payload : Array.isArray(payload.items) ? payload.items : [];
+      if(!items.length) return;
+      allItems = items;
+      renderBoards(); render();
+      skeleton.hidden=true;
+    }
 
-    var allItems=[], currentBoard='', query=''; var currentSort='newest';
+    // ===== URL <-> state
     function readURL(){
-      var u=new URL(location.href);
+      const u=new URL(location.href);
       currentBoard=u.searchParams.get('board')||'';
       query=(u.searchParams.get('q')||'').toLowerCase();
-      var s=u.searchParams.get('sort'); currentSort = (s==='popular'?'popular':'newest');
+      const s=u.searchParams.get('sort'); if(s==='popular'||s==='newest') currentSort=s;
       qInp.value=query;
     }
     function writeURL(){
-      var u=new URL(location.href);
+      const u=new URL(location.href);
       if(currentBoard) u.searchParams.set('board', currentBoard); else u.searchParams.delete('board');
       if(query) u.searchParams.set('q', query); else u.searchParams.delete('q');
       u.searchParams.set('sort', currentSort);
       history.replaceState(null,'',u);
     }
 
+    function card(t){
+      const when=fmtDayYear(t.created);
+      const preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+(t.body&&t.body.length>200?'…':'');
+      const name=esc(t.author||'anon'); const aId=encodeURIComponent(t.author_id||slugify(name));
+      const emo=authorEmoji(name);
+      const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}" title="Посты с тегом ${esc(x)}">${esc(x)}</a>`).join(' ');
+      const cc = t.commentCount||0;
+      return `<article class="kx-thread">
+        <a class="kx-link" href="/thread.html#/${encodeURIComponent(t.id)}"><h3 class="kx-title">✶ ${esc(t.title||'Без названия')}</h3></a>
+        <div class="kx-sub">${when} · <a href="/author.html#/${aId}" title="Все посты автора">${emo} ${name}</a> · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''}${cc?` · комментариев: ${cc}`:''}</div>
+        <p class="kx-preview">${esc(preview)}</p>
+        <div class="kx-tags">${tags}</div>
+      </article>`;
+    }
+
     function matches(t){
       if ((t.board||'') === 'комментарии') return false;
       if(currentBoard && (t.board||'')!==currentBoard) return false;
       if(!query) return true;
-      var hay = [t.title,t.body,(t.tags||[]).join(' '),t.author,t.sector,t.id].join(' ').toLowerCase();
-      return hay.indexOf(query)!==-1;
+      const hay = [t.title,t.body,(t.tags||[]).join(' '),t.author,t.sector,t.id].join(' ').toLowerCase();
+      return hay.includes(query);
     }
 
-    function card(t){
-      var when=fmtDayYear(t.created);
-      var preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+((t.body&&t.body.length>200)?'…':'');
-      var name=esc(t.author||'anon'); var aId=encodeURIComponent(t.author_id||slugify(name));
-      var emo=authorEmoji(name);
-      var tags=(t.tags||[]).map(function(x){return '<a class="kx-tag" href="/tags.html#/'+encodeURIComponent(x)+'" title="Посты с тегом '+esc(x)+'">'+esc(x)+'</a>'}).join(' ');
-      var cc = t.commentCount||0;
-      return '<article class="kx-thread">'
-       + '<a class="kx-link" href="/thread.html?id='+encodeURIComponent(t.id)+'"><h3 class="kx-title">✶ '+esc(t.title||'Без названия')+'</h3></a>'
-       + '<div class="kx-sub">'+when+' · <a href="/author.html?id='+aId+'" title="Все посты автора">'+emo+' '+name+'</a> · сектор: '+esc(t.sector||'—')+(t.board?(' · раздел: '+esc(t.board)):'')+(cc?(' · комментариев: '+cc):'')+'</div>'
-       + '<p class="kx-preview">'+esc(preview)+'</p>'
-       + '<div class="kx-tags">'+tags+'</div>'
-       + '</article>';
+    function render(){
+      if(!allItems.length) return;
+      let items = allItems.filter(matches);
+      if (currentSort === 'popular') {
+        items.sort((a,b)=> (b.commentCount||0) - (a.commentCount||0) || (new Date(b.created) - new Date(a.created)));
+      } else {
+        items.sort((a,b)=> new Date(b.created) - new Date(a.created));
+      }
+      // Ленивый «пакетный» рендер: сразу первые 24, остальное постепенно
+      const chunk = 24;
+      const first = items.slice(0, chunk);
+      const rest = items.slice(chunk);
+      qs('#threads').innerHTML = first.length ? first.map(card).join('') : `<div class="kx-msg">Ничего не найдено. Попробуй другой запрос или раздел.</div>`;
+      writeURL();
+      if(rest.length){
+        let i=0;
+        const addMore = ()=>{
+          const part = rest.slice(i, i+24).map(card).join('');
+          if(part){ qs('#threads').insertAdjacentHTML('beforeend', part); i+=24; requestIdleCallback? requestIdleCallback(addMore): setTimeout(addMore, 16); }
+        };
+        addMore();
+      }
     }
 
     function renderBoards(){
-      var boards = Array.from(new Set(allItems.map(function(x){return x.board}).filter(function(b){return b && b!=='комментарии'}))).sort();
-      if(!boards.length){ filtBox.innerHTML=''; return; }
-      function chip(b){ return '<span class="kx-tag'+(b===currentBoard?' kx-tag--on':'')+'" role="tab" tabindex="0" data-board="'+esc(b)+'">'+esc(b)+'</span>' }
-      filtBox.innerHTML = '<span class="kx-tag'+(!currentBoard?' kx-tag--on':'')+'" role="tab" tabindex="0" data-board="">Все</span>' + boards.map(chip).join('');
-      filtBox.onclick = function(e){ var el=e.target.closest('.kx-tag'); if(!el) return; currentBoard = el.dataset.board || ''; renderBoards(); render(); };
-      filtBox.onkeydown = function(e){ if(e.key==='Enter'||e.key===' '){ var el=e.target.closest('.kx-tag'); if(!el) return; currentBoard = el.dataset.board || ''; renderBoards(); render(); e.preventDefault(); } };
+      const boards = Array.from(new Set(allItems.map(x=>x.board).filter(b=>b && b!=='комментарии'))).sort();
+      if(!boards.length){ qs('#filters').innerHTML=''; return; }
+      const chip = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${b===currentBoard?'true':'false'}" tabindex="0" data-board="${esc(b)}">${esc(b)}</span>`;
+      const filt = qs('#filters');
+      filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${!currentBoard?'true':'false'}" tabindex="0" data-board="">Все</span>` + boards.map(chip).join('');
+      const activate = (b)=>{ currentBoard = b || ''; renderBoards(); render(); };
+      filt.onclick = e=>{ const el=e.target.closest('.kx-tag'); if(!el) return; activate(el.dataset.board||''); };
+      filt.onkeydown = e=>{ if(e.key==='Enter' || e.key===' '){ const el=e.target.closest('.kx-tag'); if(!el) return; activate(el.dataset.board||''); e.preventDefault(); } };
     }
 
     function syncSortUI(){
-      Array.prototype.forEach.call(sortersBox.querySelectorAll('button[data-sort]'), function(btn){
-        var on = btn.dataset.sort === currentSort;
+      qs('#sorters').querySelectorAll('button[data-sort]').forEach(btn=>{
+        const on = btn.dataset.sort === currentSort;
         btn.classList.toggle('is-active', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
     }
 
-    function render(){
-      var items = allItems.filter(matches);
-      if (currentSort === 'popular') items.sort(function(a,b){ return (b.commentCount||0) - (a.commentCount||0) || (new Date(b.created) - new Date(a.created)) });
-      else items.sort(function(a,b){ return new Date(b.created) - new Date(a.created) });
-      box.innerHTML = items.length ? items.map(card).join('') : '<div class="kx-panel kx-muted">Ничего не найдено. Попробуй другой запрос или раздел.</div>';
-      writeURL();
-    }
-
-    /* — Инициализация — */
+    // ===== Инициализация
     (function init(){
+      // скелетон сразу
+      qs('#skeleton').hidden=false; qs('#threads').innerHTML='';
+      // начальные настройки
       readURL(); syncSortUI();
-      getJSON('/content/threads-index.json').then(function(payload){
-        allItems = Array.isArray(payload) ? payload : (Array.isArray(payload.items)?payload.items:[]);
-        renderBoards(); render();
-      }).catch(function(err){
-        statusBox.hidden=false;
-        statusBox.innerHTML='Не удалось получить <code>/content/threads-index.json</code>: '+esc(String(err.message||err))+'. Проверь путь, редиректы и CORS.';
+      // загрузка индекса: cache-first
+      getIndex().catch(err=>{
+        qs('#status').hidden=false;
+        qs('#status').textContent = 'Ошибка загрузки индекса — ' + err;
+        qs('#skeleton').hidden=true;
       });
 
-      function debounce(fn,ms){ var t; return function(){ var a=arguments; clearTimeout(t); t=setTimeout(function(){ fn.apply(null,a) },ms) } }
-      var applySearch = debounce(function(){ query=qInp.value.trim().toLowerCase(); render(); }, 120);
-      qInp.addEventListener('input', applySearch);
-      qClr.addEventListener('click', function(){ qInp.value=''; query=''; render(); qInp.focus(); });
-
-      sortersBox.addEventListener('click', function(e){
-        var btn=e.target.closest('button[data-sort]'); if(!btn) return;
-        currentSort = btn.dataset.sort; syncSortUI(); render();
+      const applySearch = debounce(()=>{ query=qInp.value.trim().toLowerCase(); render(); }, 120);
+      qInp.addEventListener('input', applySearch, {passive:true});
+      qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); qInp.focus(); });
+      qs('#sorters').addEventListener('click', e=>{
+        const btn=e.target.closest('button[data-sort]'); if(!btn) return;
+        currentSort = btn.dataset.sort;
+        try{ localStorage.setItem(sortKey, currentSort) }catch(_){}
+        syncSortUI(); render();
       });
 
-      document.addEventListener('keydown', function(e){
-        var key=(e.key||'').toLowerCase();
+      document.addEventListener('keydown', e=>{
+        const key=(e.key||'').toLowerCase();
         if(key==='/' && document.activeElement!==qInp){ qInp.focus(); qInp.select(); e.preventDefault(); }
         else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); } }
       });
+
+      // Миграция старых #/board ссылок
+      if(location.hash && !location.search){
+        const m=location.hash.match(/^#\/(.+)$/);
+        if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); }
+      }
     })();
   </script>
 </body>
