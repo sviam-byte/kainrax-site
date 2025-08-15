@@ -1,13 +1,15 @@
 {
   "name": "kainrax-site",
   "private": true,
-  "engines": { "node": "18.x" },
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
   "dependencies": {
     "gray-matter": "^4.0.3",
     "deta": "^1.1.0"
   },
   "scripts": {
-    "build": "echo no build",
+    "build:perg": "node scripts/build-pergament.mjs",
+    "build": "npm run build:perg",
     "postinstall": "echo deps ok"
   }
 }
