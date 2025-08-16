@@ -1,30 +1,33 @@
 # netlify.toml
+
 [build]
-  command   = "node scripts/build-index.mjs"
+  # Сначала общий контент-индекс, потом пергамент
+  command   = "node scripts/build-index.mjs && node scripts/build-pergament.mjs"
   publish   = "."
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
+  # PERG_DEFAULT_CODE = "Chronicle"   # если нужен единый код для старых редакций (опционально)
 
 [functions]
-  node_bundler = "esbuild"
+  node_bundler  = "esbuild"
   included_files = ["content/**"]
 
-# functions — как были 
+# Проксирование функций (оставляем как было)
 [[redirects]]
-  from = "/.netlify/functions/*"
-  to   = "/.netlify/functions/:splat"
+  from   = "/.netlify/functions/*"
+  to     = "/.netlify/functions/:splat"
   status = 200
 
-# статика из /content
+# Отдаём статический контент как есть
 [[redirects]]
-  from = "/content/*"
-  to   = "/content/:splat"
+  from   = "/content/*"
+  to     = "/content/:splat"
   status = 200
 
-# SPA
+# SPA-роутинг
 [[redirects]]
-  from = "/*"
-  to   = "/index.html"
+  from   = "/*"
+  to     = "/index.html"
   status = 200
