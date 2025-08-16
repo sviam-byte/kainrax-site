@@ -11,7 +11,7 @@
   node_bundler = "esbuild"
   included_files = ["content/**"]
 
-# functions — как были
+# functions — как были 
 [[redirects]]
   from = "/.netlify/functions/*"
   to   = "/.netlify/functions/:splat"
