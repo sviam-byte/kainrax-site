@@ -10,21 +10,24 @@
       "title": "Первая редакция — «Сказка о звёздном взгляде» (Элиара)",
       "date": "0072-001",
       "file": "e72.txt",
-      "protected": true
+      "protected": true,
+      "code": "Chronicle"
     },
     {
       "id": "e181",
       "title": "Седьмая редакция — «Сказка о молотах и швах» (Элиара)",
       "date": "0181-001",
       "file": "e181.txt",
-      "protected": true
+      "protected": true,
+      "code": "Chronicle"
     },
     {
       "id": "e251",
       "title": "Двадцать четвёртая редакция — «Притча о Пределе» (Итур)",
       "date": "0251-001",
       "file": "e251.txt",
-      "protected": true
+      "protected": true,
+      "code": "Chronicle"
     },
     {
       "id": "e430-349",
