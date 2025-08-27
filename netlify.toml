@@ -1,47 +1,43 @@
 # netlify.toml
 
 [build]
-  # Сначала общий контент-индекс, потом пергамент
   command   = "node scripts/build-index.mjs && node scripts/build-pergament.mjs"
   publish   = "."
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
-  # PERG_DEFAULT_CODE = "Chronicle"   # если нужен единый код для старых редакций (опционально)
 
 [functions]
-  node_bundler  = "esbuild"
+  node_bundler   = "esbuild"
   included_files = ["content/**"]
 
-# ─────────────────────────────────────────────────────────────
-# Спец-исключение: /o2log — отдельная страница, не SPA-маршрут
-# ─────────────────────────────────────────────────────────────
+# ── /o2log: отдельный статический мини-приложение ───────────────
+# редиректим только голый /o2log → /o2log/
 [[redirects]]
   from   = "/o2log"
   to     = "/o2log/"
   status = 301
 
+# а все файлы внутри /o2log/* отдаём КАК ЕСТЬ (JS, JSON, PNG…)
 [[redirects]]
   from   = "/o2log/*"
-  to     = "/o2log/index.html"
+  to     = "/o2log/:splat"
   status = 200
 
-# Проксирование функций (оставляем как было)
+# ── функции ─────────────────────────────────────────────────────
 [[redirects]]
   from   = "/.netlify/functions/*"
   to     = "/.netlify/functions/:splat"
   status = 200
 
-# Отдаём статический контент как есть
+# ── статический контент ─────────────────────────────────────────
 [[redirects]]
   from   = "/content/*"
   to     = "/content/:splat"
   status = 200
 
-# ─────────────────────────────────────────────────────────────
-# Общий SPA-роутинг: всё остальное — на корневой index.html
-# ─────────────────────────────────────────────────────────────
+# ── общий SPA-роутинг для основного сайта (последним!) ─────────
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
