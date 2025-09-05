@@ -237,16 +237,6 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== fail-safe, чтобы не залипать «в загрузке» ===== */
-  window.addEventListener('error', e => {
-    const app = document.getElementById('app');
-    if (app && !app.dataset.ok) {
-      app.innerHTML = `<section class="card"><h1>Рассказы</h1>
-        <div class="anno-box">Ой. Скрипт упал: <code>${String((e && e.message) || e || 'unknown')}</code>. Проверь консоль.</div>
-      </section>`;
-    }
-  });
-
   /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
@@ -354,8 +344,9 @@
     return null;
   }
 
-  /* ===== Загрузка контента (с гонкой) ===== */
+  /* ===== Загрузка контента ===== */
   let stories=[], notes=[], pergDocs=[];
+
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -418,16 +409,24 @@
   }
 
   async function loadContent(){
-    const staticP = fetchJson('content/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
-    const fnP     = fetchJson('/.netlify/functions/content-index',{timeoutMs:900, headers:{'Accept':'application/json'}}).catch(()=>null);
+    // 1) Пробуем функцию
+    let j = await fetchJson('/.netlify/functions/content-index', {
+      timeoutMs: 1500, headers:{'Accept':'application/json'}
+    }).catch(()=>null);
 
-    let j = await Promise.race([fnP, staticP]);
-    if(!j) j = await (staticP ?? fnP);
+    // 2) Фоллбек — статический индекс
+    if(!j){
+      j = await fetchJson('content/index.json', {
+        timeoutMs: 3000, headers:{'Accept':'application/json'}
+      }).catch(()=>null);
+    }
+
     if(!j) j = { stories:[], notes:[] };
 
     stories = Array.isArray(j.stories) ? j.stories : [];
     notes   = Array.isArray(j.notes)   ? j.notes   : [];
 
+    // пергамент как раньше
     try{
       pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}});
     }catch{ pergDocs = []; }
@@ -441,9 +440,11 @@
       return String(bl).localeCompare(String(al));
     });
 
+    // пропишем file, если его нет
     stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
     notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
 
+    // построим верхнюю линейку с годами
     renderYearBar();
   }
 
@@ -458,8 +459,8 @@
     el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
   }
   applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); syncYearBarOffset(); };
-  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); syncYearBarOffset(); } });
+  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
   /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
@@ -491,7 +492,7 @@
     for(const k in map){
       map[k].items.sort((a,b)=>{
         const ay=getStoryYear(a), by=getStoryYear(b);
-        if(ay!=null && by!=null && ay!==by) return ay-by;
+        if(ay!=null && by!=null && ay!==by) return ay-by; // внутри ветки — хронология мира
         return ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id)));
       });
     }
@@ -529,7 +530,6 @@
 
     bar.innerHTML = html;
     wrap.style.display='block';
-    syncYearBarOffset();
 
     bar.querySelectorAll('.y-tab').forEach(btn=>{
       btn.onclick = ()=>{
@@ -542,25 +542,19 @@
     if(reset) reset.onclick = ()=>{ state.year = null; location.hash='#/'; };
   }
 
-  function syncYearBarOffset(){
-    const head = document.querySelector('header');
-    const wrap = document.getElementById('yearBarWrap');
-    if (head && wrap) wrap.style.top = Math.max(0, head.offsetHeight - 1) + 'px';
-  }
-  addEventListener('resize', syncYearBarOffset);
-  document.addEventListener('DOMContentLoaded', syncYearBarOffset, { once:true });
-
   /* ===== Вьюхи ===== */
   function renderList(){
     const q = state.q;
     const all = stories;
 
+    // поиск
     let filtered = all.filter(s => !q
       || s.title?.toLowerCase().includes(q)
       || (s.text||'').toLowerCase().includes(q)
       || (s.tags||[]).join(' ').toLowerCase().includes(q)
     );
 
+    // фильтр по году
     const chosenYear = Number.isFinite(state.year) ? state.year : null;
     if (chosenYear != null) filtered = filtered.filter(s => getStoryYear(s) === chosenYear);
 
@@ -584,7 +578,7 @@
                 </a>
                 <div style="margin-top:6px">${yearBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
               </div>`; }).join('')
-            :`<div class="muted" style="margin-top:10px">${chosenYear!=null?'По выбранному году ничего не найдено.':'Пока нет данных. Проверь <code>content/index.json</code> или функцию <code>content-index</code>.'}</div>`}
+            :'<div class="muted" style="margin-top:10px">По выбранному году ничего не найдено.</div>'}
           </div>
         </section>
 
@@ -604,9 +598,9 @@
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
         </aside>
       </div>`;
-    app.dataset.ok = "1";
     adminDockHide(); ensureAdminUI();
 
+    // ленивая догрузка недостающих полей (в т.ч. год)
     const need = items.filter(s=>!s.title || !s.date || getStoryYear(s)==null).slice(0,12);
     if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderYearBar(); renderList(); }); }
   }
@@ -705,6 +699,31 @@
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}${getAnno(s)?` <div class="anno">${getAnno(s)}</div>`:''}</div>`}).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  /* ===== Заметки ===== */
+  function renderNotes(){
+    const items = notes || [];
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>Заметки</h1>
+        <div class="list">
+          ${
+            items.length
+              ? items.map(n => `
+                <div class="story-item" data-arc="${n.arc||'kainrax'}">
+                  <a href="#/note/${n.id}">
+                    <div class="title">✶ ${n.title || 'Без названия'}</div>
+                    <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
+                  </a>
+                  ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
+                </div>`).join('')
+              : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>'
+          }
+        </div>
+      </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
@@ -965,7 +984,6 @@
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ===== Звёзды ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -998,53 +1016,28 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Роутер (с поддержкой /year/:y) ===== */
+  /* ===== Рендерер маршрутов ===== */
   async function render(){
-    const r = state.route;
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
+    if(r==='/project'){ renderProject(); return; }
+    if(r==='/perg'){ renderPergList(); return; }
 
-    if (r==='/' || r==='') { state.year = null; renderList(); return; }
+    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
+    if(mReadId){ await renderArticle(mReadId[1]); return; }
 
-    const mYear = r.match(/^\/year\/(-?\d+)(?:\?.*)?$/);
-    if (mYear) { state.year = parseInt(mYear[1], 10); renderList(); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
+    if(mRead){ await renderArticle(mRead[1]); return; }
 
-    if (r==='/arcs'){ renderArcs(); return; }
-    if (r==='/notes'){ renderNotes(); return; }
-    if (r==='/project'){ renderProject(); return; }
-    if (r==='/perg'){ renderPergList(); return; }
-
-    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/); if(mReadId){ await renderArticle(mReadId[1]); return; }
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
     const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
+    const mYear=r.match(/^\/year\/(-?\d+)(?:\?.*)?$/); if(mYear){ state.year=parseInt(mYear[1],10); renderList(); return; }
 
     renderList();
-  }
-
-  /* ===== Заметки ===== */
-  function renderNotes(){
-    const items = notes || [];
-    app.innerHTML = `
-      <section class="card">
-        <a class="back" href="#/">← На главную</a>
-        <h1>Заметки</h1>
-        <div class="list">
-          ${
-            items.length
-              ? items.map(n => `
-                <div class="story-item" data-arc="${n.arc||'kainrax'}">
-                  <a href="#/note/${n.id}">
-                    <div class="title">✶ ${n.title || 'Без названия'}</div>
-                    <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
-                  </a>
-                  ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
-                </div>`).join('')
-              : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>'
-          }
-        </div>
-      </section>`;
-    adminDockHide(); ensureAdminUI();
   }
 
   async function renderNote(id){
@@ -1065,15 +1058,13 @@
 
   /* ===== Инициализация ===== */
   (async function init(){
-    // быстрый «скелет»
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
     try{ await loadContent(); }catch(_){}
     applyTheme();
     render();
     ensureAdminUI();
-    syncYearBarOffset();
-    const canvasEl = document.getElementById('stars');
-    if (canvasEl) { resize(); if(!prefersReduced) requestAnimationFrame(drawStars); }
+    resize();
+    if(!prefersReduced) requestAnimationFrame(drawStars);
     initSkyLine();
   })();
   </script>
