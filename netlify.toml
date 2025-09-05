@@ -1,5 +1,4 @@
-# netlify.toml
-
+# ── Сборка ───────────────────────────────────────────────────────
 [build]
   command   = "node scripts/build-index.mjs && node scripts/build-pergament.mjs"
   publish   = "."
@@ -12,32 +11,39 @@
   node_bundler   = "esbuild"
   included_files = ["content/**"]
 
-# ── /o2log: отдельный статический мини-приложение ───────────────
+# ── /o2log: отдельное статическое мини-приложение ───────────────
 # редиректим только голый /o2log → /o2log/
 [[redirects]]
   from   = "/o2log"
   to     = "/o2log/"
   status = 301
 
-# а все файлы внутри /o2log/* отдаём КАК ЕСТЬ (JS, JSON, PNG…)
+# все файлы внутри /o2log/* отдаём как есть (JS, JSON, PNG…)
 [[redirects]]
   from   = "/o2log/*"
   to     = "/o2log/:splat"
   status = 200
 
-# ── функции ─────────────────────────────────────────────────────
+# ── Функции: безопасный алиас /api/* → /.netlify/functions/:splat ─
+# (нельзя использовать /.netlify/... в "from", поэтому даём внешний путь)
 [[redirects]]
-  from   = "/.netlify/functions/*"
+  from   = "/api/*"
   to     = "/.netlify/functions/:splat"
   status = 200
 
-# ── статический контент ─────────────────────────────────────────
+# ── Статический контент ─────────────────────────────────────────
 [[redirects]]
   from   = "/content/*"
   to     = "/content/:splat"
   status = 200
 
-# ── общий SPA-роутинг для основного сайта (последним!) ─────────
+# Кеш для статического контента
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "public, max-age=600"
+
+# ── Общий SPA-фоллбек для основного сайта (последним!) ─────────
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
