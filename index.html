@@ -7,7 +7,7 @@
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
 
-  <!-- Метрика -->
+  <!-- Яндекс.Метрика -->
   <script>
     (function(m,e,t,r,i,k,a){
       m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -18,7 +18,7 @@
 
     ym(103716449, 'init', { webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer' });
 
-    // SPA-хит
+    // SPA-хиты
     (function(){
       var last = location.href;
       function hit(){ try{ ym(103716449,'hit', location.href, { referer:last, title:document.title }); last = location.href; }catch(e){} }
@@ -68,7 +68,6 @@
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
-
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
@@ -115,8 +114,8 @@
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
   .tag:before{content:"✶";color:var(--muted)}
   [data-theme="light"] .tag:before{content:"#"}
-  .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
+  .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:8}
 
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
@@ -180,6 +179,7 @@
   .year-bar-wrap{position:sticky; top:56px; z-index:6; border-bottom:1px solid var(--line); background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.75)); backdrop-filter: blur(8px) saturate(1.05)}
   [data-theme="light"] .year-bar-wrap{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.8))}
   .year-bar{max-width:var(--max); margin:0 auto; padding:8px 12px; display:flex; gap:8px; align-items:center; overflow:auto; scrollbar-width:thin}
+  .y-label{font-size:12px; color:var(--muted); padding:0 6px}
   .y-tab, .y-reset{
     position:relative; display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
     background:var(--card); color:var(--fg); border:1px solid var(--line); border-bottom-width:3px;
@@ -202,7 +202,7 @@
   <div id="sky-line" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
   <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
-  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 Л40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
   <header>
@@ -268,7 +268,9 @@
   /* ===== Счётчик просмотров ===== */
   window.hit = async function(slug, outEl){
     try{
-      const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
+      // стараемся через /api, но есть фоллбек на /.netlify/functions
+      const r = await fetch('/api/hit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})})
+                .catch(()=>fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})}));
       const j=await r.json(); if(outEl) outEl.textContent = j?.count ?? '—'; return Number(j?.count ?? 0);
     }catch(e){ if(outEl) outEl.textContent='—'; return 0; }
   };
@@ -344,9 +346,8 @@
     return null;
   }
 
-  /* ===== Загрузка контента ===== */
+  /* ===== Загрузка контента (гонка) ===== */
   let stories=[], notes=[], pergDocs=[];
-
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -392,7 +393,6 @@
     return n;
   }
 
-  // Markdown → скромный HTML
   function mdToHtml(md) {
     let html = md
       .replace(/^### (.*)$/gim, '<h3>$1</h3>')
@@ -409,24 +409,18 @@
   }
 
   async function loadContent(){
-    // 1) Пробуем функцию
-    let j = await fetchJson('/.netlify/functions/content-index', {
-      timeoutMs: 1500, headers:{'Accept':'application/json'}
-    }).catch(()=>null);
+    // параллельные источники: функция через /api, через /.netlify/functions и статика
+    const fnApi   = fetchJson('/api/content-index',                 {timeoutMs:1200, headers:{'Accept':'application/json'}}).catch(()=>null);
+    const fnOld   = fetchJson('/.netlify/functions/content-index',  {timeoutMs:1200, headers:{'Accept':'application/json'}}).catch(()=>null);
+    const staticP = fetchJson('content/index.json',                 {timeoutMs:2000, headers:{'Accept':'application/json'}}).catch(()=>null);
 
-    // 2) Фоллбек — статический индекс
-    if(!j){
-      j = await fetchJson('content/index.json', {
-        timeoutMs: 3000, headers:{'Accept':'application/json'}
-      }).catch(()=>null);
-    }
-
+    let j = await Promise.race([fnApi, fnOld, staticP].filter(Boolean)).catch(()=>null);
+    if(!j) j = await (fnApi ?? fnOld ?? staticP) || await staticP;
     if(!j) j = { stories:[], notes:[] };
 
     stories = Array.isArray(j.stories) ? j.stories : [];
     notes   = Array.isArray(j.notes)   ? j.notes   : [];
 
-    // пергамент как раньше
     try{
       pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}});
     }catch{ pergDocs = []; }
@@ -440,11 +434,9 @@
       return String(bl).localeCompare(String(al));
     });
 
-    // пропишем file, если его нет
     stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
     notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
 
-    // построим верхнюю линейку с годами
     renderYearBar();
   }
 
@@ -521,6 +513,7 @@
 
     const chosen = Number.isFinite(state.year) ? state.year : null;
     const html = [
+      `<span class="y-label">Год:</span>`,
       `<button class="y-reset ${chosen==null?'y-active':''}" title="Все годы">Все</button>`,
       ...years.map(y => `
         <button class="y-tab ${chosen===y?'y-active':''}" data-year="${y}" title="Год ${y}">
@@ -547,14 +540,12 @@
     const q = state.q;
     const all = stories;
 
-    // поиск
     let filtered = all.filter(s => !q
       || s.title?.toLowerCase().includes(q)
       || (s.text||'').toLowerCase().includes(q)
       || (s.tags||[]).join(' ').toLowerCase().includes(q)
     );
 
-    // фильтр по году
     const chosenYear = Number.isFinite(state.year) ? state.year : null;
     if (chosenYear != null) filtered = filtered.filter(s => getStoryYear(s) === chosenYear);
 
@@ -569,15 +560,15 @@
           <div class="list" style="margin-top:8px">
             ${items.length?items.map(s=>{
               const y = getStoryYear(s);
-              const yearBadge = Number.isFinite(y) ? `<span class="tag">Год ${y}</span>` : '';
-              return `
-              <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read-id/${s.id}">
-                  <div class="title">✶ ${s.title||'Без названия'}</div>
-                  <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+              const yearBadge = Number.isFinite(y) ? \`<span class="tag">Год \${y}</span>\` : '';
+              return \`
+              <div class="story-item" data-arc="\${s.arc||'kainrax'}">
+                <a href="#/read-id/\${s.id}">
+                  <div class="title">✶ \${s.title||'Без названия'}</div>
+                  <div class="muted">\${fmtHumanDate(s.date)} · \${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: \${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
-                <div style="margin-top:6px">${yearBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
-              </div>`; }).join('')
+                <div style="margin-top:6px">\${yearBadge}\${getAnno(s)?\` <span class="anno">\${getAnno(s)}</span>\`:''}</div>
+              </div>\`; }).join('')
             :'<div class="muted" style="margin-top:10px">По выбранному году ничего не найдено.</div>'}
           </div>
         </section>
@@ -600,7 +591,7 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
 
-    // ленивая догрузка недостающих полей (в т.ч. год)
+    // ленивая догрузка недостающих полей (в т.ч. worldYear)
     const need = items.filter(s=>!s.title || !s.date || getStoryYear(s)==null).slice(0,12);
     if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderYearBar(); renderList(); }); }
   }
@@ -928,7 +919,7 @@
     ensureAdminUI();
   }
 
-  /* ===== Комментарии / утилиты ===== */
+  /* ===== Комментарии и утилиты ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -1035,11 +1026,11 @@
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
     const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
-    const mYear=r.match(/^\/year\/(-?\d+)(?:\?.*)?$/); if(mYear){ state.year=parseInt(mYear[1],10); renderList(); return; }
-
+    const mYear=r.match(/^\/year\/([^?]+)(?:\?.*)?$/); if(mYear){ state.year = parseInt(mYear[1],10); renderList(); return; }
     renderList();
   }
 
+  /* ===== Заметка ===== */
   async function renderNote(id){
     const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
     try{ await loadMdIntoNote(n, isAdmin); }catch(e){}
@@ -1058,10 +1049,12 @@
 
   /* ===== Инициализация ===== */
   (async function init(){
+    // быстрый каркас — рендерим сразу, не ждём сети
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    try{ await loadContent(); }catch(_){}
     applyTheme();
-    render();
+    render();                 // первый рендер по текущему hash
+    try{ await loadContent(); }catch(_){}
+    render();                 // перерисовка с данными
     ensureAdminUI();
     resize();
     if(!prefersReduced) requestAnimationFrame(drawStars);
