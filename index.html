@@ -85,7 +85,7 @@
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
 
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
+  header{position:sticky;top:0;z-index:7;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
   [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
   .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
@@ -117,7 +117,7 @@
   [data-theme="light"] .tag:before{content:"#"}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
-  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
+  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:8}
 
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
   .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
@@ -152,16 +152,8 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  .parchment{
-    position:relative;
-    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
-    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18);
-    background-blend-mode:multiply;
-  }
-  .parchment::before{
-    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>");
-  }
+  .parchment{ position:relative; background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3); color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply; }
+  .parchment::before{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>"); }
   [data-theme="light"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,250,240,.6), transparent 60%), linear-gradient(#fffaf1, #f5ecda)}
   [data-theme="cringe"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.85), transparent 60%), linear-gradient(#ffffff, #faf7ef)}
   .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
@@ -184,24 +176,24 @@
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
 
-  /* ====== ЭРА-СТРИП ====== */
-  .era-strip{
-    display:flex; gap:8px; align-items:stretch;
-    margin:12px 0 14px; background:rgba(125,211,252,.06);
-    padding:8px; border-radius:12px; border:1px solid var(--line);
+  /* ===== ВЕРХНЯЯ ПОЛОСА С ГОДАМИ ===== */
+  .year-bar-wrap{position:sticky; top:56px; z-index:6; border-bottom:1px solid var(--line); background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.75)); backdrop-filter: blur(8px) saturate(1.05)}
+  [data-theme="light"] .year-bar-wrap{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.8))}
+  .year-bar{max-width:var(--max); margin:0 auto; padding:8px 12px; display:flex; gap:8px; align-items:center; overflow:auto; scrollbar-width:thin}
+  .y-tab, .y-reset{
+    position:relative; display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
+    background:var(--card); color:var(--fg); border:1px solid var(--line); border-bottom-width:3px;
+    border-radius:10px 10px 6px 6px; cursor:pointer; white-space:nowrap; box-shadow:var(--shadow);
+    transition:transform .08s ease, border-color .15s ease;
   }
-  .era-strip .era-seg, .era-strip .era-reset{
-    position:relative; display:flex; justify-content:space-between; align-items:center;
-    gap:8px; padding:8px 10px; border-radius:10px; cursor:pointer; border:1px solid var(--line);
-    background:var(--card); color:var(--fg); box-shadow:var(--shadow);
-    transition:transform .08s ease;
+  .y-tab::after{
+    content:""; position:absolute; left:10px; top:-6px; width:12px; height:6px;
+    background:var(--card); border:1px solid var(--line); border-bottom:0; border-radius:6px 6px 0 0;
   }
-  .era-strip .era-seg{ min-width:80px; background:linear-gradient(180deg, color-mix(in oklab, var(--seg-color) 22%, transparent), transparent); }
-  .era-strip .era-seg:hover, .era-strip .era-reset:hover{ transform:translateY(-1px); }
-  .era-strip .active{ outline:2px solid var(--accent); }
-  .era-label{ font-weight:700; letter-spacing:.2px }
-  .era-count{ color:var(--muted); font-size:12px }
-  .era-reset{ min-width:72px }
+  .y-tab:hover, .y-reset:hover{ transform:translateY(-1px) }
+  .y-active{ border-color:var(--accent); border-bottom-color:var(--accent2) }
+  .y-count{ color:var(--muted); font-size:12px }
+  .y-sep{ color:var(--muted); font-size:12px; padding:0 4px }
   </style>
 </head>
 
@@ -235,6 +227,11 @@
       </div>
     </div>
   </header>
+
+  <!-- Стикер-бар с годами -->
+  <div class="year-bar-wrap" id="yearBarWrap" style="display:none">
+    <nav class="year-bar" id="yearBar" role="navigation" aria-label="Фильтр по годам"></nav>
+  </div>
 
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
@@ -280,7 +277,7 @@
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
-const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year:null };
+  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year:null };
 
   /* ===== Утилиты ===== */
   function toDate(val){
@@ -328,28 +325,27 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
     return { attributes: attrs, body };
   }
 
-  /* ===== Эпохи ===== */
-  const EPOCHS = [
-    { id:'e1', label:'Эпоха I', short:'I',  start:0,   end:197,  color:'var(--surface)' },
-    { id:'e2', label:'Эпоха II', short:'II', start:197, end:367,  color:'var(--ibut)'    },
-    { id:'e3', label:'Эпоха III',short:'III',start:367, end:9999, color:'var(--kainrax)' },
-  ];
-  function normEpoch(val){
-    const s = String(val||'').trim().toLowerCase();
-    if (!s) return '';
-    if (['e1','e2','e3'].includes(s)) return s;
-    if (/^(i|1|эпоха\s*i)\b/.test(s))   return 'e1';
-    if (/^(ii|2|эпоха\s*ii)\b/.test(s)) return 'e2';
-    if (/^(iii|3|эпоха\s*iii)\b/.test(s))return 'e3';
-    return '';
+  /* ===== ГОД РАССКАЗА ===== */
+  function parseYearLike(v){
+    if(v==null) return null;
+    if(typeof v==='number' && isFinite(v)) return Math.trunc(v);
+    if(typeof v==='string'){
+      const m = v.match(/-?\d+/);
+      if(m) return Math.trunc(+m[0]);
+    }
+    return null;
   }
-  function getStoryEpoch(s){
-    const fm = normEpoch(s.epoch);
-    if (fm) return fm;
-    const tagHit = (s.tags||[]).map(t=>normEpoch(t)).find(Boolean);
-    return tagHit || '';
+  function getStoryYear(s){
+    // 1) из JSON (автосборка)
+    if (s.worldYear!=null && isFinite(s.worldYear)) return Math.trunc(s.worldYear);
+    // 2) если догрузили md — из фронтматтера
+    const fm = parseYearLike(s.year ?? s.world_year ?? s.worldYear);
+    if (fm!=null) return fm;
+    // 3) как запаска — из тегов вида "год 362", "362 ов"
+    const hit = (s.tags||[]).find(t => /(^|\s)(год|year)\s*[:=]?\s*-?\d+|^-?\d+\s*ов$/i.test(String(t)));
+    if (hit){ const n=parseYearLike(hit); if(n!=null) return n; }
+    return null;
   }
-  function epochMeta(id){ return EPOCHS.find(e=>e.id===id) || null; }
 
   /* ===== Загрузка контента ===== */
   let stories=[], notes=[], pergDocs=[];
@@ -372,7 +368,9 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
       s.tags       = s.tags       || attributes.tags  || [];
       s.annotation = s.annotation || attributes.annotation || '';
       s.text       = body || '';
-      s.epoch      = s.epoch      || attributes.epoch || ''; // ← эпоха из фронтматтера
+      // год мира из разных ключей в фронтматтере
+      const wy = parseYearLike(attributes.worldYear ?? attributes.world_year ?? attributes.year ?? attributes.wy);
+      if (wy!=null) s.worldYear = wy;
     }catch(e){}
     return s;
   }
@@ -434,6 +432,8 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
 
     stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
     notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
+
+    renderYearBar(); // построим верхнюю полосу после первой загрузки
   }
 
   /* ===== Тема ===== */
@@ -478,7 +478,11 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
       map[id].items.push(s);
     }
     for(const k in map){
-      map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
+      map[k].items.sort((a,b)=>{
+        const ay=getStoryYear(a), by=getStoryYear(b);
+        if(ay!=null && by!=null && ay!==by) return ay-by; // внутри ветки — хронология мира
+        return ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id)));
+      });
     }
     return Object.values(map);
   }
@@ -491,29 +495,56 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
     return bySlug[0] || null;
   }
 
+  /* ===== Верхняя полоса с годами ===== */
+  function renderYearBar(){
+    const wrap = document.getElementById('yearBarWrap');
+    const bar  = document.getElementById('yearBar');
+    if(!wrap || !bar) return;
+
+    const years = Array.from(new Set(stories.map(getStoryYear).filter(y => y!=null))).sort((a,b)=>a-b);
+    if(!years.length){ wrap.style.display='none'; return; }
+
+    const counts = new Map();
+    for(const s of stories){ const y=getStoryYear(s); if(y!=null){ counts.set(y,(counts.get(y)||0)+1); } }
+
+    const chosen = Number.isFinite(state.year) ? state.year : null;
+    const html = [
+      `<button class="y-reset ${chosen==null?'y-active':''}" title="Все годы">Все</button>`,
+      ...years.map(y => `
+        <button class="y-tab ${chosen===y?'y-active':''}" data-year="${y}" title="Год ${y}">
+          <span>${y}</span><span class="y-count">${counts.get(y)||0}</span>
+        </button>`),
+    ].join('<span class="y-sep">·</span>');
+
+    bar.innerHTML = html;
+    wrap.style.display='block';
+
+    bar.querySelectorAll('.y-tab').forEach(btn=>{
+      btn.onclick = ()=>{
+        const y=Number(btn.getAttribute('data-year'));
+        state.year = y;
+        location.hash = '#/year/'+encodeURIComponent(String(y));
+      };
+    });
+    const reset = bar.querySelector('.y-reset');
+    if(reset) reset.onclick = ()=>{ state.year = null; location.hash='#/'; };
+  }
+
   /* ===== Вьюхи ===== */
   function renderList(){
     const q = state.q;
     const all = stories;
 
+    // поиск
     let filtered = all.filter(s => !q
       || s.title?.toLowerCase().includes(q)
       || (s.text||'').toLowerCase().includes(q)
       || (s.tags||[]).join(' ').toLowerCase().includes(q)
     );
 
-    const chosenEra = state.era && normEpoch(state.era);
-    if (chosenEra) filtered = filtered.filter(s => getStoryEpoch(s) === chosenEra);
-
-    const eraCounts = EPOCHS.map(e => ({
-      ...e, count: all.filter(s => getStoryEpoch(s)===e.id).length
-    }));
-    const totalInEras = eraCounts.reduce((a,b)=>a+b.count,0);
-    function segWidth(count){
-      if(!totalInEras) return (100/EPOCHS.length)+'%';
-      const pct = Math.max(6, (count/totalInEras)*100);
-      return pct.toFixed(2)+'%';
-    }
+    // фильтр по году
+    const chosenYear = Number.isFinite(state.year) ? state.year : null;
+    if (chosenYear != null) filtered = filtered.filter(s => getStoryYear(s) === chosenYear);
 
     const items = filtered;
 
@@ -523,36 +554,19 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
 
-          <!-- Таймлайн по эпохам -->
-          <div class="era-strip" role="navigation" aria-label="Фильтр по эпохе">
-            ${EPOCHS.map(e=>{
-              const active = (chosenEra===e.id) ? 'active' : '';
-              const cnt = eraCounts.find(x=>x.id===e.id)?.count||0;
-              return `
-                <button class="era-seg ${active}"
-                        style="--seg-color:${e.color}; width:${segWidth(cnt)}"
-                        data-era="${e.id}" title="${e.label} · ${cnt}">
-                  <span class="era-label">${e.short}</span>
-                  <span class="era-count">${cnt}</span>
-                </button>`;
-            }).join('')}
-            <button class="era-reset ${chosenEra?'':'active'}" title="Все эпохи">Все</button>
-          </div>
-
-          <div class="list">
+          <div class="list" style="margin-top:8px">
             ${items.length?items.map(s=>{
-              const eid = getStoryEpoch(s);
-              const em = epochMeta(eid);
-              const eraBadge = em ? `<span class="tag">Эпоха ${em.short}</span>` : '';
+              const y = getStoryYear(s);
+              const yearBadge = Number.isFinite(y) ? `<span class="tag">Год ${y}</span>` : '';
               return `
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
                 <a href="#/read-id/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
-                <div style="margin-top:6px">${eraBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
+                <div style="margin-top:6px">${yearBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
               </div>`; }).join('')
-            :'<div class="muted" style="margin-top:10px">Пока нет данных. Или эпоха пуста.</div>'}
+            :'<div class="muted" style="margin-top:10px">По выбранному году ничего не найдено.</div>'}
           </div>
         </section>
 
@@ -574,20 +588,9 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
       </div>`;
     adminDockHide(); ensureAdminUI();
 
-    // События на сегментах
-    document.querySelectorAll('.era-strip .era-seg').forEach(btn=>{
-      btn.onclick=()=>{
-        const id = btn.getAttribute('data-era');
-        state.era = id;
-        location.hash = '#/era/'+encodeURIComponent(id);
-      };
-    });
-    const resetBtn = document.querySelector('.era-strip .era-reset');
-    if (resetBtn) resetBtn.onclick = ()=>{ state.era=''; location.hash='#/'; };
-
-    // Ленивая догрузка меты — потом перерендер
-    const need = items.filter(s=>!s.title || !s.date || (getStoryEpoch(s)==='')).slice(0,12);
-    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
+    // ленивая догрузка недостающих полей (в т.ч. год)
+    const need = items.filter(s=>!s.title || !s.date || getStoryYear(s)==null).slice(0,12);
+    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderYearBar(); renderList(); }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
@@ -624,6 +627,7 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
     const order=a.items; const pos=Math.max(0, order.findIndex(v=> v.id===s.id ));
     const prev=order[pos-1], next=order[pos+1];
+    const y = getStoryYear(s);
 
     app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
@@ -633,12 +637,12 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
           <div class="muted">
             ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
             · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
-            (${pos+1}/${order.length})
+            (${pos+1}/${order.length}) ${Number.isFinite(y)?`· год: ${y}`:''}
             · <span id="viewsBox" data-admin-only style="display:none">—</span>
           </div>
           <div style="margin:6px 0 12px">
             ${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}
-            ${(()=>{const em=epochMeta(getStoryEpoch(s)); return em?`<span class="tag">Эпоха ${em.short}</span>`:'';})()}
+            ${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}
           </div>
 
           ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
@@ -676,11 +680,13 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
     app.innerHTML=`<section class="card">
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
-      <div class="list">${items.map(s=>`
+      <div class="list">${items.map(s=>{
+        const y=getStoryYear(s);
+        return `
         <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
-        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
+        </a>${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}${getAnno(s)?` <div class="anno">${getAnno(s)}</div>`:''}</div>`}).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
@@ -707,22 +713,6 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
         </div>
       </section>`;
     adminDockHide(); ensureAdminUI();
-  }
-
-  async function renderNote(id){
-    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
-    try{ await loadMdIntoNote(n, isAdmin); }catch(e){}
-    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
-        <div>
-          <h1>${n.title}</h1>
-          <div class="muted">${fmtHumanDate(n.date)}</div>
-          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-        </div>
-        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-      </article>
-      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
   /* ===== Проект ===== */
@@ -1016,6 +1006,7 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
 
   /* ===== Рендерер маршрутов ===== */
   async function render(){
+    renderYearBar(); // синхронизируем активное состояние на полосе
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
@@ -1028,8 +1019,8 @@ const state={ theme: localStorage.getItem('theme') || 'dark', route: location.ha
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
 
-    // Новое: эпохи
-    const mEra=r.match(/^\/era\/([^?]+)(?:\?.*)?$/); if(mEra){ state.era = decodeURIComponent(mEra[1]); renderList(); return; }
+    // новый роут: год
+    const mYear=r.match(/^\/year\/(-?\d+)(?:\?.*)?$/); if(mYear){ state.year = Number(mYear[1]); renderList(); return; }
 
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
