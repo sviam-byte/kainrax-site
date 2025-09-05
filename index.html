@@ -6,7 +6,8 @@
   <title>Кайнракс — рассказы</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
-  <!-- В <head> -->
+
+  <!-- Метрика -->
   <script>
     (function(m,e,t,r,i,k,a){
       m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -14,12 +15,10 @@
       for (var j=0;j<document.scripts.length;j++){ if(document.scripts[j].src===r){ return; } }
       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
     })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
-  
-    ym(103716449, 'init', {
-      webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer'
-    });
-  
-    // SPA-хит: первый и на каждую смену хеша
+
+    ym(103716449, 'init', { webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer' });
+
+    // SPA-хит
     (function(){
       var last = location.href;
       function hit(){ try{ ym(103716449,'hit', location.href, { referer:last, title:document.title }); last = location.href; }catch(e){} }
@@ -27,8 +26,6 @@
       addEventListener('hashchange', hit);
     })();
   </script>
-
-
 
   <!-- OG/Twitter -->
   <meta property="og:type" content="website">
@@ -186,15 +183,30 @@
   .edbar{position:relative;margin:8px 0 6px;height:4px;background:linear-gradient(90deg, rgba(0,0,0,.15), rgba(255,255,255,.12));border-radius:999px;overflow:hidden}
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
+
+  /* ====== ЭРА-СТРИП ====== */
+  .era-strip{
+    display:flex; gap:8px; align-items:stretch;
+    margin:12px 0 14px; background:rgba(125,211,252,.06);
+    padding:8px; border-radius:12px; border:1px solid var(--line);
+  }
+  .era-strip .era-seg, .era-strip .era-reset{
+    position:relative; display:flex; justify-content:space-between; align-items:center;
+    gap:8px; padding:8px 10px; border-radius:10px; cursor:pointer; border:1px solid var(--line);
+    background:var(--card); color:var(--fg); box-shadow:var(--shadow);
+    transition:transform .08s ease;
+  }
+  .era-strip .era-seg{ min-width:80px; background:linear-gradient(180deg, color-mix(in oklab, var(--seg-color) 22%, transparent), transparent); }
+  .era-strip .era-seg:hover, .era-strip .era-reset:hover{ transform:translateY(-1px); }
+  .era-strip .active{ outline:2px solid var(--accent); }
+  .era-label{ font-weight:700; letter-spacing:.2px }
+  .era-count{ color:var(--muted); font-size:12px }
+  .era-reset{ min-width:72px }
   </style>
 </head>
 
 <body>
-    
-  <!-- В самом начале <body> -->
-  <noscript>
-    <div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div>
-  </noscript>
+  <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
   <div id="sky-line" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
   <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
@@ -241,46 +253,34 @@
     }
   })();
 
-  /* ===== Хелперы сети с таймаутами (чтобы главная не висла) ===== */
+  /* ===== Хелперы сети ===== */
   function timeout(ms){ return new Promise(res=> setTimeout(res, ms)); }
-
   async function fetchJson(url, {timeoutMs=1500, headers={}}={}){
-    const ctrl = new AbortController();
-    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
-    try{
-      const r = await fetch(url, { signal: ctrl.signal, headers });
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      return await r.json();
+    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{ const r = await fetch(url, { signal: ctrl.signal, headers });
+      if(!r.ok) throw new Error('HTTP '+r.status); return await r.json();
     }finally{ clearTimeout(t); }
   }
   async function fetchText(url, {timeoutMs=4000, cacheMode}={}){
-    const ctrl = new AbortController();
-    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
-    try{
-      const r = await fetch(url, { signal: ctrl.signal, ...(cacheMode?{cache:cacheMode}:{}) });
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      return await r.text();
+    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{ const r = await fetch(url, { signal: ctrl.signal, ...(cacheMode?{cache:cacheMode}:{}) });
+      if(!r.ok) throw new Error('HTTP '+r.status); return await r.text();
     }finally{ clearTimeout(t); }
   }
 
-  /* ===== Счётчик просмотров (мягкая деградация) ===== */
+  /* ===== Счётчик просмотров ===== */
   window.hit = async function(slug, outEl){
     try{
       const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
-      const j=await r.json();
-      if(outEl) outEl.textContent = j?.count ?? '—';
-      return Number(j?.count ?? 0);
-    }catch(e){
-      if(outEl) outEl.textContent='—';
-      return 0;
-    }
+      const j=await r.json(); if(outEl) outEl.textContent = j?.count ?? '—'; return Number(j?.count ?? 0);
+    }catch(e){ if(outEl) outEl.textContent='—'; return 0; }
   };
 
   /* ===== Состояние ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
-  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
+  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', era:'' };
 
   /* ===== Утилиты ===== */
   function toDate(val){
@@ -328,6 +328,31 @@
     return { attributes: attrs, body };
   }
 
+  /* ===== Эпохи ===== */
+  const EPOCHS = [
+    { id:'e1', label:'Эпоха I', short:'I',  start:0,   end:197,  color:'var(--surface)' },
+    { id:'e2', label:'Эпоха II', short:'II', start:197, end:367,  color:'var(--ibut)'    },
+    { id:'e3', label:'Эпоха III',short:'III',start:367, end:9999, color:'var(--kainrax)' },
+  ];
+  function normEpoch(val){
+    const s = String(val||'').trim().toLowerCase();
+    if (!s) return '';
+    if (['e1','e2','e3'].includes(s)) return s;
+    if (/^(i|1|эпоха\s*i)\b/.test(s))   return 'e1';
+    if (/^(ii|2|эпоха\s*ii)\b/.test(s)) return 'e2';
+    if (/^(iii|3|эпоха\s*iii)\b/.test(s))return 'e3';
+    return '';
+  }
+  function getStoryEpoch(s){
+    const fm = normEpoch(s.epoch);
+    if (fm) return fm;
+    const tagHit = (s.tags||[]).map(t=>normEpoch(t)).find(Boolean);
+    return tagHit || '';
+  }
+  function epochMeta(id){ return EPOCHS.find(e=>e.id===id) || null; }
+
+  /* ===== Загрузка контента ===== */
+  let stories=[], notes=[], pergDocs=[];
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -347,10 +372,10 @@
       s.tags       = s.tags       || attributes.tags  || [];
       s.annotation = s.annotation || attributes.annotation || '';
       s.text       = body || '';
-    }catch(e){ /* молчим, текст подтянется потом или останется краткая карточка */ }
+      s.epoch      = s.epoch      || attributes.epoch || ''; // ← эпоха из фронтматтера
+    }catch(e){}
     return s;
   }
-
   async function loadMdIntoNote(n, isAdmin){
     if (!n) return n;
     let file = n.file;
@@ -372,7 +397,7 @@
     return n;
   }
 
-  // Markdown → очень скромный HTML для project.md
+  // Markdown → скромный HTML
   function mdToHtml(md) {
     let html = md
       .replace(/^### (.*)$/gim, '<h3>$1</h3>')
@@ -388,25 +413,16 @@
     return html;
   }
 
-  /* ===== Загрузка данных (с приоритетом статики и таймаутами) ===== */
-  let stories=[], notes=[], pergDocs=[];
   async function loadContent(){
-    // параллельно: статический индекс и функция; что успеет, то и рендерим
     const staticP = fetchJson('content/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
     const fnP     = fetchJson('/.netlify/functions/content-index',{timeoutMs:900, headers:{'Accept':'application/json'}}).catch(()=>null);
-
-    let j = await Promise.race([fnP, staticP]);
-    if(!j) j = await (staticP ?? fnP); // добираем второй вариант
-    if(!j) j = { stories:[], notes:[] };
-
+    let j = await Promise.race([fnP, staticP]); if(!j) j = await (staticP ?? fnP); if(!j) j = { stories:[], notes:[] };
     stories = Array.isArray(j.stories) ? j.stories : [];
     notes   = Array.isArray(j.notes)   ? j.notes   : [];
 
-    // пергамент — всегда статикой
     try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}); }
     catch{ pergDocs = []; }
 
-    // нормализация и сортировки
     const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''));
     stories.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
     notes.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
@@ -416,7 +432,6 @@
       return String(bl).localeCompare(String(al));
     });
 
-    // гарантируем file-пути
     stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
     notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
   }
@@ -449,7 +464,7 @@
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== Построение арок, карты и безопасные ссылки по ID ===== */
+  /* ===== Арки ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
@@ -467,47 +482,84 @@
     }
     return Object.values(map);
   }
-
   function findStoryByKey(key){
     if(!key) return null;
-    // приоритетный поиск по id, затем по slug
     let s = stories.find(x=> (x.id||'') === key);
     if(s) return s;
     const bySlug = stories.filter(x=> (x.slug||'') === key);
-    if(bySlug.length>1){
-      // коллизия slug — выберем самый свежий, чтобы не сводить с ума читателя
-      bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
-      return bySlug[0] || null;
-    }
+    if(bySlug.length>1){ bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id))); return bySlug[0] || null; }
     return bySlug[0] || null;
   }
 
   /* ===== Вьюхи ===== */
   function renderList(){
-    const q=state.q;
-    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
-    const arcs = buildArcs();
+    const q = state.q;
+    const all = stories;
+
+    let filtered = all.filter(s => !q
+      || s.title?.toLowerCase().includes(q)
+      || (s.text||'').toLowerCase().includes(q)
+      || (s.tags||[]).join(' ').toLowerCase().includes(q)
+    );
+
+    const chosenEra = state.era && normEpoch(state.era);
+    if (chosenEra) filtered = filtered.filter(s => getStoryEpoch(s) === chosenEra);
+
+    const eraCounts = EPOCHS.map(e => ({
+      ...e, count: all.filter(s => getStoryEpoch(s)===e.id).length
+    }));
+    const totalInEras = eraCounts.reduce((a,b)=>a+b.count,0);
+    function segWidth(count){
+      if(!totalInEras) return (100/EPOCHS.length)+'%';
+      const pct = Math.max(6, (count/totalInEras)*100);
+      return pct.toFixed(2)+'%';
+    }
+
+    const items = filtered;
+
     app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+
+          <!-- Таймлайн по эпохам -->
+          <div class="era-strip" role="navigation" aria-label="Фильтр по эпохе">
+            ${EPOCHS.map(e=>{
+              const active = (chosenEra===e.id) ? 'active' : '';
+              const cnt = eraCounts.find(x=>x.id===e.id)?.count||0;
+              return `
+                <button class="era-seg ${active}"
+                        style="--seg-color:${e.color}; width:${segWidth(cnt)}"
+                        data-era="${e.id}" title="${e.label} · ${cnt}">
+                  <span class="era-label">${e.short}</span>
+                  <span class="era-count">${cnt}</span>
+                </button>`;
+            }).join('')}
+            <button class="era-reset ${chosenEra?'':'active'}" title="Все эпохи">Все</button>
+          </div>
+
           <div class="list">
-            ${items.length?items.map(s=>`
+            ${items.length?items.map(s=>{
+              const eid = getStoryEpoch(s);
+              const em = epochMeta(eid);
+              const eraBadge = em ? `<span class="tag">Эпоха ${em.short}</span>` : '';
+              return `
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
                 <a href="#/read-id/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
-                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
-              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или функцию <code>content-index</code>.</div>'}
+                <div style="margin-top:6px">${eraBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
+              </div>`; }).join('')
+            :'<div class="muted" style="margin-top:10px">Пока нет данных. Или эпоха пуста.</div>'}
           </div>
         </section>
 
         <aside class="card">
           <h2>Ветки</h2>
           <div class="list">
-            ${arcs.map(a=>`
+            ${buildArcs().map(a=>`
               <div class="story-item" data-arc="${a.id}">
                 <a href="#/arc/${a.id}">
                   <div class="title">✶ ${a.title}</div>
@@ -522,8 +574,19 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
 
-    // подтягиваем мету первых 12 без перезагрузки
-    const need = items.filter(s=>!s.title || !s.date).slice(0,12);
+    // События на сегментах
+    document.querySelectorAll('.era-strip .era-seg').forEach(btn=>{
+      btn.onclick=()=>{
+        const id = btn.getAttribute('data-era');
+        state.era = id;
+        location.hash = '#/era/'+encodeURIComponent(id);
+      };
+    });
+    const resetBtn = document.querySelector('.era-strip .era-reset');
+    if (resetBtn) resetBtn.onclick = ()=>{ state.era=''; location.hash='#/'; };
+
+    // Ленивая догрузка меты — потом перерендер
+    const need = items.filter(s=>!s.title || !s.date || (getStoryEpoch(s)==='')).slice(0,12);
     if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
   }
 
@@ -573,13 +636,10 @@
             (${pos+1}/${order.length})
             · <span id="viewsBox" data-admin-only style="display:none">—</span>
           </div>
-          <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
-
-          ${getAnno(s) ? `
-            <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
-              <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
-              <div style="margin-top:8px">${getAnno(s)}</div>
-            </details>` : ''}
+          <div style="margin:6px 0 12px">
+            ${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}
+            ${(()=>{const em=epochMeta(getStoryEpoch(s)); return em?`<span class="tag">Эпоха ${em.short}</span>`:'';})()}
+          </div>
 
           ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
 
@@ -609,11 +669,7 @@
     ensureAdminUI();
   }
 
-  async function renderArticle(key){
-    const s = findStoryByKey(key);
-    if(!s){ location.hash='#/'; return; }
-    await renderArticleByObj(s);
-  }
+  async function renderArticle(key){ const s = findStoryByKey(key); if(!s){ location.hash='#/'; return; } await renderArticleByObj(s); }
 
   function renderTag(tag){
     const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
@@ -681,13 +737,12 @@
       updated = attributes.updated || '';
       body = mdBody || body;
     } catch(_) {}
-    // Вставляем твой текстовый блок именно сюда, не на главную
     const intro = `
       <div class="prose">
         <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
         <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
         <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
+        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной».</p>
         <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
         <div class="anno-box"><strong>Прямо сейчас пишется:</strong> роман и фолк-хоррор-повесть</div>
       </div>`;
@@ -702,7 +757,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент (как у тебя, не ломаем) ===== */
+  /* ===== Пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -871,7 +926,7 @@
     ensureAdminUI();
   }
 
-  /* ===== Комментарии / утилиты ===== */
+  /* ===== Комменты / утилиты ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -959,7 +1014,7 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Рендерер маршрутов (с поддержкой read-id/:id и read/:slug) ===== */
+  /* ===== Рендерер маршрутов ===== */
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -968,30 +1023,24 @@
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
 
-    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
-    if(mReadId){ await renderArticle(mReadId[1]); return; }
-
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
-    if(mRead){ await renderArticle(mRead[1]); return; }
-
+    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/); if(mReadId){ await renderArticle(mReadId[1]); return; }
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/); if(mRead){ await renderArticle(mRead[1]); return; }
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+
+    // Новое: эпохи
+    const mEra=r.match(/^\/era\/([^?]+)(?:\?.*)?$/); if(mEra){ state.era = decodeURIComponent(mEra[1]); renderList(); return; }
+
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     renderList();
   }
 
   /* ===== Инициализация ===== */
   (async function init(){
-    // быстрый «скелет» чтобы не было пустоты
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    try{
-      await loadContent();
-    }catch(_){}
-    applyTheme();
-    render();
-    ensureAdminUI();
-    resize();
+    try{ await loadContent(); }catch(_){}
+    applyTheme(); render(); ensureAdminUI(); resize();
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!prefersReduced) requestAnimationFrame(drawStars);
     initSkyLine();
   })();
