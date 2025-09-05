@@ -412,16 +412,29 @@
   }
 
   async function loadContent(){
-    const staticP = fetchJson('content/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
-    const fnP     = fetchJson('/.netlify/functions/content-index',{timeoutMs:900, headers:{'Accept':'application/json'}}).catch(()=>null);
-    let j = await Promise.race([fnP, staticP]); if(!j) j = await (staticP ?? fnP); if(!j) j = { stories:[], notes:[] };
+    // 1) Пытаемся через функцию
+    let j = await fetchJson('/.netlify/functions/content-index', {
+      timeoutMs: 1500, headers:{'Accept':'application/json'}
+    }).catch(()=>null);
+  
+    // 2) Фоллбек — статический индекс
+    if(!j){
+      j = await fetchJson('content/index.json', {
+        timeoutMs: 3000, headers:{'Accept':'application/json'}
+      }).catch(()=>null);
+    }
+  
+    if(!j) j = { stories:[], notes:[] };
+  
     stories = Array.isArray(j.stories) ? j.stories : [];
     notes   = Array.isArray(j.notes)   ? j.notes   : [];
-
-    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}); }
-    catch{ pergDocs = []; }
-
-    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''));
+  
+    // пергамент как раньше
+    try{
+      pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}});
+    }catch{ pergDocs = []; }
+  
+    const tie = (a,b)=> String((a.slug||a.id||'')).localeCompare(String(b.slug||b.id||''));
     stories.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
     notes.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
@@ -429,12 +442,15 @@
       const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
       return String(bl).localeCompare(String(al));
     });
-
+  
+    // пропишем file, если его нет
     stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
     notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
-
-    renderYearBar(); // построим верхнюю полосу после первой загрузки
+  
+    // построим верхнюю линейку с годами (если есть что строить)
+    renderYearBar();
   }
+
 
   /* ===== Тема ===== */
   function applyTheme(){
