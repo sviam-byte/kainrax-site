@@ -2,6 +2,7 @@
 title: "Дороговато"
 date: "2025-07-25"
 minutes: 9
+year: 430
 arc: "kainrax"
 tags:
   - "Кайнракс"
