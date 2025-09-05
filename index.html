@@ -185,6 +185,16 @@
   .y-active{ border-color:var(--accent); border-bottom-color:var(--accent2) }
   .y-count{ color:var(--muted); font-size:12px }
   .y-sep{ color:var(--muted); font-size:12px; padding:0 4px }
+    /* 1) Гарантируем, что декор под контентом */
+  .card { position: relative; z-index: 0; }
+  .card::after { z-index: 0; pointer-events: none; }
+  
+  /* 2) Поднимаем сам контент над вуалью */
+  .card > * { position: relative; z-index: 1; }
+  
+  /* 3) На всякий — отключаем клики у декоративной ленты в списке */
+  .story-item::before { pointer-events: none; }
+
   </style>
 </head>
 
