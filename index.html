@@ -7,7 +7,7 @@
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
 
-  <!-- Яндекс.Метрика -->
+  <!-- Я.Метрика -->
   <script>
     (function(m,e,t,r,i,k,a){
       m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -15,11 +15,13 @@
       for (var j=0;j<document.scripts.length;j++){ if(document.scripts[j].src===r){ return; } }
       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
     })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
+
     ym(103716449, 'init', { webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer' });
-    (function(){ // SPA-хиты
+
+    (function(){ // SPA hit
       var last = location.href;
       function hit(){ try{ ym(103716449,'hit', location.href, { referer:last, title:document.title }); last = location.href; }catch(e){} }
-      if (document.readyState!=='loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
+      if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
       addEventListener('hashchange', hit);
     })();
   </script>
@@ -36,7 +38,7 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
-  <!-- Favicon (динамический цвет) -->
+  <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
   <style>
@@ -65,7 +67,6 @@
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
-
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
@@ -132,20 +133,12 @@
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  #sky-line {
-    position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: 0.7; filter: blur(1px);
-    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%);
-  }
-  [data-theme="light"] #sky-line {
-    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 40%); opacity: 0.6;
-  }
-  [data-theme="cringe"] #sky-line {
-    height: 4px; background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
-    background-size: 200% 200%; animation: cringe-line-anim 3s linear infinite; filter: blur(2px); opacity: 0.8;
-  }
+  #sky-line { position:fixed; left:0; right:0; height:3px; z-index:0; pointer-events:none; opacity:.7; filter:blur(1px);
+    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 50%); }
+  [data-theme="cringe"] #sky-line { height:4px; background:linear-gradient(90deg,#ff00ff,#00ffff,#ffff00,#ff00ff); background-size:200% 200%; animation:cringe-line-anim 3s linear infinite; filter:blur(2px); opacity:.8 }
   @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
-  .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
+  .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow:var(--shadow)}
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
@@ -173,11 +166,11 @@
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
 
-  /* ===== Верхняя полоса с годами ===== */
+  /* Годы */
   .year-bar-wrap{position:sticky; top:56px; z-index:6; border-bottom:1px solid var(--line); background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.75)); backdrop-filter: blur(8px) saturate(1.05)}
   [data-theme="light"] .year-bar-wrap{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.8))}
   .year-bar{max-width:var(--max); margin:0 auto; padding:8px 12px; display:flex; gap:8px; align-items:center; overflow:auto; scrollbar-width:thin}
-  .y-label{color:var(--muted); font-size:12px; padding:0 4px}
+  .y-label{color:var(--muted); font-size:12px; padding-right:4px}
   .y-tab, .y-reset{
     position:relative; display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
     background:var(--card); color:var(--fg); border:1px solid var(--line); border-bottom-width:3px;
@@ -226,7 +219,7 @@
     </div>
   </header>
 
-  <!-- Стикер-бар с годами -->
+  <!-- Липкая полоса фильтра «Год» -->
   <div class="year-bar-wrap" id="yearBarWrap" style="display:none">
     <nav class="year-bar" id="yearBar" role="navigation" aria-label="Фильтр по годам"></nav>
   </div>
@@ -238,7 +231,6 @@
   /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
-
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
       const s=document.createElement('script'); s.defer=true;
@@ -250,8 +242,18 @@
 
   /* ===== Хелперы сети ===== */
   function timeout(ms){ return new Promise(res=> setTimeout(res, ms)); }
-  async function fetchJson(url, {timeoutMs=1500, headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
-  async function fetchText(url, {timeoutMs=4000, cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
+  async function fetchJson(url, {timeoutMs=1500, headers={}}={}){
+    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{ const r = await fetch(url, { signal: ctrl.signal, headers });
+      if(!r.ok) throw new Error('HTTP '+r.status); return await r.json();
+    }finally{ clearTimeout(t); }
+  }
+  async function fetchText(url, {timeoutMs=4000, cacheMode}={}){
+    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{ const r = await fetch(url, { signal: ctrl.signal, ...(cacheMode?{cache:cacheMode}:{}) });
+      if(!r.ok) throw new Error('HTTP '+r.status); return await r.text();
+    }finally{ clearTimeout(t); }
+  }
 
   /* ===== Счётчик просмотров ===== */
   window.hit = async function(slug, outEl){
@@ -281,7 +283,10 @@
     return null;
   }
   function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
-  function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
+  function fmtHumanDate(v){
+    const d=toDate(v);
+    return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : '';
+  }
   function fmtPergDayYear(s){
     if(typeof s!=='string') return String(s||'');
     const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s);
@@ -294,8 +299,6 @@
     if (!txt) return '';
     const cut = 180; return txt.length > cut ? txt.slice(0, cut) + '…' : txt;
   };
-  const annoHtml = (t) => t ? (' <span class="anno">'+t.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))+'</span>') : '';
-  const yearBadgeHtml = (y) => Number.isFinite(y) ? ('<span class="tag">Год '+y+'</span>') : '';
 
   // простейший парсер фронтматтера
   function parseFrontMatter(md){
@@ -312,11 +315,14 @@
     return { attributes: attrs, body };
   }
 
-  /* ===== ГОД РАССКАЗА ===== */
+  /* ===== Мировой год ===== */
   function parseYearLike(v){
     if(v==null) return null;
     if(typeof v==='number' && isFinite(v)) return Math.trunc(v);
-    if(typeof v==='string'){ const m=v.match(/-?\d+/); if(m) return Math.trunc(+m[0]); }
+    if(typeof v==='string'){
+      const m = v.match(/-?\d+/);
+      if(m) return Math.trunc(+m[0]);
+    }
     return null;
   }
   function getStoryYear(s){
@@ -328,15 +334,11 @@
     return null;
   }
 
-  /* ===== Загрузка контента ===== */
+  /* ===== Загрузка контента (надёжная) ===== */
   let stories=[], notes=[], pergDocs=[];
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
-    let file = s.file;
-    if(!file){
-      const name=(s.slug||s.id||'').trim();
-      if(name) file = `content/stories/${name}.md`;
-    }
+    let file = s.file || ((s.slug||s.id)?`content/stories/${(s.slug||s.id).trim()}.md`:null);
     if(!file || s.text) return s;
     try{
       const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
@@ -356,11 +358,7 @@
   }
   async function loadMdIntoNote(n, isAdmin){
     if (!n) return n;
-    let file = n.file;
-    if(!file){
-      const name=(n.slug||n.id||'').trim();
-      if(name) file = `content/notes/${name}.md`;
-    }
+    let file = n.file || ((n.slug||n.id)?`content/notes/${(n.slug||n.id).trim()}.md`:null);
     if(!file || n.text) return n;
     try{
       const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
@@ -375,14 +373,14 @@
     return n;
   }
 
-  // Markdown → компактный HTML для project.md
+  // Markdown → скромный HTML (без флага s; используем [\\s\\S])
   function mdToHtml(md) {
     let html = md
       .replace(/^### (.*)$/gim, '<h3>$1</h3>')
       .replace(/^## (.*)$/gim,  '<h2>$1</h2>')
       .replace(/^# (.*)$/gim,   '<h1>$1</h1>')
       .replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)(?!\s*<li>)/gims, '<ul>$1</ul>')
+      .replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/gim, '<ul>$1</ul>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
@@ -392,17 +390,31 @@
   }
 
   async function loadContent(){
-    // 1) Функция
-    let j = await fetchJson('/.netlify/functions/content-index', { timeoutMs: 1500, headers:{'Accept':'application/json'} }).catch(()=>null);
-    // 2) Фоллбек — статический индекс
-    if(!j){ j = await fetchJson('content/index.json', { timeoutMs: 3000, headers:{'Accept':'application/json'} }).catch(()=>null); }
-    if(!j) j = { stories:[], notes:[] };
+    const tryUrls = [
+      '/.netlify/functions/content-index', // основной путь
+      '/api/content-index',                // твой алиас из netlify.toml
+      '/content/index.json'                // статический fallback
+    ];
+    let j = null;
+    for (const u of tryUrls) {
+      j = await fetchJson(u, { timeoutMs: 2000, headers:{'Accept':'application/json'} }).catch(()=>null);
+      if (j && (Array.isArray(j.stories) || Array.isArray(j.notes))) break;
+    }
+    if (!j) {
+      stories = []; notes = []; pergDocs = [];
+      app.innerHTML = `<section class="card">
+        <h1>Рассказы</h1>
+        <div class="anno-box">Не удалось получить индекс: /.netlify/functions/content-index, /api/content-index и /content/index.json недоступны.</div>
+      </section>`;
+      return;
+    }
 
     stories = Array.isArray(j.stories) ? j.stories : [];
     notes   = Array.isArray(j.notes)   ? j.notes   : [];
 
-    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}); }
-    catch{ pergDocs = []; }
+    try{
+      pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}});
+    }catch{ pergDocs = []; }
 
     const tie = (a,b)=> String((a.slug||a.id||'')).localeCompare(String(b.slug||b.id||''));
     stories.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
@@ -478,7 +490,7 @@
     return bySlug[0] || null;
   }
 
-  /* ===== Верхняя полоса с годами ===== */
+  /* ===== Полоса «Год» ===== */
   function renderYearBar(){
     const wrap = document.getElementById('yearBarWrap');
     const bar  = document.getElementById('yearBar');
@@ -491,25 +503,22 @@
     for(const s of stories){ const y=getStoryYear(s); if(y!=null){ counts.set(y,(counts.get(y)||0)+1); } }
 
     const chosen = Number.isFinite(state.year) ? state.year : null;
-    const parts = [];
-    parts.push('<span class="y-label">Год:</span>');
-    parts.push('<button class="y-reset '+(chosen==null?'y-active':'')+'" title="Все годы">Все</button>');
-    for(const y of years){
-      parts.push('<span class="y-sep">·</span>');
-      parts.push(
-        '<button class="y-tab '+(chosen===y?'y-active':'')+'" data-year="'+y+'" title="Год '+y+'">'+
-        '<span>'+y+'</span><span class="y-count">'+(counts.get(y)||0)+'</span>'+
-        '</button>'
-      );
-    }
-    bar.innerHTML = parts.join('');
+    const html = [
+      `<span class="y-label">Год:</span>`,
+      `<button class="y-reset ${chosen==null?'y-active':''}" title="Все годы">Все</button>`,
+      ...years.map(y => `
+        <button class="y-tab ${chosen===y?'y-active':''}" data-year="${y}" title="Год ${y}">
+          <span>${y}</span><span class="y-count">${counts.get(y)||0}</span>
+        </button>`),
+    ].join('<span class="y-sep">·</span>');
+
+    bar.innerHTML = html;
     wrap.style.display='block';
 
     bar.querySelectorAll('.y-tab').forEach(btn=>{
       btn.onclick = ()=>{
         const y=Number(btn.getAttribute('data-year'));
-        state.year = y;
-        location.hash = '#/year/'+encodeURIComponent(String(y));
+        state.year = y; location.hash = '#/year/'+encodeURIComponent(String(y));
       };
     });
     const reset = bar.querySelector('.y-reset');
@@ -519,18 +528,13 @@
   /* ===== Вьюхи ===== */
   function renderList(){
     const q = state.q;
-    const all = stories;
-
-    let filtered = all.filter(s => !q
+    let items = stories.filter(s => !q
       || s.title?.toLowerCase().includes(q)
       || (s.text||'').toLowerCase().includes(q)
       || (s.tags||[]).join(' ').toLowerCase().includes(q)
     );
-
     const chosenYear = Number.isFinite(state.year) ? state.year : null;
-    if (chosenYear != null) filtered = filtered.filter(s => getStoryYear(s) === chosenYear);
-
-    const items = filtered;
+    if (chosenYear != null) items = items.filter(s => getStoryYear(s) === chosenYear);
 
     app.innerHTML=`
       <div class="grid">
@@ -539,40 +543,32 @@
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
 
           <div class="list" style="margin-top:8px">
-            ${
-              items.length
-              ? items.map(s=>{
-                  const y=getStoryYear(s);
-                  const anno=getAnno(s);
-                  const mins = s.minutes||Math.max(5,Math.round((s.text||'').length/1100));
-                  const vetka=(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title;
-                  return (
-                    '<div class="story-item" data-arc="'+(s.arc||'kainrax')+'">'+
-                      '<a href="#/read-id/'+s.id+'">'+
-                        '<div class="title">✶ '+(s.title||'Без названия')+'</div>'+
-                        '<div class="muted">'+fmtHumanDate(s.date)+' · '+mins+' мин чтения · ветка: '+vetka+'</div>'+
-                      '</a>'+
-                      '<div style="margin-top:6px">'+yearBadgeHtml(y)+annoHtml(anno)+'</div>'+
-                    '</div>'
-                  );
-                }).join('')
-              : '<div class="muted" style="margin-top:10px">По выбранному году ничего не найдено.</div>'
-            }
+            ${items.length?items.map(s=>{
+              const y = getStoryYear(s);
+              const yearBadge = Number.isFinite(y) ? `<span class="tag">Год ${y}</span>` : '';
+              return `
+              <div class="story-item" data-arc="${s.arc||'kainrax'}">
+                <a href="#/read-id/${s.id}">
+                  <div class="title">✶ ${s.title||'Без названия'}</div>
+                  <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+                </a>
+                <div style="margin-top:6px">${yearBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
+              </div>`; }).join('')
+            :'<div class="muted" style="margin-top:10px">По выбранному году ничего не найдено.</div>'}
           </div>
         </section>
 
         <aside class="card">
           <h2>Ветки</h2>
           <div class="list">
-            ${buildArcs().map(a=>
-              '<div class="story-item" data-arc="'+a.id+'">'+
-                '<a href="#/arc/'+a.id+'">'+
-                  '<div class="title">✶ '+a.title+'</div>'+
-                  '<div class="muted">'+a.items.length+' текст(а)</div>'+
-                  '<div>'+(a.desc||'')+'</div>'+
-                '</a>'+
-              '</div>'
-            ).join('')}
+            ${buildArcs().map(a=>`
+              <div class="story-item" data-arc="${a.id}">
+                <a href="#/arc/${a.id}">
+                  <div class="title">✶ ${a.title}</div>
+                  <div class="muted">${a.items.length} текст(а)</div>
+                  <div>${a.desc||''}</div>
+                </a>
+              </div>`).join('')}
           </div>
           <h3 style="margin-top:14px">Подписка</h3>
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
@@ -580,18 +576,18 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
 
-    // ленивая догрузка недостающих полей (в т.ч. год)
+    // ленивая догрузка недостающих полей (включая год)
     const need = items.filter(s=>!s.title || !s.date || getStoryYear(s)==null).slice(0,12);
     if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderYearBar(); renderList(); }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
-    <div class="list">${arcs.map(a=>
-      '<div class="story-item" data-arc="'+a.id+'"><a href="#/arc/'+a.id+'">'+
-        '<div class="title">✶ '+a.title+'</div>'+
-        '<div class="muted">'+a.items.length+' текст(а)</div>'+
-        '<div>'+(a.desc||'')+'</div>'+
-      '</a></div>').join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+    <div class="list">${arcs.map(a=>`
+      <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
+        <div class="title">✶ ${a.title}</div>
+        <div class="muted">${a.items.length} текст(а)</div>
+        <div>${a.desc||''}</div>
+      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
 
   function renderArc(id){
     const arcs=buildArcs();
@@ -599,14 +595,14 @@
     app.innerHTML=`<section class="card">
       <a class="back" href="#/arcs">← Ко всем веткам</a>
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
-      <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>
-        '<li class="story-item" data-arc="'+(s.arc||'kainrax')+'">'+
-          '<a href="#/read-id/'+s.id+'">'+
-            '<div class="title">✶ '+(i+1)+'. '+s.title+'</div>'+
-            '<div class="muted">'+fmtHumanDate(s.date)+' · '+(s.minutes||Math.max(5,Math.round((s.text||'').length/1100)))+' мин</div>'+
-          '</a>'+
-          (getAnno(s)?'<div class="anno">'+getAnno(s)+'</div>':'')+
-        '</li>').join('')}
+      <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
+        <li class="story-item" data-arc="${s.arc||'kainrax'}">
+          <a href="#/read-id/${s.id}">
+            <div class="title">✶ ${i+1}. ${s.title}</div>
+            <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
+          </a>
+          ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+        </li>`).join('')}
       </ol></section>`;
     adminDockHide(); ensureAdminUI();
   }
@@ -634,7 +630,7 @@
           </div>
           <div style="margin:6px 0 12px">
             ${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}
-            ${yearBadgeHtml(y)}
+            ${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}
           </div>
 
           ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
@@ -664,7 +660,6 @@
     adminDockFor('story', s.slug||s.id);
     ensureAdminUI();
   }
-
   async function renderArticle(key){ const s = findStoryByKey(key); if(!s){ location.hash='#/'; return; } await renderArticleByObj(s); }
 
   function renderTag(tag){
@@ -672,43 +667,13 @@
     app.innerHTML=`<section class="card">
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
-      <div class="list">${
-        items.map(s=>{
-          const y=getStoryYear(s);
-          return (
-          '<div class="story-item" data-arc="'+(s.arc||'kainrax')+'"><a href="#/read-id/'+s.id+'">'+
-            '<div class="title">✶ '+s.title+'</div>'+
-            '<div class="muted">'+fmtHumanDate(s.date)+' · '+(s.minutes||Math.max(5,Math.round((s.text||'').length/1100)))+' мин · ветка: '+(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title+'</div>'+
-          '</a>'+yearBadgeHtml(y)+annoHtml(getAnno(s))+'</div>'
-          );
-        }).join('')}
-      </div></section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-
-  /* ===== Заметки ===== */
-  function renderNotes(){
-    const items = notes || [];
-    app.innerHTML = `
-      <section class="card">
-        <a class="back" href="#/">← На главную</a>
-        <h1>Заметки</h1>
-        <div class="list">
-          ${
-            items.length
-              ? items.map(n =>
-                '<div class="story-item" data-arc="'+(n.arc||'kainrax')+'">'+
-                  '<a href="#/note/'+n.id+'">'+
-                    '<div class="title">✶ '+(n.title || 'Без названия')+'</div>'+
-                    '<div class="muted">'+fmtHumanDate(n.date)+' · '+(n.tags||[]).join(', ')+'</div>'+
-                  '</a>'+
-                  (getAnno(n)?'<div class="anno">'+getAnno(n)+'</div>':'')+
-                '</div>'
-              ).join('')
-              : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>'
-          }
-        </div>
-      </section>`;
+      <div class="list">${items.map(s=>{
+        const y=getStoryYear(s);
+        return `
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
+          <div class="title">✶ ${s.title}</div>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+        </a>${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}${getAnno(s)?` <div class="anno">${getAnno(s)}</div>`:''}</div>`}).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
 
@@ -744,7 +709,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент ===== */
+  /* ===== Пергамент (без изменений по логике) ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -1001,7 +966,7 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Рендерер маршрутов (есть /year/:y) ===== */
+  /* ===== Рендерер маршрутов ===== */
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -1009,9 +974,6 @@
     if(r==='/notes'){ renderNotes(); return; }
     if(r==='/project'){ renderProject(); return; }
     if(r==='/perg'){ renderPergList(); return; }
-
-    const mYear=r.match(/^\/year\/([^?]+)(?:\?.*)?$/);
-    if(mYear){ const y=parseInt(decodeURIComponent(mYear[1]),10); state.year = Number.isFinite(y)?y:null; renderList(); return; }
 
     const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
     if(mReadId){ await renderArticle(mReadId[1]); return; }
@@ -1029,14 +991,14 @@
   /* ===== Инициализация ===== */
   (async function init(){
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    try{ await loadContent(); }catch(_){}
-    applyTheme();
-    render();
-    ensureAdminUI();
-    resize();
-    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if(!prefersReduced) requestAnimationFrame(drawStars);
-    initSkyLine();
+    applyTheme(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); initSkyLine();
+
+    // если сеть тупит — всё равно покажем UI через 1.5с
+    let renderedEarly = false;
+    const failSafe = setTimeout(()=>{ renderedEarly = true; render(); }, 1500);
+
+    try { await loadContent(); }
+    finally { clearTimeout(failSafe); if (!renderedEarly) render(); }
   })();
   </script>
 </body>
