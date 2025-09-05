@@ -7,7 +7,9 @@ const matter = require("gray-matter");
 async function listMd(dir) {
   try {
     const files = await fs.readdir(dir, { withFileTypes: true });
-    return files.filter(f => f.isFile() && f.name.toLowerCase().endsWith(".md")).map(f => f.name);
+    return files
+      .filter(f => f.isFile() && f.name.toLowerCase().endsWith(".md"))
+      .map(f => f.name);
   } catch {
     return [];
   }
@@ -18,19 +20,39 @@ function toMinutes(text) {
   return Math.max(5, Math.round(len / 1100));
 }
 
+// аккуратно вытащим «внутримировой год» из фронтматтера
+function pickWorldYear(data) {
+  let w =
+    data.worldYear ??
+    data.world_year ??
+    data.year ??
+    data.y ??
+    data.wy ??
+    null;
+  if (typeof w === "string") {
+    // допускаем мусор вроде "362 ОВ" — вынем цифры/минус
+    const m = w.match(/-?\d+/);
+    w = m ? Number(m[0]) : NaN;
+  }
+  return Number.isFinite(w) ? Number(w) : null;
+}
+
 function mdToItem(kind, file, parsed) {
   const base = file.replace(/\.md$/i, "");
   const text = parsed.content || "";
+  const worldYear = pickWorldYear(parsed.data);
+
   return {
     id: base,                                     // стабильный id = имя файла
     slug: parsed.data.slug || base,               // человекочитаемый slug (если задан)
     title: (parsed.data.title || base).toString().trim(),
-    date: String(parsed.data.date || ""),
+    date: String(parsed.data.date || ""),         // дата публикации (оставляем на месте — вдруг нужна)
     minutes: parsed.data.minutes || toMinutes(text),
     arc: parsed.data.arc || "kainrax",
     tags: parsed.data.tags || [],
     annotation: parsed.data.annotation || parsed.data.anno || "",
-    text,                                         // ВАЖНО: отдаем тело сразу
+    worldYear,                                    // ← НОВОЕ: год события
+    text,                                         // отдаём тело сразу
     file: `content/${kind}/${file}`               // прямой путь для подстраховки
   };
 }
@@ -68,8 +90,14 @@ exports.handler = async () => {
       });
     }
 
-    // новые сверху
-    stories.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    // новые сверху по ВНУТРИМИРОВОЙ хронологии (приоритет гг. мира)
+    stories.sort((a, b) => {
+      const ay = a.worldYear ?? -Infinity;
+      const by = b.worldYear ?? -Infinity;
+      if (by !== ay) return by - ay; // свежие годы мира сверху
+      return new Date(b.date || 0) - new Date(a.date || 0); // запасной ключ — дата публикации
+    });
+
     notes.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
     return {
@@ -81,7 +109,7 @@ exports.handler = async () => {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "internal", reason: String(e && e.message || e) })
+      body: JSON.stringify({ error: "internal", reason: String((e && e.message) || e) })
     };
   }
 };
