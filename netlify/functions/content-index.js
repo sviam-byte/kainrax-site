@@ -3,13 +3,13 @@ const fs = require("fs/promises");
 const path = require("path");
 const matter = require("gray-matter");
 
-// безопасный листинг .md
+// ── утилиты ─────────────────────────────────────────────────────
 async function listMd(dir) {
   try {
     const files = await fs.readdir(dir, { withFileTypes: true });
     return files
-      .filter(f => f.isFile() && f.name.toLowerCase().endsWith(".md"))
-      .map(f => f.name);
+      .filter((f) => f.isFile() && f.name.toLowerCase().endsWith(".md"))
+      .map((f) => f.name);
   } catch {
     return [];
   }
@@ -29,12 +29,13 @@ function pickWorldYear(data) {
     data.y ??
     data.wy ??
     null;
+
   if (typeof w === "string") {
     // допускаем мусор вроде "362 ОВ" — вынем цифры/минус
     const m = w.match(/-?\d+/);
     w = m ? Number(m[0]) : NaN;
   }
-  return Number.isFinite(w) ? Number(w) : null;
+  return Number.isFinite(w) ? Math.trunc(w) : null;
 }
 
 function mdToItem(kind, file, parsed) {
@@ -46,70 +47,108 @@ function mdToItem(kind, file, parsed) {
     id: base,                                     // стабильный id = имя файла
     slug: parsed.data.slug || base,               // человекочитаемый slug (если задан)
     title: (parsed.data.title || base).toString().trim(),
-    date: String(parsed.data.date || ""),         // дата публикации (оставляем на месте — вдруг нужна)
+    date: String(parsed.data.date || ""),         // дата публикации
     minutes: parsed.data.minutes || toMinutes(text),
     arc: parsed.data.arc || "kainrax",
     tags: parsed.data.tags || [],
     annotation: parsed.data.annotation || parsed.data.anno || "",
-    worldYear,                                    // ← НОВОЕ: год события
-    text,                                         // отдаём тело сразу
+    worldYear,                                    // ← год события
+    text,                                         // тело нужно для локального поиска
     file: `content/${kind}/${file}`               // прямой путь для подстраховки
   };
 }
 
+// ── основная функция ────────────────────────────────────────────
 exports.handler = async () => {
   try {
     const root = path.join(process.cwd(), "content");
     const storiesDir = path.join(root, "stories");
     const notesDir   = path.join(root, "notes");
 
-    const storyFiles = await listMd(storiesDir);
-    const noteFiles  = await listMd(notesDir);
+    const [storyFiles, noteFiles] = await Promise.all([
+      listMd(storiesDir),
+      listMd(notesDir)
+    ]);
 
-    const stories = [];
-    for (const f of storyFiles) {
-      const raw = await fs.readFile(path.join(storiesDir, f), "utf8");
-      const parsed = matter(raw);
-      stories.push(mdToItem("stories", f, parsed));
-    }
+    // читаем параллельно; битые файлы тихо пропускаем
+    const stories = (
+      await Promise.all(
+        storyFiles.map(async (f) => {
+          try {
+            const raw = await fs.readFile(path.join(storiesDir, f), "utf8");
+            const parsed = matter(raw);
+            return mdToItem("stories", f, parsed);
+          } catch {
+            return null;
+          }
+        })
+      )
+    ).filter(Boolean);
 
-    const notes = [];
-    for (const f of noteFiles) {
-      const raw = await fs.readFile(path.join(notesDir, f), "utf8");
-      const parsed = matter(raw);
-      const base = f.replace(/\.md$/i, "");
-      notes.push({
-        id: base,
-        slug: parsed.data.slug || base,
-        title: (parsed.data.title || base).toString().trim(),
-        date: String(parsed.data.date || ""),
-        tags: parsed.data.tags || [],
-        annotation: parsed.data.annotation || parsed.data.anno || "",
-        text: parsed.content || "",
-        file: `content/notes/${f}`
-      });
-    }
+    const notes = (
+      await Promise.all(
+        noteFiles.map(async (f) => {
+          try {
+            const raw = await fs.readFile(path.join(notesDir, f), "utf8");
+            const parsed = matter(raw);
+            const base = f.replace(/\.md$/i, "");
+            return {
+              id: base,
+              slug: parsed.data.slug || base,
+              title: (parsed.data.title || base).toString().trim(),
+              date: String(parsed.data.date || ""),
+              tags: parsed.data.tags || [],
+              annotation: parsed.data.annotation || parsed.data.anno || "",
+              text: parsed.content || "",
+              file: `content/notes/${f}`
+            };
+          } catch {
+            return null;
+          }
+        })
+      )
+    ).filter(Boolean);
 
-    // новые сверху по ВНУТРИМИРОВОЙ хронологии (приоритет гг. мира)
+    // стабильная сортировка:
+    // 1) год мира (desc), 2) дата публикации (desc), 3) slug (asc)
     stories.sort((a, b) => {
       const ay = a.worldYear ?? -Infinity;
       const by = b.worldYear ?? -Infinity;
-      if (by !== ay) return by - ay; // свежие годы мира сверху
-      return new Date(b.date || 0) - new Date(a.date || 0); // запасной ключ — дата публикации
+      if (by !== ay) return by - ay;
+
+      const ad = new Date(a.date || 0).getTime();
+      const bd = new Date(b.date || 0).getTime();
+      if (bd !== ad) return bd - ad;
+
+      const as = (a.slug || a.id || "").toString();
+      const bs = (b.slug || b.id || "").toString();
+      return as.localeCompare(bs, "ru");
     });
 
-    notes.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    notes.sort((a, b) => {
+      const ad = new Date(a.date || 0).getTime();
+      const bd = new Date(b.date || 0).getTime();
+      if (bd !== ad) return bd - ad;
+      return (a.slug || a.id || "").localeCompare(b.slug || b.id || "", "ru");
+    });
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        // чтобы браузер и edge-функции не держали кэш после деплоя
+        "Cache-Control": "no-store"
+      },
       body: JSON.stringify({ stories, notes })
     };
   } catch (e) {
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "internal", reason: String((e && e.message) || e) })
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        error: "internal",
+        reason: String((e && e.message) || e)
+      })
     };
   }
 };
