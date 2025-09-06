@@ -6,8 +6,7 @@
   <title>Кайнракс — рассказы</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
-
-  <!-- Я.Метрика -->
+  <!-- В <head> -->
   <script>
     (function(m,e,t,r,i,k,a){
       m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -15,16 +14,21 @@
       for (var j=0;j<document.scripts.length;j++){ if(document.scripts[j].src===r){ return; } }
       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
     })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
-
-    ym(103716449, 'init', { webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer' });
-
-    (function(){ // SPA hit
+  
+    ym(103716449, 'init', {
+      webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer'
+    });
+  
+    // SPA-хит: первый и на каждую смену хеша
+    (function(){
       var last = location.href;
       function hit(){ try{ ym(103716449,'hit', location.href, { referer:last, title:document.title }); last = location.href; }catch(e){} }
       if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
       addEventListener('hashchange', hit);
     })();
   </script>
+
+
 
   <!-- OG/Twitter -->
   <meta property="og:type" content="website">
@@ -67,11 +71,10 @@
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
+
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
-
-  /* Карточки и вуаль */
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
   .card::after{
     content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.35;
@@ -80,11 +83,7 @@
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><path d='M80 6 L87 27 L109 31 L87 35 L80 56 L73 35 L51 31 L73 27 Z' fill='rgba(125,211,252,0.06)'/></svg>"),
       url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><defs><pattern id='hex' width='16' height='14' patternUnits='userSpaceOnUse' patternTransform='skewX(-12)'><path d='M4 0 L12 0 L16 7 L12 14 L4 14 L0 7 Z' fill='none' stroke='rgba(125,211,252,0.05)'/></pattern></defs><rect width='100%' height='100%' fill='url(%23hex)'/></svg>\");
     background-repeat:no-repeat, repeat, repeat; background-size:auto, 160px 160px, auto;
-    z-index:0;
   }
-  .card > *{position:relative; z-index:1}
-  /* На главной вуаль убрана, чтобы гарантировать клики */
-  .grid > .card::after{ display:none; }
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
@@ -100,7 +99,7 @@
 
   .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-  main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:5}
+  main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
 
@@ -111,7 +110,6 @@
   .story-item::before{
     content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
     background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);
-    pointer-events:none;
   }
   .story-item[data-arc="surface"]::before{ background:linear-gradient(12deg, var(--surface), transparent 60%) }
   .story-item[data-arc="kainrax"]::before{ background:linear-gradient(12deg, var(--kainrax), transparent 60%) }
@@ -122,7 +120,7 @@
   [data-theme="light"] .tag:before{content:"#"}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
-  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:8}
+  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
 
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
   .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
@@ -130,29 +128,43 @@
   [data-theme="cringe"] .anno-box{background:rgba(255,62,165,.08)}
   details.anno-dtl summary{cursor:pointer;user-select:none}
 
-  /* Декор: в отдельном слое ниже интерактива */
-  #decor{position:fixed; inset:0; z-index:0; pointer-events:none}
-  #stars{position:absolute; inset:0}
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
   #ceiling,#mountains{display:none}
   [data-theme="cringe"] #ceiling,[data-theme="cringe"] #mountains{display:block}
-  #ceiling{position:absolute;left:0;right:0;top:0;height:18vh;opacity:.95}
+  #ceiling{position:fixed;left:0;right:0;top:0;height:18vh;z-index:0;pointer-events:none;opacity:.95}
   #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)}
   #ceiling path{fill:var(--mountain)}
-  #mountains{position:absolute;left:0;right:0;bottom:0;height:28vh;opacity:.92}
+  #mountains{position:fixed;left:0;right:0;bottom:0;height:28vh;z-index:0;pointer-events:none;opacity:.92}
   #mountains svg{width:100%;height:100%;display:block}
   #mountains path{fill:var(--mountain)}
 
-  #sky-line { position:absolute; left:0; right:0; height:3px; opacity:.7; filter:blur(1px);
-    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 50%); }
-  [data-theme="cringe"] #sky-line { height:4px; background:linear-gradient(90deg,#ff00ff,#00ffff,#ffff00,#ff00ff); background-size:200% 200%; animation:cringe-line-anim 3s linear infinite; filter:blur(2px); opacity:.8 }
+  #sky-line {
+    position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: 0.7; filter: blur(1px);
+    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%);
+  }
+  [data-theme="light"] #sky-line {
+    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 40%); opacity: 0.6;
+  }
+  [data-theme="cringe"] #sky-line {
+    height: 4px; background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+    background-size: 200% 200%; animation: cringe-line-anim 3s linear infinite; filter: blur(2px); opacity: 0.8;
+  }
   @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
-  .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow:var(--shadow)}
+  .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  .parchment{ position:relative; background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3); color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply; }
-  .parchment::before{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>"); }
+  .parchment{
+    position:relative;
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
+    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    background-blend-mode:multiply;
+  }
+  .parchment::before{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>");
+  }
   [data-theme="light"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,250,240,.6), transparent 60%), linear-gradient(#fffaf1, #f5ecda)}
   [data-theme="cringe"] .parchment{background: radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,.85), transparent 60%), linear-gradient(#ffffff, #faf7ef)}
   .scroll-body p{ text-indent:1.2em; margin:0 0 1em }
@@ -165,6 +177,8 @@
 
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:20}
   .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);max-width:440px;width:92%}
+  .seal{display:inline-block;min-width:64px;min-height:64px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff6b6b,#c81e1e);box-shadow:0 8px 24px rgba(0,0,0,.3);transform-origin:center;animation:seal 1.4s ease-in-out infinite}
+  @keyframes seal{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.06)}}
 
   #adminDock{position:fixed;right:14px;bottom:14px;z-index:7;display:none}
   #adminBtns{display:none}
@@ -172,39 +186,19 @@
   .edbar{position:relative;margin:8px 0 6px;height:4px;background:linear-gradient(90deg, rgba(0,0,0,.15), rgba(255,255,255,.12));border-radius:999px;overflow:hidden}
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
-
-  .year-bar-wrap{position:sticky; top:56px; z-index:6; border-bottom:1px solid var(--line); background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.75)); backdrop-filter: blur(8px) saturate(1.05)}
-  [data-theme="light"] .year-bar-wrap{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.8))}
-  .year-bar{max-width:var(--max); margin:0 auto; padding:8px 12px; display:flex; gap:8px; align-items:center; overflow:auto; scrollbar-width:thin}
-  .y-label{color:var(--muted); font-size:12px; padding-right:4px}
-  .y-tab, .y-reset{
-    position:relative; display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
-    background:var(--card); color:var(--fg); border:1px solid var(--line); border-bottom-width:3px;
-    border-radius:10px 10px 6px 6px; cursor:pointer; white-space:nowrap; box-shadow:var(--shadow);
-    transition:transform .08s ease, border-color .15s ease;
-  }
-  .y-tab::after{
-    content:""; position:absolute; left:10px; top:-6px; width:12px; height:6px;
-    background:var(--card); border:1px solid var(--line); border-bottom:0; border-radius:6px 6px 0 0;
-  }
-  .y-tab:hover, .y-reset:hover{ transform:translateY(-1px) }
-  .y-active{ border-color:var(--accent); border-bottom-color:var(--accent2) }
-  .y-count{ color:var(--muted); font-size:12px }
-  .y-sep{ color:var(--muted); font-size:12px; padding:0 4px }
   </style>
 </head>
 
 <body>
-  <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
-
-  <!-- Декор ниже интерактива -->
-  <div id="decor" aria-hidden="true">
-    <div id="sky-line"></div>
-    <canvas id="stars"></canvas>
-    <div id="ceiling"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
-    <div id="mountains"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
-  </div>
-
+    
+  <!-- В самом начале <body> -->
+  <noscript>
+    <div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div>
+  </noscript>
+  <div id="sky-line" aria-hidden="true"></div>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
   <header>
@@ -230,35 +224,14 @@
     </div>
   </header>
 
-  <!-- Липкая полоса фильтра «Год» -->
-  <div class="year-bar-wrap" id="yearBarWrap" style="display:none">
-    <nav class="year-bar" id="yearBar" role="navigation" aria-label="Фильтр по годам"></nav>
-  </div>
-
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== Safe storage (устойчиво к Safari private) ===== */
-  const storage = (() => {
-    try {
-      const k='__kx__test';
-      window.localStorage.setItem(k,'1');
-      window.localStorage.removeItem(k);
-      return window.localStorage;
-    } catch (_) {
-      const mem = Object.create(null);
-      return {
-        getItem: (k) => (k in mem ? mem[k] : null),
-        setItem: (k, v) => { mem[k] = String(v); },
-        removeItem: (k) => { delete mem[k]; }
-      };
-    }
-  })();
-
   /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
+
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
       const s=document.createElement('script'); s.defer=true;
@@ -268,34 +241,46 @@
     }
   })();
 
-  /* ===== Хелперы сети ===== */
+  /* ===== Хелперы сети с таймаутами (чтобы главная не висла) ===== */
   function timeout(ms){ return new Promise(res=> setTimeout(res, ms)); }
+
   async function fetchJson(url, {timeoutMs=1500, headers={}}={}){
-    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeoutMs);
-    try{ const r = await fetch(url, { signal: ctrl.signal, headers });
-      if(!r.ok) throw new Error('HTTP '+r.status); return await r.json();
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+      const r = await fetch(url, { signal: ctrl.signal, headers });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return await r.json();
     }finally{ clearTimeout(t); }
   }
   async function fetchText(url, {timeoutMs=4000, cacheMode}={}){
-    const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeoutMs);
-    try{ const r = await fetch(url, { signal: ctrl.signal, ...(cacheMode?{cache:cacheMode}:{}) });
-      if(!r.ok) throw new Error('HTTP '+r.status); return await r.text();
+    const ctrl = new AbortController();
+    const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+      const r = await fetch(url, { signal: ctrl.signal, ...(cacheMode?{cache:cacheMode}:{}) });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return await r.text();
     }finally{ clearTimeout(t); }
   }
 
-  /* ===== Счётчик просмотров ===== */
+  /* ===== Счётчик просмотров (мягкая деградация) ===== */
   window.hit = async function(slug, outEl){
     try{
       const r=await fetch('/.netlify/functions/hit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
-      const j=await r.json(); if(outEl) outEl.textContent = j?.count ?? '—'; return Number(j?.count ?? 0);
-    }catch(e){ if(outEl) outEl.textContent='—'; return 0; }
+      const j=await r.json();
+      if(outEl) outEl.textContent = j?.count ?? '—';
+      return Number(j?.count ?? 0);
+    }catch(e){
+      if(outEl) outEl.textContent='—';
+      return 0;
+    }
   };
 
   /* ===== Состояние ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
-  const state={ theme: storage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year:null };
+  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
 
   /* ===== Утилиты ===== */
   function toDate(val){
@@ -343,30 +328,13 @@
     return { attributes: attrs, body };
   }
 
-  /* ===== Мировой год ===== */
-  function parseYearLike(v){
-    if(v==null) return null;
-    if(typeof v==='number' && isFinite(v)) return Math.trunc(v);
-    if(typeof v==='string'){
-      const m = v.match(/-?\d+/);
-      if(m) return Math.trunc(+m[0]);
-    }
-    return null;
-  }
-  function getStoryYear(s){
-    if (s.worldYear!=null && isFinite(s.worldYear)) return Math.trunc(s.worldYear);
-    const fm = parseYearLike(s.year ?? s.world_year ?? s.worldYear);
-    if (fm!=null) return fm;
-    const hit = (s.tags||[]).find(t => /(^|\s)(год|year)\s*[:=]?\s*-?\d+|^-?\d+\s*ов$/i.test(String(t)));
-    if (hit){ const n=parseYearLike(hit); if(n!=null) return n; }
-    return null;
-  }
-
-  /* ===== Загрузка контента (надёжная) ===== */
-  let stories=[], notes=[], pergDocs=[];
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
-    let file = s.file || ((s.slug||s.id)?`content/stories/${(s.slug||s.id).trim()}.md`:null);
+    let file = s.file;
+    if(!file){
+      const name=(s.slug||s.id||'').trim();
+      if(name) file = `content/stories/${name}.md`;
+    }
     if(!file || s.text) return s;
     try{
       const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
@@ -379,14 +347,17 @@
       s.tags       = s.tags       || attributes.tags  || [];
       s.annotation = s.annotation || attributes.annotation || '';
       s.text       = body || '';
-      const wy = parseYearLike(attributes.worldYear ?? attributes.world_year ?? attributes.year ?? attributes.wy);
-      if (wy!=null) s.worldYear = wy;
-    }catch(e){}
+    }catch(e){ /* молчим, текст подтянется потом или останется краткая карточка */ }
     return s;
   }
+
   async function loadMdIntoNote(n, isAdmin){
     if (!n) return n;
-    let file = n.file || ((n.slug||n.id)?`content/notes/${(n.slug||n.id).trim()}.md`:null);
+    let file = n.file;
+    if(!file){
+      const name=(n.slug||n.id||'').trim();
+      if(name) file = `content/notes/${name}.md`;
+    }
     if(!file || n.text) return n;
     try{
       const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
@@ -401,14 +372,14 @@
     return n;
   }
 
-  // Markdown → скромный HTML
+  // Markdown → очень скромный HTML для project.md
   function mdToHtml(md) {
     let html = md
       .replace(/^### (.*)$/gim, '<h3>$1</h3>')
       .replace(/^## (.*)$/gim,  '<h2>$1</h2>')
       .replace(/^# (.*)$/gim,   '<h1>$1</h1>')
       .replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>')
-      .replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/gim, '<ul>$1</ul>')
+      .replace(/(<li>.*<\/li>)(?!\s*<li>)/gims, '<ul>$1</ul>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
@@ -417,34 +388,26 @@
     return html;
   }
 
+  /* ===== Загрузка данных (с приоритетом статики и таймаутами) ===== */
+  let stories=[], notes=[], pergDocs=[];
   async function loadContent(){
-    const tryUrls = [
-      '/.netlify/functions/content-index',
-      '/api/content-index',
-      '/content/index.json'
-    ];
-    let j = null;
-    for (const u of tryUrls) {
-      j = await fetchJson(u, { timeoutMs: 2000, headers:{'Accept':'application/json'} }).catch(()=>null);
-      if (j && (Array.isArray(j.stories) || Array.isArray(j.notes))) break;
-    }
-    if (!j) {
-      stories = []; notes = []; pergDocs = [];
-      app.innerHTML = `<section class="card">
-        <h1>Рассказы</h1>
-        <div class="anno-box">Не удалось получить индекс: /.netlify/functions/content-index, /api/content-index и /content/index.json недоступны.</div>
-      </section>`;
-      return;
-    }
+    // параллельно: статический индекс и функция; что успеет, то и рендерим
+    const staticP = fetchJson('content/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
+    const fnP     = fetchJson('/.netlify/functions/content-index',{timeoutMs:900, headers:{'Accept':'application/json'}}).catch(()=>null);
+
+    let j = await Promise.race([fnP, staticP]);
+    if(!j) j = await (staticP ?? fnP); // добираем второй вариант
+    if(!j) j = { stories:[], notes:[] };
 
     stories = Array.isArray(j.stories) ? j.stories : [];
     notes   = Array.isArray(j.notes)   ? j.notes   : [];
 
-    try{
-      pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}});
-    }catch{ pergDocs = []; }
+    // пергамент — всегда статикой
+    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}); }
+    catch{ pergDocs = []; }
 
-    const tie = (a,b)=> String((a.slug||a.id||'')).localeCompare(String(b.slug||b.id||''));
+    // нормализация и сортировки
+    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''));
     stories.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
     notes.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
@@ -453,16 +416,15 @@
       return String(bl).localeCompare(String(al));
     });
 
+    // гарантируем file-пути
     stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
     notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
-
-    renderYearBar();
   }
 
   /* ===== Тема ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
-    storage.setItem('theme', state.theme);
+    localStorage.setItem('theme', state.theme);
     setUtterancesTheme(state.theme);
     setCusdisTheme();
     const el=document.getElementById('favicon');
@@ -474,9 +436,9 @@
   document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
   /* ===== Admin mode ===== */
-  let isAdmin = new URLSearchParams(location.search).has('admin') || storage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ storage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; storage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
   function ensureAdminUI(){
     document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
     document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
@@ -487,7 +449,7 @@
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== Арки ===== */
+  /* ===== Построение арок, карты и безопасные ссылки по ID ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
@@ -501,95 +463,51 @@
       map[id].items.push(s);
     }
     for(const k in map){
-      map[k].items.sort((a,b)=>{
-        const ay=getStoryYear(a), by=getStoryYear(b);
-        if(ay!=null && by!=null && ay!==by) return ay-by;
-        return ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id)));
-      });
+      map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
     }
     return Object.values(map);
   }
+
   function findStoryByKey(key){
     if(!key) return null;
+    // приоритетный поиск по id, затем по slug
     let s = stories.find(x=> (x.id||'') === key);
     if(s) return s;
     const bySlug = stories.filter(x=> (x.slug||'') === key);
-    if(bySlug.length>1){ bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id))); return bySlug[0] || null; }
+    if(bySlug.length>1){
+      // коллизия slug — выберем самый свежий, чтобы не сводить с ума читателя
+      bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
+      return bySlug[0] || null;
+    }
     return bySlug[0] || null;
-  }
-
-  /* ===== Полоса «Год» ===== */
-  function renderYearBar(){
-    const wrap = document.getElementById('yearBarWrap');
-    const bar  = document.getElementById('yearBar');
-    if(!wrap || !bar) return;
-
-    const years = Array.from(new Set(stories.map(getStoryYear).filter(y => y!=null))).sort((a,b)=>a-b);
-    if(!years.length){ wrap.style.display='none'; return; }
-
-    const counts = new Map();
-    for(const s of stories){ const y=getStoryYear(s); if(y!=null){ counts.set(y,(counts.get(y)||0)+1); } }
-
-    const chosen = Number.isFinite(state.year) ? state.year : null;
-    const html = [
-      `<span class="y-label">Год:</span>`,
-      `<button class="y-reset ${chosen==null?'y-active':''}" title="Все годы">Все</button>`,
-      ...years.map(y => `
-        <button class="y-tab ${chosen===y?'y-active':''}" data-year="${y}" title="Год ${y}">
-          <span>${y}</span><span class="y-count">${counts.get(y)||0}</span>
-        </button>`),
-    ].join('<span class="y-sep">·</span>');
-
-    bar.innerHTML = html;
-    wrap.style.display='block';
-
-    bar.querySelectorAll('.y-tab').forEach(btn=>{
-      btn.onclick = ()=>{
-        const y=Number(btn.getAttribute('data-year'));
-        state.year = y; location.hash = '#/year/'+encodeURIComponent(String(y));
-      };
-    });
-    const reset = bar.querySelector('.y-reset');
-    if(reset) reset.onclick = ()=>{ state.year = null; location.hash='#/'; };
   }
 
   /* ===== Вьюхи ===== */
   function renderList(){
-    const q = state.q;
-    let items = stories.filter(s => !q
-      || s.title?.toLowerCase().includes(q)
-      || (s.text||'').toLowerCase().includes(q)
-      || (s.tags||[]).join(' ').toLowerCase().includes(q)
-    );
-    const chosenYear = Number.isFinite(state.year) ? state.year : null;
-    if (chosenYear != null) items = items.filter(s => getStoryYear(s) === chosenYear);
-
+    const q=state.q;
+    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
+    const arcs = buildArcs();
     app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
-
-          <div class="list" style="margin-top:8px">
-            ${items.length?items.map(s=>{
-              const y = getStoryYear(s);
-              const yearBadge = Number.isFinite(y) ? `<span class="tag">Год ${y}</span>` : '';
-              return `
+          <div class="list">
+            ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
                 <a href="#/read-id/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
                   <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
                 </a>
-                <div style="margin-top:6px">${yearBadge}${getAnno(s)?` <span class="anno">${getAnno(s)}</span>`:''}</div>
-              </div>`; }).join('')
-            :'<div class="muted" style="margin-top:10px">По выбранному году ничего не найдено.</div>'}
+                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или функцию <code>content-index</code>.</div>'}
           </div>
         </section>
 
         <aside class="card">
           <h2>Ветки</h2>
           <div class="list">
-            ${buildArcs().map(a=>`
+            ${arcs.map(a=>`
               <div class="story-item" data-arc="${a.id}">
                 <a href="#/arc/${a.id}">
                   <div class="title">✶ ${a.title}</div>
@@ -604,9 +522,9 @@
       </div>`;
     adminDockHide(); ensureAdminUI();
 
-    // ленивая догрузка недостающих полей (включая год)
-    const need = items.filter(s=>!s.title || !s.date || getStoryYear(s)==null).slice(0,12);
-    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderYearBar(); renderList(); }); }
+    // подтягиваем мету первых 12 без перезагрузки
+    const need = items.filter(s=>!s.title || !s.date).slice(0,12);
+    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
@@ -643,7 +561,6 @@
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
     const order=a.items; const pos=Math.max(0, order.findIndex(v=> v.id===s.id ));
     const prev=order[pos-1], next=order[pos+1];
-    const y = getStoryYear(s);
 
     app.innerHTML=`
       <a class="back" href="#/">← К списку</a>
@@ -653,13 +570,16 @@
           <div class="muted">
             ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
             · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
-            (${pos+1}/${order.length}) ${Number.isFinite(y)?`· год: ${y}`:''}
+            (${pos+1}/${order.length})
             · <span id="viewsBox" data-admin-only style="display:none">—</span>
           </div>
-          <div style="margin:6px 0 12px">
-            ${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}
-            ${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}
-          </div>
+          <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+
+          ${getAnno(s) ? `
+            <details class="anno-dtl anno-box" ${location.hash.includes('openAnno')?'open':''}>
+              <summary><strong>Аннотация</strong> — нажми, чтобы ${location.hash.includes('openAnno')?'скрыть':'показать'}</summary>
+              <div style="margin-top:8px">${getAnno(s)}</div>
+            </details>` : ''}
 
           ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
 
@@ -688,21 +608,65 @@
     adminDockFor('story', s.slug||s.id);
     ensureAdminUI();
   }
-  async function renderArticle(key){ const s = findStoryByKey(key); if(!s){ location.hash='#/'; return; } await renderArticleByObj(s); }
+
+  async function renderArticle(key){
+    const s = findStoryByKey(key);
+    if(!s){ location.hash='#/'; return; }
+    await renderArticleByObj(s);
+  }
 
   function renderTag(tag){
     const items=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
     app.innerHTML=`<section class="card">
       <a class="back" href="#/">← На главную</a>
       <h1>#${tag}</h1>
-      <div class="list">${items.map(s=>{
-        const y=getStoryYear(s);
-        return `
+      <div class="list">${items.map(s=>`
         <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
           <div class="title">✶ ${s.title}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
-        </a>${Number.isFinite(y)?`<span class="tag">Год ${y}</span>`:''}${getAnno(s)?` <div class="anno">${getAnno(s)}</div>`:''}</div>`}).join('')}</div></section>`;
+        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
+  }
+
+  /* ===== Заметки ===== */
+  function renderNotes(){
+    const items = notes || [];
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>Заметки</h1>
+        <div class="list">
+          ${
+            items.length
+              ? items.map(n => `
+                <div class="story-item" data-arc="${n.arc||'kainrax'}">
+                  <a href="#/note/${n.id}">
+                    <div class="title">✶ ${n.title || 'Без названия'}</div>
+                    <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
+                  </a>
+                  ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
+                </div>`).join('')
+              : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>'
+          }
+        </div>
+      </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  async function renderNote(id){
+    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
+    try{ await loadMdIntoNote(n, isAdmin); }catch(e){}
+    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
+      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
+        <div>
+          <h1>${n.title}</h1>
+          <div class="muted">${fmtHumanDate(n.date)}</div>
+          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+        </div>
+        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
+      </article>
+      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
+    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
   }
 
   /* ===== Проект ===== */
@@ -717,12 +681,13 @@
       updated = attributes.updated || '';
       body = mdBody || body;
     } catch(_) {}
+    // Вставляем твой текстовый блок именно сюда, не на главную
     const intro = `
       <div class="prose">
         <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
         <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
         <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной».</p>
+        <p>В работе: роман о попытке предотвратить падение цивилизации и фолк-хоррор-повесть о жрице-«Избранной». Один мир. Одни жёсткие — но скрытые — правила.</p>
         <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
         <div class="anno-box"><strong>Прямо сейчас пишется:</strong> роман и фолк-хоррор-повесть</div>
       </div>`;
@@ -737,7 +702,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент ===== */
+  /* ===== Пергамент (как у тебя, не ломаем) ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -817,12 +782,12 @@
     async function ensureAccessForNonLast(ed){
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
-      if(storage.getItem(key)==='1') return true;
+      if(localStorage.getItem(key)==='1') return true;
       const ok = await showAccessModal(
         { message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access&&ed.access.hint) || 'хроникёр и год' },
         (input)=> checkPergCode(input, ed)
       );
-      if(ok){ storage.setItem(key,'1'); return true; }
+      if(ok){ localStorage.setItem(key,'1'); return true; }
       return false;
     }
     const canOpen = await ensureAccessForNonLast(e);
@@ -927,7 +892,7 @@
     wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
     const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
   }
-  function setUtterancesTheme(theme){ try{ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }catch(_){} }
+  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
   function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
 
   const adminDock=document.getElementById('adminDock');
@@ -950,7 +915,7 @@
       const total=art.scrollHeight - window.innerHeight + 1;
       const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
       progress.style.width=(isFinite(pct)?pct:0)+'%';
-      const id=art.dataset.slug||art.dataset.id; if(id){ storage.setItem('read:'+id, window.scrollY); }
+      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
       ticking=false;
     });
   }
@@ -958,11 +923,10 @@
   function restoreScroll(){
     const art=document.querySelector('article'); if(!art) return;
     const id=art.dataset.slug||art.dataset.id;
-    const y=+storage.getItem('read:'+id)||0;
+    const y=+localStorage.getItem('read:'+id)||0;
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  /* ===== Декор: звёзды и «линия неба» ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -981,21 +945,21 @@
   document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
 
   function initSkyLine() {
-    const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let run = true;
+    const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
     function updatePosition() {
       const now = new Date();
       const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
       const progress = msSinceMidnight / 86400000;
       skyLine.style.top = `${progress * 100}vh`;
-      if (run) requestAnimationFrame(updatePosition);
+      if (running) requestAnimationFrame(updatePosition);
     }
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') { run = true; requestAnimationFrame(updatePosition); } else { run = false; }
+      if (document.visibilityState === 'visible') { running = true; requestAnimationFrame(updatePosition); } else { running = false; }
     });
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Рендерер маршрутов ===== */
+  /* ===== Рендерер маршрутов (с поддержкой read-id/:id и read/:slug) ===== */
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -1017,23 +981,19 @@
     renderList();
   }
 
-  /* ===== Заглушки для notes, чтобы не падать ===== */
-  function renderNotes(){
-    app.innerHTML = `<section class="card"><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-  async function renderNote(){ renderNotes(); }
-
   /* ===== Инициализация ===== */
   (async function init(){
+    // быстрый «скелет» чтобы не было пустоты
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    applyTheme(); ensureAdminUI(); resize(); requestAnimationFrame(drawStars); initSkyLine();
-
-    // fail-safe: покажем UI через 1.5с, но ПОТОМ ВСЕГДА перерисуем с данными
-    const failSafe = setTimeout(()=>{ render(); }, 1500);
-
-    try { await loadContent(); }
-    finally { clearTimeout(failSafe); render(); } /* ← ключевая правка */
+    try{
+      await loadContent();
+    }catch(_){}
+    applyTheme();
+    render();
+    ensureAdminUI();
+    resize();
+    if(!prefersReduced) requestAnimationFrame(drawStars);
+    initSkyLine();
   })();
   </script>
 </body>
