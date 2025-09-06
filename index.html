@@ -219,7 +219,11 @@
     .rw-mark{ padding:5px 8px; font-size:11px }
     .rw-mark .cnt{ padding-left:3px }
   }
-  </style>
+    /* edge-to-edge для runway внутри .card (паддинг 18px) */
+  .card .runway-edge{ width:calc(100% + 36px); margin:8px -18px 10px; }
+  .runway-svg{ overflow:visible }
+  .runway-marks{ overflow:visible }
+</style>
 </head>
 
 <body>
@@ -545,47 +549,59 @@
   }
   
   function renderList(){
-    const q = state.q;
+    const q=state.q;
+
+    // год из хеша
     const hq = parseHashQuery();
     const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null;
     state.year = ySel;
 
+    // базовый набор по поиску
     const base = stories.filter(s=>{
       if (!q) return true;
       const hay = [s.title||'', (s.text||''), (s.tags||[]).join(' ')].join(' ').toLowerCase();
       return hay.includes(q);
     });
 
-    const counts = base.reduce((acc,s)=>{ const y=Number(s.year); if(Number.isFinite(y)) acc[y]=(acc[y]||0)+1; return acc; },{});
+    // счётчики по годам для текущей выборки
+    const counts = base.reduce((acc, s)=>{
+      const y = Number(s.year);
+      if (Number.isFinite(y)) acc[y] = (acc[y]||0)+1;
+      return acc;
+    }, {});
     const years = Object.keys(counts).map(Number).sort((a,b)=>a-b);
 
+    // окончательная фильтрация по выбранному году
     const items = base.filter(s=> ySel==null ? true : Number(s.year)===ySel);
 
-    const runway = `
-      <div class="runway-wrap">
-        <svg class="runway-svg" viewBox="0 0 1000 140" preserveAspectRatio="none" aria-hidden="true">
+    // HTML runway с линией и резким обрывом
+    const runwayHtml = `
+      <div class="runway-wrap runway-edge">
+        <svg class="runway-svg" viewBox="-30 0 1060 140" preserveAspectRatio="none" aria-hidden="true">
           <defs>
             <linearGradient id="rw-grad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0"   stop-color="var(--accent,#7dd3fc)" stop-opacity="0.35"/>
-              <stop offset="0.6" stop-color="var(--accent,#7dd3fc)" stop-opacity="0.75"/>
-              <stop offset="1"   stop-color="var(--accent2,#a78bfa)" stop-opacity="1"/>
+              <stop offset="0"   stop-color="var(--accent)"  stop-opacity="0.35"/>
+              <stop offset="0.6" stop-color="var(--accent)"  stop-opacity="0.75"/>
+              <stop offset="1"   stop-color="var(--accent2)" stop-opacity="1"/>
             </linearGradient>
-            <filter id="rw-glow" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="2.2" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
             <linearGradient id="rw-shine" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stop-color="rgba(255,255,255,.0)"/>
               <stop offset="0.55" stop-color="rgba(255,255,255,.3)"/>
               <stop offset="1" stop-color="rgba(255,255,255,.0)"/>
             </linearGradient>
+            <filter id="rw-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="2.2" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
           </defs>
-          <path id="rw-path" d="M 0 60 C 330 56, 700 52, 985 48" fill="none" stroke="transparent" stroke-width="1"/>
-          <path d="M 0 60 C 330 56, 700 52, 985 48" class="rw-l rw-l1" stroke="url(#rw-grad)"/>
-          <path d="M 0 82 C 330 76, 700 70, 985 66" class="rw-l rw-l2" stroke="url(#rw-grad)"/>
-          <path d="M 0 60 C 330 56, 700 52, 985 48" class="rw-s" stroke="url(#rw-shine)"/>
-          <path d="M 0 82 C 330 76, 700 70, 985 66" class="rw-s" stroke="url(#rw-shine)"/>
-          <line x1="990" y1="18" x2="990" y2="120" class="rw-cliff"/>
+          <path id="rw-path" d="M 0 60 C 330 56, 700 52, 1000 48" fill="none" stroke="transparent"/>
+          <g filter="url(#rw-glow)">
+            <path d="M 0 60 C 330 56, 700 52, 1000 48" fill="none" stroke="url(#rw-grad)" stroke-width="6"/>
+            <path d="M 0 82 C 330 76, 700 70, 1000 66" fill="none" stroke="url(#rw-grad)" stroke-width="6" opacity=".75"/>
+            <path d="M 0 60 C 330 56, 700 52, 1000 48" fill="none" stroke="url(#rw-shine)" stroke-width="2" opacity=".65"/>
+            <path d="M 0 82 C 330 76, 700 70, 1000 66" fill="none" stroke="url(#rw-shine)" stroke-width="2" opacity=".65"/>
+          </g>
+          <line x1="1010" y1="16" x2="1010" y2="124" stroke="var(--accent2)" stroke-width="8" stroke-linecap="round" style="filter:drop-shadow(0 0 8px rgba(167,139,250,.45))"/>
         </svg>
         <div class="runway-marks" id="runwayMarks"></div>
       </div>`;
@@ -595,7 +611,7 @@
         <section class="card">
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
-          ${runway}
+          ${runwayHtml}
           <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
@@ -607,29 +623,33 @@
               </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных.</div>'}
           </div>
         </section>
-
         <aside class="card">
           <h2>Ветки</h2>
-          <div class="list">${buildArcs().map(a=>`
-            <div class="story-item" data-arc="${a.id}">
-              <a href="#/arc/${a.id}">
-                <div class="title">✶ ${a.title}</div>
-                <div class="muted">${a.items.length} текст(а)</div>
-                <div>${a.desc||''}</div>
-              </a>
-            </div>`).join('')}</div>
+          <div class="list">
+            ${buildArcs().map(a=>`
+              <div class="story-item" data-arc="${a.id}">
+                <a href="#/arc/${a.id}">
+                  <div class="title">✶ ${a.title}</div>
+                  <div class="muted">${a.items.length} текст(а)</div>
+                  <div>${a.desc||''}</div>
+                </a>
+              </div>`).join('')}
+          </div>
           <h3 style="margin-top:14px">Подписка</h3>
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
         </aside>
       </div>`;
 
-    const itemsForRunway = [{label:'Все', value:''}].concat(years.map(y=>({label:String(y), value:y, count:counts[y]})));
-    mountRunway({ items: itemsForRunway, selected: ySel });
+    // собрать элементы для runway и отрисовать по кривой
+    const runwayItems = [{label:'Все', value:''}].concat(years.map(y=>({label:String(y), value:y, count:counts[y]})));
+    mountRunway({ items: runwayItems, selected: state.year });
 
     adminDockHide(); ensureAdminUI();
 
+    // ленивое догружение меты первых 12 карточек
     const need = items.filter(s=>!s.title || !s.date).slice(0,12);
     if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
+  }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
