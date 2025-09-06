@@ -81,7 +81,7 @@
     background-image:
       radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><path d='M80 6 L87 27 L109 31 L87 35 L80 56 L73 35 L51 31 L73 27 Z' fill='rgba(125,211,252,0.06)'/></svg>"),
-      url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><defs><pattern id='hex' width='16' height='14' patternUnits='userSpaceOnUse' patternTransform='skewX(-12)'><path d='M4 0 L12 0 L16 7 L12 14 L4 14 L0 7 Z' fill='none' stroke='rgba(125,211,252,0.05)'/></pattern></defs><rect width='100%' height='100%' fill='url(%23hex)'/></svg>\");
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><defs><pattern id='hex' width='16' height='14' patternUnits='userSpaceOnUse' patternTransform='skewX(-12)'><path d='M4 0 L12 0 L16 7 L12 14 L4 14 L0 7 Z' fill='none' stroke='rgba(125,211,252,0.05)'/></pattern></defs><rect width='100%' height='100%' fill='url(%23hex)'/></svg>");
     background-repeat:no-repeat, repeat, repeat; background-size:auto, 160px 160px, auto;
   }
 
@@ -186,6 +186,19 @@
   .edbar{position:relative;margin:8px 0 6px;height:4px;background:linear-gradient(90deg, rgba(0,0,0,.15), rgba(255,255,255,.12));border-radius:999px;overflow:hidden}
   .edbar > .fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg, var(--surface), var(--ibut), var(--kainrax));}
   .edhint{font-size:12px;color:var(--muted);margin-bottom:6px}
+
+  /* ==== ГОДА: панель фильтра ==== */
+  .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+  .pill.year{cursor:pointer;position:relative;user-select:none}
+  .pill.year .badge{
+    position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1;
+    padding:2px 6px; border-radius:999px; border:1px solid var(--line);
+    background:var(--card); color:var(--muted)
+  }
+  .pill[data-active="true"]{
+    color:var(--fg); border-color:var(--accent);
+    box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow)
+  }
   </style>
 </head>
 
@@ -280,7 +293,7 @@
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
-  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'' };
+  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
 
   /* ===== Утилиты ===== */
   function toDate(val){
@@ -346,6 +359,7 @@
       s.arc        = s.arc        || attributes.arc   || 'kainrax';
       s.tags       = s.tags       || attributes.tags  || [];
       s.annotation = s.annotation || attributes.annotation || '';
+      s.year       = s.year ?? (Number(attributes.year ?? attributes.pergYear) || null); // добавили поддержку года
       s.text       = body || '';
     }catch(e){ /* молчим, текст подтянется потом или останется краткая карточка */ }
     return s;
@@ -484,20 +498,67 @@
 
   /* ===== Вьюхи ===== */
   function renderList(){
-    const q=state.q;
-    const items=stories.filter(s=>!q || s.title?.toLowerCase().includes(q) || (s.text||'').toLowerCase().includes(q) || (s.tags||[]).join(' ').toLowerCase().includes(q));
-    const arcs = buildArcs();
+    // поиск
+    const q = state.q;
+
+    // год из хеша
+    const hq = parseHashQuery();
+    const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null;
+    state.year = ySel;
+
+    // базовый набор по поиску
+    const base = stories.filter(s=>{
+      if (!q) return true;
+      const hay = [
+        s.title||'',
+        (s.text||''),
+        (s.tags||[]).join(' ')
+      ].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+
+    // счётчики по годам для текущей выборки
+    const counts = base.reduce((acc, s)=>{
+      const y = Number(s.year);
+      if (Number.isFinite(y)) acc[y] = (acc[y]||0)+1;
+      return acc;
+    }, {});
+    const years = Object.keys(counts).map(Number).sort((a,b)=>a-b);
+
+    // окончательная фильтрация по выбранному году
+    const items = base.filter(s=>{
+      if (ySel==null) return true;
+      return Number(s.year)===ySel;
+    });
+
+    // панель годов
+    const yearBar = `
+      <div class="yearbar" id="yearbar">
+        <span class="muted">Год:</span>
+        <span class="pill year" data-year="" data-active="${ySel==null}">Все</span>
+        ${years.map(y=>`
+          <span class="pill year" data-year="${y}" data-active="${ySel===y}">
+            ${y}<span class="badge">${counts[y]}</span>
+          </span>`).join('')}
+      </div>`;
+
     app.innerHTML=`
       <div class="grid">
         <section class="card">
           <h1>Рассказы</h1>
           <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+          ${yearBar}
           <div class="list">
             ${items.length?items.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
                 <a href="#/read-id/${s.id}">
                   <div class="title">✶ ${s.title||'Без названия'}</div>
-                  <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+                  <div class="muted">
+                    ${fmtHumanDate(s.date)}
+                    · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения
+                    · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}
+                    ${Number.isFinite(+s.year)?` · год: ${s.year}`:''}
+                  </div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
               </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока нет данных. Проверь <code>content/index.json</code> или функцию <code>content-index</code>.</div>'}
@@ -507,7 +568,7 @@
         <aside class="card">
           <h2>Ветки</h2>
           <div class="list">
-            ${arcs.map(a=>`
+            ${buildArcs().map(a=>`
               <div class="story-item" data-arc="${a.id}">
                 <a href="#/arc/${a.id}">
                   <div class="title">✶ ${a.title}</div>
@@ -520,6 +581,20 @@
           <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
         </aside>
       </div>`;
+
+    // клики по «пилюлям»
+    const ybar = document.getElementById('yearbar');
+    if (ybar){
+      ybar.addEventListener('click', (e)=>{
+        const pill = e.target.closest('.pill.year');
+        if(!pill) return;
+        const v = pill.dataset.year || '';
+        const newHash = v ? `#/?year=${encodeURIComponent(v)}` : '#/';
+        if (location.hash !== newHash) location.hash = newHash;
+        else renderList();
+      });
+    }
+
     adminDockHide(); ensureAdminUI();
 
     // подтягиваем мету первых 12 без перезагрузки
@@ -681,7 +756,7 @@
       updated = attributes.updated || '';
       body = mdBody || body;
     } catch(_) {}
-    // Вставляем твой текстовый блок именно сюда, не на главную
+    // Вставляем вступление
     const intro = `
       <div class="prose">
         <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
@@ -702,7 +777,7 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент (как у тебя, не ломаем) ===== */
+  /* ===== Пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
 
@@ -987,14 +1062,14 @@
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
     try{
       await loadContent();
-    }catch(_){}
-    applyTheme();
-    render();
-    ensureAdminUI();
-    resize();
-    if(!prefersReduced) requestAnimationFrame(drawStars);
-    initSkyLine();
-  })();
+    }catch(_){}}
+  )();
+  applyTheme();
+  render();
+  ensureAdminUI();
+  resize();
+  if(!prefersReduced) requestAnimationFrame(drawStars);
+  initSkyLine();
   </script>
 </body>
 </html>
