@@ -83,7 +83,7 @@
     z-index:0;
   }
   .card > *{position:relative; z-index:1}
-  /* На главной вуаль можно убрать совсем, чтобы гарантировать клики */
+  /* На главной вуаль убрана, чтобы гарантировать клики */
   .grid > .card::after{ display:none; }
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
@@ -197,7 +197,7 @@
 <body>
   <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
 
-  <!-- ВЕСЬ ДЕКОР СЮДА: он ниже интерактива и не ловит события -->
+  <!-- Декор ниже интерактива -->
   <div id="decor" aria-hidden="true">
     <div id="sky-line"></div>
     <canvas id="stars"></canvas>
@@ -1012,12 +1012,11 @@
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
     applyTheme(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); initSkyLine();
 
-    // если сеть тупит — всё равно покажем UI через 1.5с
-    let renderedEarly = false;
-    const failSafe = setTimeout(()=>{ renderedEarly = true; render(); }, 1500);
+    // fail-safe: покажем UI через 1.5с, но ПОТОМ ВСЕГДА перерисуем с данными
+    const failSafe = setTimeout(()=>{ render(); }, 1500);
 
     try { await loadContent(); }
-    finally { clearTimeout(failSafe); if (!renderedEarly) render(); }
+    finally { clearTimeout(failSafe); render(); } /* ← ключевая правка */
   })();
   </script>
 </body>
