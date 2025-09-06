@@ -239,6 +239,23 @@
   <main id="app" aria-live="polite"></main>
 
   <script>
+  /* ===== Safe storage (устойчиво к Safari private) ===== */
+  const storage = (() => {
+    try {
+      const k='__kx__test';
+      window.localStorage.setItem(k,'1');
+      window.localStorage.removeItem(k);
+      return window.localStorage;
+    } catch (_) {
+      const mem = Object.create(null);
+      return {
+        getItem: (k) => (k in mem ? mem[k] : null),
+        setItem: (k, v) => { mem[k] = String(v); },
+        removeItem: (k) => { delete mem[k]; }
+      };
+    }
+  })();
+
   /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
@@ -278,7 +295,7 @@
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
-  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year:null };
+  const state={ theme: storage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year:null };
 
   /* ===== Утилиты ===== */
   function toDate(val){
@@ -445,7 +462,7 @@
   /* ===== Тема ===== */
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
-    localStorage.setItem('theme', state.theme);
+    storage.setItem('theme', state.theme);
     setUtterancesTheme(state.theme);
     setCusdisTheme();
     const el=document.getElementById('favicon');
@@ -457,9 +474,9 @@
   document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
   /* ===== Admin mode ===== */
-  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
+  let isAdmin = new URLSearchParams(location.search).has('admin') || storage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ storage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; storage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
   function ensureAdminUI(){
     document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
     document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
@@ -800,12 +817,12 @@
     async function ensureAccessForNonLast(ed){
       if(isLast) return true;
       const key = 'perg:'+d.id+':'+ed.id+':ok';
-      if(localStorage.getItem(key)==='1') return true;
+      if(storage.getItem(key)==='1') return true;
       const ok = await showAccessModal(
         { message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access&&ed.access.hint) || 'хроникёр и год' },
         (input)=> checkPergCode(input, ed)
       );
-      if(ok){ localStorage.setItem(key,'1'); return true; }
+      if(ok){ storage.setItem(key,'1'); return true; }
       return false;
     }
     const canOpen = await ensureAccessForNonLast(e);
@@ -910,7 +927,7 @@
     wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
     const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
   }
-  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
+  function setUtterancesTheme(theme){ try{ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }catch(_){} }
   function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
 
   const adminDock=document.getElementById('adminDock');
@@ -933,7 +950,7 @@
       const total=art.scrollHeight - window.innerHeight + 1;
       const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
       progress.style.width=(isFinite(pct)?pct:0)+'%';
-      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      const id=art.dataset.slug||art.dataset.id; if(id){ storage.setItem('read:'+id, window.scrollY); }
       ticking=false;
     });
   }
@@ -941,7 +958,7 @@
   function restoreScroll(){
     const art=document.querySelector('article'); if(!art) return;
     const id=art.dataset.slug||art.dataset.id;
-    const y=+localStorage.getItem('read:'+id)||0;
+    const y=+storage.getItem('read:'+id)||0;
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
@@ -1010,7 +1027,7 @@
   /* ===== Инициализация ===== */
   (async function init(){
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    applyTheme(); ensureAdminUI(); resize(); if(!prefersReduced) requestAnimationFrame(drawStars); initSkyLine();
+    applyTheme(); ensureAdminUI(); resize(); requestAnimationFrame(drawStars); initSkyLine();
 
     // fail-safe: покажем UI через 1.5с, но ПОТОМ ВСЕГДА перерисуем с данными
     const failSafe = setTimeout(()=>{ render(); }, 1500);
