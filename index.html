@@ -1060,16 +1060,18 @@
   (async function init(){
     // быстрый «скелет» чтобы не было пустоты
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    try{
-      await loadContent();
-    }catch(_){}}
-  )();
-  applyTheme();
-  render();
-  ensureAdminUI();
-  resize();
-  if(!prefersReduced) requestAnimationFrame(drawStars);
-  initSkyLine();
+    try {
+      await loadContent();         // дожидаемся контента
+    } catch(_) {}
+
+    // только ПОСЛЕ загрузки — вся остальная инициализация
+    applyTheme();
+    render();                      // теперь stories/notes уже заполнены
+    ensureAdminUI();
+    resize();
+    if (!prefersReduced) requestAnimationFrame(drawStars);
+    initSkyLine();
+  })();
   </script>
 </body>
 </html>
