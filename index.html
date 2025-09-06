@@ -647,9 +647,7 @@
     adminDockHide(); ensureAdminUI();
 
     // ленивое догружение меты первых 12 карточек
-    const need = items.filter(s=>!s.title || !s.date).slice(0,12);
-    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
-  }); }
+    const need = items.filter(s=>!s.title || !s.date).slice(0,12);    if(need.length){ Promise.all(need.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
   }
 
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
