@@ -231,9 +231,17 @@
   /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
-  const MEDIA_PROXY = '/api/media'; // /api/* алиас → /.netlify/functions/*
-  const API_INDEX  = '/api/content-index';
-  const API_HIT    = '/api/hit';
+  const MEDIA_PROXY = '/api/media';
+  
+  // кандидаты индекса: функция (через алиас), функция (прямо), статика
+  const API_INDEX_CANDIDATES = [
+    '/api/content-index',
+    '/.netlify/functions/content-index',
+    'content/index.json'
+  ];
+  
+  const API_HIT = '/api/hit';
+
 
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
@@ -409,44 +417,93 @@
   /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
-  async function loadContent(){
-    // общий индекс (функция) + статический бэкап
-    const staticP = fetchJson('content/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
-    const fnP     = fetchJson(API_INDEX,{timeoutMs:1500, headers:{'Accept':'application/json'}}).catch(()=>null);
-
-    let j = await Promise.race([fnP, staticP]);
-    if(!j) j = await (staticP ?? fnP);
-    if(!j) j = { stories:[], notes:[], articles:[] };
-
-    stories = Array.isArray(j.stories) ? j.stories : [];
-    notes   = Array.isArray(j.notes)   ? j.notes   : [];
-    articles= Array.isArray(j.articles)? j.articles: [];
-
-    // если функция ещё не умеет articles — пробуем отдельный статикус
-    if (!articles.length){
-      try{ const aj = await fetchJson('content/articles/index.json',{timeoutMs:2000, headers:{'Accept':'application/json'}}); articles = Array.isArray(aj)?aj: (aj.articles||[]); }catch(e){}
+ // helper: попробовать список URL по одному, пока не получим валидный JSON с массивами
+async function firstJson(urls, {timeouts=[8000,8000,5000]} = {}) {
+  for (let i = 0; i < urls.length; i++) {
+    const url = urls[i];
+    try {
+      const j = await fetchJson(url, { timeoutMs: timeouts[i] ?? 6000, headers:{'Accept':'application/json'} });
+      if (j && (Array.isArray(j.stories) || Array.isArray(j.notes) || Array.isArray(j.articles))) {
+        console.info('[content] loaded from', url);
+        return j;
+      }
+      if (Array.isArray(j)) { // случай content/articles/index.json как массива
+        return { stories:[], notes:[], articles:j };
+      }
+    } catch(e) {
+      console.warn('[content] failed', url, String(e));
     }
-
-    // пергамент — статикой
-    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:1500, headers:{'Accept':'application/json'}}); }
-    catch{ pergDocs = []; }
-
-    // сортировки по дате публикации (UI-хрон)
-    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
-    stories.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
-    notes.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
-    articles.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
-    pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
-    pergDocs.sort((a,b)=> {
-      const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
-      return String(bl).localeCompare(String(al));
-    });
-
-    // гарантируем file-пути
-    stories.forEach(s=>{ if(!s.file){ const base=(s.slug||s.id||'').trim(); if(base) s.file=`content/stories/${base}.md`; } });
-    notes.forEach(n=>{ if(!n.file){ const base=(n.slug||n.id||'').trim(); if(base) n.file=`content/notes/${base}.md`; } });
-    articles.forEach(a=>{ if(!a.file){ const base=(a.slug||a.id||'').trim(); if(base) a.file=`content/articles/${base}.md`; } });
   }
+  return null;
+}
+
+async function loadContent(){
+  // основной индекс: функция/статика
+  let j = await firstJson(API_INDEX_CANDIDATES);
+  if (!j) j = { stories:[], notes:[], articles:[] };
+
+  // подстраховка: если в основном индексе нет статей — пробуем отдельный
+  if (!Array.isArray(j.articles) || !j.articles.length) {
+    try {
+      const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
+      j.articles = Array.isArray(aj) ? aj : (aj.articles||[]);
+    } catch(_) {}
+  }
+
+  // пергамент — статикой (как было)
+  try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
+  catch{ pergDocs = []; }
+
+  // нормализация полей
+  const coerceYear = (y, wy) => {
+    const v = (y ?? wy);
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
+
+  stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
+    ...s,
+    id:   s.id   || s.slug || '',
+    slug: s.slug || s.id   || '',
+    year: (s.year ?? coerceYear(s.year, s.worldYear)),
+    file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
+    tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+  }));
+  notes    = (Array.isArray(j.notes)?j.notes:[]).map(n=>({
+    ...n,
+    id:   n.id   || n.slug || '',
+    slug: n.slug || n.id   || '',
+    file: n.file || (n.slug||n.id ? `content/notes/${(n.slug||n.id)}.md` : undefined),
+    tags: Array.isArray(n.tags) ? n.tags : (typeof n.tags==='string' ? n.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+  }));
+  articles = (Array.isArray(j.articles)?j.articles:[]).map(a=>({
+    ...a,
+    id:   a.id   || a.slug || '',
+    slug: a.slug || a.id   || '',
+    year: (a.year ?? null),
+    file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
+    tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+  }));
+
+  // сортировки по дате
+  const ts = (v)=> { const d = (v?new Date(v):null); return d && !isNaN(+d) ? +d : 0; };
+  stories.sort ((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+  notes.sort   ((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+  articles.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+
+  // пергамент — те же сортировки редакций
+  pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
+  pergDocs.sort((a,b)=> {
+    const ad=(a.editions||[]), bd=(b.editions||[]);
+    const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
+    return String(bl).localeCompare(String(al));
+  });
+
+  // экспорт для быстрых проверок
+  window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
+}
+
 
   /* ===== Тема ===== */
   function applyTheme(){
