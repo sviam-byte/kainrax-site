@@ -248,7 +248,7 @@
   const MEDIA_PROXY = '/api/media';
 
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  const API_HIT = '/api/hit'; // оставим эндпоинт, но UI не показывает счётчик
+  const API_HIT = '/api/hit'; // оставлен эндпоинт, но UI счётчик не показываем
 
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
@@ -337,7 +337,7 @@
       .replace(/(<li>.*<\/li>)(?!\s*<li>)/gims, '<ul>$1</ul>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      // картинки: ![alt](src "cap")
+      /* картинки: ![alt](src "cap") */
       .replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)/g, (m,alt,src,cap)=> {
         const finalSrc = rewriteMediaUrl(src);
         const capHtml = cap ? `<figcaption>${cap}</figcaption>` : '';
