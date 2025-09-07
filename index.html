@@ -15,10 +15,10 @@
       for (var j=0;j<document.scripts.length;j++){ if(document.scripts[j].src===r){ return; } }
       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
     })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
-    ym(103716449, 'init', { webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer' });
+    ym(103716449,'init',{webvisor:true,clickmap:true,trackLinks:true,accurateTrackBounce:true,ecommerce:'dataLayer'});
     (function(){
       var last=location.href;
-      function hit(){ try{ ym(103716449,'hit', location.href, { referer:last, title:document.title }); last=location.href; }catch(e){} }
+      function hit(){ try{ ym(103716449,'hit',location.href,{referer:last,title:document.title}); last=location.href; }catch(e){} }
       if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
       addEventListener('hashchange', hit);
     })();
@@ -39,14 +39,23 @@
   <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
 
-  <!-- MathJax для формул -->
+  <!-- MathJax: конфиг с переносами по контейнеру -->
   <script>
     window.MathJax = {
       tex: {
         inlineMath: [['$','$'], ['\\(','\\)']],
-        displayMath: [['$$','$$'], ['\\[','\\]']]
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        tags: 'ams'
       },
-      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+      chtml: {
+        linebreaks: { automatic: true, width: 'container' },
+        scale: 1,
+        mtextInheritFont: true,
+        matchFontHeight: false
+      },
+      options: {
+        skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+      }
     };
   </script>
   <script id="mathjax" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
@@ -188,6 +197,11 @@
   code, pre{ background:var(--code); color:var(--fg); padding:2px 6px; border-radius:6px }
   pre{ padding:10px 12px; overflow:auto }
   blockquote{ border-left:3px solid var(--line); padding-left:12px; color:var(--muted) }
+
+  /* MathJax страховка — не вываливаться и давать скролл при необходимости */
+  .prose .mjx-container { max-width:100%; overflow-x:auto; overflow-y:hidden; }
+  .prose .mjx-container[jax="CHTML"][display="true"] { display:block; }
+  @media (max-width:640px){ .prose .mjx-container{ font-size:.97em; } }
   </style>
 </head>
 
@@ -233,12 +247,8 @@
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
 
-  // кандидаты индекса: функция (через алиас), функция (прямо), статика
-  const API_INDEX_CANDIDATES = [
-    '/api/content-index',
-    '/.netlify/functions/content-index',
-    'content/index.json'
-  ];
+  const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
+  const API_HIT = '/api/hit'; // оставим эндпоинт, но UI не показывает счётчик
 
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
@@ -250,17 +260,26 @@
   })();
 
   /* ===== Хелперы сети с таймаутами ===== */
-  function timeout(ms){ return new Promise(res=> setTimeout(res, ms)); }
-  async function fetchJson(url, {timeoutMs=1500, headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(), timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }finally{ clearTimeout(t); } }
-  async function fetchText(url, {timeoutMs=4000, cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(), timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); }finally{ clearTimeout(t); } }
+  const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
+  async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
+  async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
 
   /* ===== Прокси медиа ===== */
   function rewriteMediaUrl(src){
     if(!src) return src;
     if(/^https?:\/\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
-    if(/^hub:\/\//i.test(src) || /^asset:\/\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
-    return src; // относительные из репо оставить
+    if(/^hub:\//i.test(src) || /^asset:\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
+    return src;
   }
+
+  /* ===== Счётчик просмотров (без UI) ===== */
+  window.hit = async function(slug){
+    try{
+      const r=await fetch(API_HIT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
+      const j=await r.json();
+      return Number(j?.count ?? 0);
+    }catch(e){ return 0; }
+  };
 
   /* ===== Состояние ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
@@ -348,8 +367,8 @@
       s.arc        = s.arc        || attributes.arc   || 'kainrax';
       s.tags       = s.tags       || normalizeTags(attributes.tags);
       s.annotation = s.annotation || attributes.annotation || '';
-      // аккуртано вычисляем год
-      s.year       = s.year ?? coerceYear(attributes.year, attributes.worldYear);
+      const yRaw   = (attributes.year ?? attributes.pergYear);
+      s.year       = s.year ?? (Number.isFinite(+yRaw) ? +yRaw : null);
       s.text       = body || '';
     }catch(e){}
     return s;
@@ -393,8 +412,7 @@
       a.minutes    = a.minutes    || Number(attributes.minutes)|| Math.max(6, Math.round((body||'').length/1000));
       a.tags       = a.tags       || normalizeTags(attributes.tags);
       a.annotation = a.annotation || attributes.annotation || '';
-      a.year       = a.year ?? (Number(attributes.year));
-      if(!Number.isFinite(a.year)) a.year = null;
+      a.year       = a.year ?? (Number.isFinite(+attributes.year) ? +attributes.year : null);
       a.author     = a.author     || attributes.author || '';
       a.outlet     = a.outlet     || attributes.outlet || attributes.journal || '';
       a.cover      = a.cover      || attributes.cover  || '';
@@ -406,39 +424,23 @@
   /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
-  // helper: привести год корректно
-  function coerceYear(y, wy){
-    const v = (y ?? wy);
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  }
-
-  // helper: попробовать список URL по одному, пока не получим валидный JSON с массивами
-  async function firstJson(urls, {timeouts=[8000,8000,5000]} = {}) {
-    for (let i = 0; i < urls.length; i++) {
-      const url = urls[i];
-      try {
-        const j = await fetchJson(url, { timeoutMs: timeouts[i] ?? 6000, headers:{'Accept':'application/json'} });
-        if (j && (Array.isArray(j.stories) || Array.isArray(j.notes) || Array.isArray(j.articles))) {
-          console.info('[content] loaded from', url);
-          return j;
-        }
-        if (Array.isArray(j)) { // случай content/articles/index.json как массива
-          return { stories:[], notes:[], articles:j };
-        }
-      } catch(e) {
-        console.warn('[content] failed', url, String(e));
-      }
+  // helper: попробовать список URL по одному, пока не получим валидный JSON
+  async function firstJson(urls,{timeouts=[8000,8000,5000]}={}) {
+    for (let i=0;i<urls.length;i++){
+      const url=urls[i];
+      try{
+        const j=await fetchJson(url,{timeoutMs:timeouts[i] ?? 6000, headers:{'Accept':'application/json'}});
+        if (j && (Array.isArray(j.stories) || Array.isArray(j.notes) || Array.isArray(j.articles))) return j;
+        if (Array.isArray(j)) return { stories:[], notes:[], articles:j };
+      }catch(e){}
     }
     return null;
   }
 
   async function loadContent(){
-    // основной индекс: функция/статика
     let j = await firstJson(API_INDEX_CANDIDATES);
     if (!j) j = { stories:[], notes:[], articles:[] };
 
-    // подстраховка: если в основном индексе нет статей — пробуем отдельный
     if (!Array.isArray(j.articles) || !j.articles.length) {
       try {
         const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
@@ -446,18 +448,16 @@
       } catch(_) {}
     }
 
-    // пергамент — статикой (как было)
     try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
     catch{ pergDocs = []; }
 
-    // нормализация полей
     const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
 
     stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
       ...s,
       id:   s.id   || s.slug || '',
       slug: s.slug || s.id   || '',
-      year: coerceYear(s.year, s.worldYear),
+      year: (Number.isFinite(+s.year) ? +s.year : Number.isFinite(+s.worldYear) ? +s.worldYear : null),
       file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
       tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
@@ -472,29 +472,24 @@
       ...a,
       id:   a.id   || a.slug || '',
       slug: a.slug || a.id   || '',
-      year: Number.isFinite(Number(a.year)) ? Number(a.year) : null,
+      year: (Number.isFinite(+a.year) ? +a.year : null),
       file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
       tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
 
-    // сортировки по дате
-    const _ts = (v)=> { const d = (v?new Date(v):null); return d && !isNaN(+d) ? +d : 0; };
-    stories.sort ((a,b)=> _ts(b.date)-_ts(a.date) || tie(a,b));
-    notes.sort   ((a,b)=> _ts(b.date)-_ts(a.date) || tie(a,b));
-    articles.sort((a,b)=> _ts(b.date)-_ts(a.date) || tie(a,b));
+    const ts2 = (v)=> { const d = (v?new Date(v):null); return d && !isNaN(+d) ? +d : 0; };
+    stories.sort ((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
+    notes.sort   ((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
+    articles.sort((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
 
-    // пергамент — те же сортировки редакций
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
-      const ad=(a.editions||[]), bd=(b.editions||[]);
-      const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
+      const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
       return String(bl).localeCompare(String(al));
     });
 
-    // экспорт для быстрых проверок
     window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
   }
-
 
   /* ===== Тема ===== */
   function applyTheme(){
@@ -671,7 +666,6 @@
 
     adminDockHide(); ensureAdminUI();
 
-    // лениво подтянем мету
     const needS = itemsStories.filter(s=>!s.title || !s.date).slice(0,8);
     if(needS.length){ Promise.all(needS.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
     const needA = itemsArticles.filter(a=>!a.title || !a.date).slice(0,8);
@@ -759,10 +753,8 @@
   }
 
   async function renderArticleRead(id){
-    const a = findArticleByKey(id);
-    if(!a){ location.hash = '#/articles'; return; }
+    const a=findArticleByKey(id); if(!a){ location.hash='#/articles'; return; }
     try{ await loadMdIntoArticle(a, isAdmin); }catch(e){}
-
     app.innerHTML = `
       <a class="back" href="#/articles">← К статьям</a>
       <article class="with-margin" data-id="${a.id}" data-slug="${a.slug||a.id}">
@@ -784,20 +776,22 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
-
     typesetMath(document.querySelector('.article-body'));
     mountComments('article:'+(a.slug||a.id));
     setTimeout(restoreScroll,0);
     adminDockFor('article', a.slug||a.id);
     ensureAdminUI();
+    // без вывода просмотров
+    window.hit('article:'+(a.slug||a.id)).catch(()=>{});
   }
 
   function typesetMath(scope){
     try{
       if(window.MathJax && MathJax.typesetPromise && scope){
+        if (MathJax.typesetClear) MathJax.typesetClear([scope]);
         MathJax.typesetPromise([scope]).catch(()=>{});
       }
-    }catch(_){ }
+    }catch(_){}
   }
 
   /* ===== Теги ===== */
@@ -860,6 +854,7 @@
       </article>
       <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
     mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
+    window.hit('note:'+(n.slug||n.id)).catch(()=>{});
   }
 
   async function renderProject() {
@@ -887,7 +882,6 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ===== Пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function renderPergList(){
     const items = pergDocs;
@@ -1042,6 +1036,7 @@
     setTimeout(restoreScroll,0);
     adminDockFor('perg', d.slug||d.id);
     ensureAdminUI();
+    window.hit('perg:'+(d.slug||d.id)+':'+(e.id||'')).catch(()=>{});
   }
 
   /* ===== Комменты / служебки ===== */
@@ -1195,6 +1190,7 @@
     setTimeout(restoreScroll,0);
     adminDockFor('story', s.slug||s.id);
     ensureAdminUI();
+    window.hit('story:'+(s.slug||s.id)).catch(()=>{});
   }
 
   /* ===== Инициализация ===== */
