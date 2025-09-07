@@ -162,10 +162,43 @@
   pre{ padding:10px 12px; overflow:auto }
   blockquote{ border-left:3px solid var(--line); padding-left:12px; color:var(--muted) }
 
-  /* MathJax контейнеры не разламывают верстку */
-  .prose .mjx-container{ max-width:100%; overflow-x:auto; overflow-y:hidden; }
-  .prose .mjx-container[jax="CHTML"][display="true"]{ display:block; }
-  @media (max-width:640px){ .prose .mjx-container{ font-size:.97em; } }
+  /* === MathJax: устойчивость на мобилках === */
+  .prose .mjx-container{
+    display:block;
+    max-width:100%;
+  }
+  /* инлайн-математика — можно скроллить по оси X в крайних случаях */
+  .prose .mjx-container:not([display="true"]){
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* блочные не скроллим, мы их вписываем */
+  .prose .mjx-container[display="true"]{
+    overflow:visible;
+    margin:12px 0;
+  }
+  /* переносы внутри \text{...} и длинных токенов */
+  .prose .mjx-container mjx-mtext,
+  .prose .mjx-container mjx-mi,
+  .prose .mjx-container mjx-mn{
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  /* обёртка под автоскейл */
+  .kx-math-fit{
+    width:100%;
+    overflow:hidden;
+    position:relative;
+  }
+  .kx-math-fit > .mjx-container{
+    will-change: transform;
+    transform-origin: left top;
+  }
+  @media (max-width:480px){
+    .prose .mjx-container{ font-size:.95em; }
+  }
   </style>
 </head>
 
@@ -251,7 +284,7 @@
     ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
   });
 
-  /* ===== Ленивая загрузка MathJax ===== */
+  /* ===== Ленивая загрузка MathJax + устойчивый typeset ===== */
   let mjPending=null;
   function ensureMathJax(){
     if (window.MathJax) return Promise.resolve();
@@ -278,6 +311,8 @@
     });
     return mjPending;
   }
+
+  // === Новый typeset с автоподгонкой формул ===
   async function typesetMath(scope){
     try{
       if(!scope) return;
@@ -288,9 +323,49 @@
       if(window.MathJax){
         if (MathJax.typesetClear) MathJax.typesetClear([scope]);
         await MathJax.typesetPromise([scope]);
+        fitLargeMath(scope);
       }
     }catch(_){}
   }
+
+  // === Авто-масштабирование блочных формул ===
+  let __fitRaf = 0;
+  function fitLargeMath(root){
+    const scope = root || document;
+    const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
+    blocks.forEach(el=>{
+      // оборачиваем один раз
+      let wrap = el.parentElement;
+      if(!wrap || !wrap.classList.contains('kx-math-fit')){
+        const w = document.createElement('div');
+        w.className = 'kx-math-fit';
+        wrap ? wrap.insertBefore(w, el) : el.parentNode.insertBefore(w, el);
+        w.appendChild(el);
+        wrap = w;
+      }
+      // сброс и измерение
+      el.style.transform = '';
+      wrap.style.height = '';
+      const cs = getComputedStyle(wrap);
+      const padL = parseFloat(cs.paddingLeft)||0, padR = parseFloat(cs.paddingRight)||0;
+      const avail = Math.max(0, wrap.clientWidth - padL - padR);
+      const need = el.scrollWidth;
+      if(need > avail && avail > 0){
+        const scale = Math.max(0.6, Math.min(1, avail / need));
+        const rect = el.getBoundingClientRect(); // высота до скейла
+        el.style.transform = `scale(${scale})`;
+        wrap.style.height = (rect.height * scale + 2) + 'px';
+      }
+    });
+  }
+  addEventListener('resize', ()=> {
+    cancelAnimationFrame(__fitRaf);
+    __fitRaf = requestAnimationFrame(()=> fitLargeMath(document));
+  }, {passive:true});
+  addEventListener('hashchange', ()=> {
+    cancelAnimationFrame(__fitRaf);
+    __fitRaf = requestAnimationFrame(()=> fitLargeMath(document));
+  }, {passive:true});
 
   /* ===== Хелперы сети с таймаутами ===== */
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
@@ -465,7 +540,6 @@
   /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
-  // helper: попробовать список URL по одному, пока не получим валидный JSON
   async function firstJson(urls,{timeouts=[8000,8000,5000]}={}) {
     for (let i=0;i<urls.length;i++){
       const url=urls[i];
@@ -479,13 +553,11 @@
   }
 
   async function loadContent(){
-    // быстрый старт из кэша
     let j = CACHE.get('__contentIndex');
     if (!j) j = await firstJson(API_INDEX_CANDIDATES);
     if (!j) j = { stories:[], notes:[], articles:[] };
     else CACHE.set('__contentIndex', j);
 
-    // подгрузим статьи, если отдельный индекс есть
     if (!Array.isArray(j.articles) || !j.articles.length) {
       try {
         const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
@@ -493,7 +565,6 @@
       } catch(_) {}
     }
 
-    // пергамент
     try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
     catch{ pergDocs = []; }
 
@@ -536,7 +607,6 @@
 
     window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
 
-    // в фоне обновим индекс с сети и перерисуем, если что-то поменялось
     (async ()=> {
       try{
         const fresh = await firstJson(API_INDEX_CANDIDATES);
@@ -609,7 +679,7 @@
     return bySlug[0] || null;
   }
 
-  /* ===== Список на главной (рассказы + статьи, общий год/поиск) ===== */
+  /* ===== Главная: список ===== */
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
   function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null; state.year = ySel; return ySel; }
 
@@ -648,7 +718,6 @@
       return hay.includes(q);
     });
 
-    // «полоса времени» считает только объекты с валидным годом и НЕ из ibut
     const unionForYears = baseStories.concat(baseArticles);
     const counts = collectYearCounts(unionForYears, {excludeArc:'ibut'});
     const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
@@ -735,7 +804,7 @@
     if(needA.length){ Promise.all(needA.map(a=>loadMdIntoArticle(a,isAdmin))).then(()=>{ renderList(); }); }
   }
 
-  /* ===== Ветки ===== */
+  /* ===== Ветки и теги ===== */
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
@@ -759,6 +828,30 @@
           ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
         </li>`).join('')}
       </ol></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  function renderTag(tag){
+    const st=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
+    const ar=articles.filter(a=> (a.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
+    app.innerHTML=`<section class="card">
+      <a class="back" href="#/">← На главную</a>
+      <h1>#${tag}</h1>
+
+      <h3>В рассказах</h3>
+      <div class="list">${st.length?st.map(s=>`
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
+          <div class="title">✶ ${s.title}</div>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
+
+      <h3 style="margin-top:14px">В статьях</h3>
+      <div class="list">${ar.length?ar.map(a=>`
+        <div class="story-item" data-kind="article"><a href="#/read-article/${a.id}">
+          <div class="title">📰 ${a.title}</div>
+          <div class="muted">${fmtHumanDateTime(a.date)} ${a.outlet?` · ${a.outlet}`:''} ${a.author?` · ${a.author}`:''}</div>
+        </a>${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
+    </section>`;
     adminDockHide(); ensureAdminUI();
   }
 
@@ -839,7 +932,8 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
-    typesetMath(document.querySelector('.article-body'));
+    await typesetMath(document.querySelector('.article-body'));
+    fitLargeMath(document); // на всякий, сразу после
     mountComments('article:'+(a.slug||a.id));
     setTimeout(restoreScroll,0);
     adminDockFor('article', a.slug||a.id);
@@ -847,32 +941,7 @@
     window.hit('article:'+(a.slug||a.id)).catch(()=>{});
   }
 
-  /* ===== Теги ===== */
-  function renderTag(tag){
-    const st=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
-    const ar=articles.filter(a=> (a.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
-    app.innerHTML=`<section class="card">
-      <a class="back" href="#/">← На главную</a>
-      <h1>#${tag}</h1>
-
-      <h3>В рассказах</h3>
-      <div class="list">${st.length?st.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
-          <div class="title">✶ ${s.title}</div>
-          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
-        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
-
-      <h3 style="margin-top:14px">В статьях</h3>
-      <div class="list">${ar.length?ar.map(a=>`
-        <div class="story-item" data-kind="article"><a href="#/read-article/${a.id}">
-          <div class="title">📰 ${a.title}</div>
-          <div class="muted">${fmtHumanDateTime(a.date)} ${a.outlet?` · ${a.outlet}`:''} ${a.author?` · ${a.author}`:''}</div>
-        </a>${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
-    </section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-
-  /* ===== Заметки / Проект / Пергамент ===== */
+  /* ===== Заметки / Проект / Пергамент (без изменений в логике) ===== */
   function renderNotes(){
     const items = notes || [];
     app.innerHTML = `
@@ -1155,8 +1224,8 @@
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
   addEventListener('resize', resize, {passive:true});
   function makeStars(){
-    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80; // было 60/120, стало легче
-    const k = (W*H)/60000; // было /30000, снизили плотность
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80;
+    const k = (W*H)/60000;
     const count = Math.floor(base + k);
     starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
   }
@@ -1243,8 +1312,8 @@
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
 
-    // Ленивое типосеттинг LaTeX, если вдруг спрятался в рассказе
-    typesetMath(document.querySelector('.prose.readbox'));
+    await typesetMath(document.querySelector('.prose.readbox'));
+    fitLargeMath(document);
     mountComments('story:'+(s.slug||s.id));
     setTimeout(restoreScroll,0);
     adminDockFor('story', s.slug||s.id);
