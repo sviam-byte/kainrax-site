@@ -66,7 +66,7 @@
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
 
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line);transition:transform .22s ease}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
   [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
   .head{max-width:var(--max);margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:center}
@@ -97,8 +97,8 @@
   .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
   .tag:before{content:"✶";color:var(--muted)}
   [data-theme="light"] .tag:before{content:"#"}
-
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
+
   .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
 
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
@@ -120,7 +120,8 @@
   #sky-line { position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: .7; filter: blur(1px);
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%); }
   [data-theme="light"] #sky-line { background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 40%); opacity: .6; }
-  [data-theme="cringe"] #sky-line { height: 4px; background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff); background-size: 200% 200%; animation: cringe-line-anim 3s linear infinite; filter: blur(2px); opacity: .8; }
+  [data-theme="cringe"] #sky-line { height: 4px; background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+    background-size: 200% 200%; animation: cringe-line-anim 3s linear infinite; filter: blur(2px); opacity: .8; }
   @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
   .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
@@ -138,12 +139,18 @@
   }
 
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
-  .with-margin > * { min-width: 0; } /* ВАЖНО: чтобы контент не раздувал колонку */
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
   .margin-notes{position:sticky;top:76px;align-self:start}
   .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
+  .mnote .linklike{cursor:pointer; text-decoration:underline}
 
-  /* Контент */
+  /* ===== Панель выбора года ===== */
+  .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+  .pill.year{cursor:pointer;position:relative;user-select:none}
+  .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
+  .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
+
+  /* ===== Контент ===== */
   .prose img{ max-width:100%; height:auto; border-radius:12px; display:block; margin:8px auto }
   figure{ margin:10px 0; }
   figure img{ max-width:100%; display:block }
@@ -154,26 +161,19 @@
   pre{ padding:10px 12px; overflow:auto }
   blockquote{ border-left:3px solid var(--line); padding-left:12px; color:var(--muted) }
 
-  /* ======= MathJax: анти-раздув и вписывание ======= */
+  /* ===== MathJax: устойчивость на мобилках ===== */
+  html, body { max-width: 100%; overflow-x: hidden; } /* ремень безопасности */
 
-  /* Ремень безопасности по ширине */
-  html, body { max-width:100%; overflow-x:hidden; }
-
-  /* Основная колонка никогда не даёт горизонтальный скролл */
-  .prose.readbox, .article-body { overflow-x:hidden; }
-
-  /* Любой контейнер MathJax не расширяет страницу */
   .prose .mjx-container{
     display:block;
     max-inline-size:100%;
     box-sizing:border-box;
-    overflow-x:auto;         /* запасной парашют */
+    overflow-x:auto;          /* при необходимости можно скроллить по X */
     overflow-y:hidden;
     -webkit-overflow-scrolling:touch;
     margin:12px 0;
   }
-
-  /* Переносы внутри \text{} и длинных идентификаторов */
+  /* переносы в \text{...} и длинных токенах */
   .prose .mjx-container mjx-mtext,
   .prose .mjx-container mjx-mi,
   .prose .mjx-container mjx-mn{
@@ -182,21 +182,28 @@
     overflow-wrap:anywhere;
   }
 
-  /* Обёртка для мягкого автоскейла блочных формул */
-  .kx-math-fit{
-    display:block;
-    width:100%;
-    overflow:hidden;
-    position:relative;
-  }
-  .kx-math-fit > .mjx-container{
-    will-change:transform;
-    transform-origin:left top;
+  /* обёртка для мягкого автоскейла дисплейных формул */
+  .kx-math-fit{ width:100%; overflow:hidden; position:relative; }
+  .kx-math-fit > .mjx-container{ will-change:transform; transform-origin:left top; }
+
+  /* ===== Скрываемая шапка (мобилки) ===== */
+  .mobile-only { display: none; }
+  @media (max-width:980px){
+    body.header-collapsed header{ transform: translateY(-100%); }
+    .mobile-only { display: inline-flex; }
+    .show-header-fab{
+      position: fixed;
+      right: 12px;
+      top: 10px;
+      z-index: 6;
+      display: none;
+      padding: 8px 10px;
+    }
+    body.header-collapsed .show-header-fab{ display: inline-flex; }
   }
 
-  @media (max-width:480px){
-    .prose .mjx-container{ font-size:.95em; }
-  }
+  /* чтобы контент не дёргался по ширине в grid */
+  .with-margin > * { min-width: 0; }
   </style>
 </head>
 
@@ -206,6 +213,8 @@
 
   <div id="sky-line" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
+  <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
   <header>
@@ -221,7 +230,8 @@
         <a class="btn" href="#/project">О проекте | планы</a>
         <a class="btn" href="/o2log/">Логи O₂</a>
         <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
-        <button id="themeBtn" title="Сменить тему (T)">🌓</button>
+        <button id="themeBtn" class="btn" title="Сменить тему (T)">🌓</button>
+        <button id="hideHeaderBtn" class="btn mobile-only" title="Скрыть шапку">▴</button>
         <span id="adminBtns" style="display:none">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
           <a class="btn" id="newStoryBtn"   href="/admin/#/collections/stories/new"   target="_blank" rel="noopener">+ Рассказ</a>
@@ -233,6 +243,9 @@
     </div>
   </header>
 
+  <!-- FAB для показа шапки на мобилках -->
+  <button id="showHeaderFab" class="btn show-header-fab" title="Показать шапку" aria-label="Показать шапку">▾</button>
+
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
@@ -243,7 +256,7 @@
   const MEDIA_PROXY = '/api/media';
 
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  const API_HIT = '/api/hit';
+  const API_HIT = '/api/hit'; // UI счётчик не показываем
 
   // Plausible — только на проде, лениво
   (function loadPlausibleOnProd(){
@@ -264,8 +277,7 @@
   function initYM(){
     if (window.__ymInited) return; window.__ymInited = true;
     (function(m,e,t,r,i,k,a){
-      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-      m[i].l=1*new Date();
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)}; m[i].l=1*new Date();
       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
     })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
     try{
@@ -280,7 +292,7 @@
     ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
   });
 
-  /* ===== Ленивая загрузка MathJax + typeset с автоподгонкой ===== */
+  /* ===== Ленивая загрузка MathJax (+устойчивые настройки) ===== */
   let mjPending=null;
   function ensureMathJax(){
     if (window.MathJax) return Promise.resolve();
@@ -308,6 +320,7 @@
     return mjPending;
   }
 
+  // Typeset + автоскейл дисплейных формул
   async function typesetMath(scope){
     try{
       if(!scope) return;
@@ -318,46 +331,80 @@
       if(window.MathJax){
         if (MathJax.typesetClear) MathJax.typesetClear([scope]);
         await MathJax.typesetPromise([scope]);
-        KX_refitMath(scope); // вписать блочные формулы
+        KX_refitMath(scope);
       }
     }catch(_){}
   }
+  </script>
 
-  /* ===== Хелперы сети с таймаутами ===== */
+  <script>
+  /* ===== Мелкие хелперы ===== */
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
   async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
   async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
 
-  /* ===== Кэш на сессию ===== */
   const CACHE = {
     get(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(_){ return null; } },
     set(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(_){ } }
   };
 
-  /* ===== Прокси медиа ===== */
   function rewriteMediaUrl(src){
     if(!src) return src;
     if(/^https?:\/\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
     if(/^hub:\//i.test(src) || /^asset:\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
     return src;
   }
+  </script>
 
-  /* ===== Счётчик просмотров (без UI) ===== */
-  window.hit = async function(slug){
-    try{
-      const r=await fetch(API_HIT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
-      const j=await r.json();
-      return Number(j?.count ?? 0);
-    }catch(e){ return 0; }
-  };
-
-  /* ===== Состояние ===== */
+  <script>
+  /* ===== Состояние приложения ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
 
-  /* ===== Утилиты ===== */
+  function applyTheme(){
+    document.documentElement.setAttribute('data-theme', state.theme);
+    localStorage.setItem('theme', state.theme);
+    setUtterancesTheme(state.theme);
+    setCusdisTheme();
+    const el=document.getElementById('favicon');
+    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
+    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
+  }
+  applyTheme();
+  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
+
+  /* ===== Скрываемая шапка (мобилки) ===== */
+  const hideHeaderBtn = document.getElementById('hideHeaderBtn');
+  const showHeaderFab = document.getElementById('showHeaderFab');
+  function setHeaderCollapsed(v){
+    document.body.classList.toggle('header-collapsed', !!v);
+    try { localStorage.setItem('headerCollapsed', v ? '1' : '0'); } catch(_){}
+  }
+  if (localStorage.getItem('headerCollapsed') === '1') setHeaderCollapsed(true);
+  if (hideHeaderBtn) hideHeaderBtn.onclick = ()=> setHeaderCollapsed(true);
+  if (showHeaderFab) showHeaderFab.onclick = ()=> setHeaderCollapsed(false);
+  document.addEventListener('keyup',(e)=>{
+    if ((e.key||'').toLowerCase()==='h'){
+      setHeaderCollapsed(!document.body.classList.contains('header-collapsed'));
+    }
+  });
+
+  /* ===== Admin mode ===== */
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
+  function ensureAdminUI(){
+    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    if(!isAdmin) adminDockHide();
+  }
+  </script>
+
+  <script>
+  /* ===== Markdown / контент ===== */
   const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
 
   function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
@@ -382,7 +429,6 @@
     return [];
   }
 
-  // простейший парсер фронтматтера
   function parseFrontMatter(md){
     const m = md.match(/^---\s*([\s\S]*?)\s*---\s*\n?([\s\S]*)$/);
     if (!m) return { attributes:{}, body: md.trim() };
@@ -397,7 +443,6 @@
     return { attributes: attrs, body };
   }
 
-  // markdown → html (со вставкой картинок и ссылок)
   function mdToHtml(md) {
     let html = md
       .replace(/```([\s\S]*?)```/g, (m,code)=> `<pre><code>${code.replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</code></pre>`)
@@ -409,7 +454,6 @@
       .replace(/(<li>.*<\/li>)(?!\s*<li>)/gims, '<ul>$1</ul>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      /* картинки: ![alt](src "cap") */
       .replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)/g, (m,alt,src,cap)=> {
         const finalSrc = rewriteMediaUrl(src);
         const capHtml = cap ? `<figcaption>${cap}</figcaption>` : '';
@@ -420,7 +464,9 @@
     html = html.split(/\n{2,}/).map(b => /<(h\d|ul|ol|pre|blockquote|figure|hr)/i.test(b) ? b : `<p>${b.replace(/\n/g,'<br>')}</p>`).join('\n');
     return html;
   }
+  </script>
 
+  <script>
   /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
@@ -437,13 +483,11 @@
   }
 
   async function loadContent(){
-    // быстрый старт из кэша
     let j = CACHE.get('__contentIndex');
     if (!j) j = await firstJson(API_INDEX_CANDIDATES);
     if (!j) j = { stories:[], notes:[], articles:[] };
     else CACHE.set('__contentIndex', j);
 
-    // подгрузим статьи, если отдельный индекс есть
     if (!Array.isArray(j.articles) || !j.articles.length) {
       try {
         const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
@@ -451,7 +495,6 @@
       } catch(_) {}
     }
 
-    // пергамент
     try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
     catch{ pergDocs = []; }
 
@@ -492,9 +535,6 @@
       return String(bl).localeCompare(String(al));
     });
 
-    window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
-
-    // в фоне обновим индекс с сети и перерисуем, если что-то поменялось
     (async ()=> {
       try{
         const fresh = await firstJson(API_INDEX_CANDIDATES);
@@ -502,41 +542,19 @@
       }catch(_){}
     })();
   }
+  </script>
 
-  /* ===== Тема ===== */
-  function applyTheme(){
-    document.documentElement.setAttribute('data-theme', state.theme);
-    localStorage.setItem('theme', state.theme);
-    setUtterancesTheme(state.theme);
-    setCusdisTheme();
-    const el=document.getElementById('favicon');
-    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
-    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
-  }
-  applyTheme();
-  document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
-  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
-
-  /* ===== Admin mode ===== */
-  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
-  function ensureAdminUI(){
-    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
-    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
-    if(!isAdmin) adminDockHide();
-  }
-
-  /* ===== Router ===== */
+  <script>
+  /* ===== Роутер и рендер списков ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
-  /* ===== АРКИ ===== */
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
     ibut:    {id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.'},
   };
+
   function buildArcs(){
     const map = {};
     for(const s of stories){
@@ -567,7 +585,6 @@
     return bySlug[0] || null;
   }
 
-  /* ===== Главная: список ===== */
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
   function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null; state.year = ySel; return ySel; }
 
@@ -691,8 +708,10 @@
     const needA = itemsArticles.filter(a=>!a.title || !a.date).slice(0,8);
     if(needA.length){ Promise.all(needA.map(a=>loadMdIntoArticle(a,isAdmin))).then(()=>{ renderList(); }); }
   }
+  </script>
 
-  /* ===== Ветки / Теги ===== */
+  <script>
+  /* ===== Ветки/теги/страницы ===== */
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
@@ -742,8 +761,82 @@
     </section>`;
     adminDockHide(); ensureAdminUI();
   }
+  </script>
 
+  <script>
   /* ===== Статьи ===== */
+  async function loadMdIntoStory(s, isAdmin){
+    if (!s) return s;
+    let file = s.file;
+    if(!file){
+      const name=(s.slug||s.id||'').trim();
+      if(name) file = `content/stories/${name}.md`;
+    }
+    if(!file || s.text) return s;
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      s.file       = file;
+      s.title      = s.title      || attributes.title || s.id;
+      s.date       = s.date       || attributes.date  || '';
+      s.minutes    = s.minutes    || Number(attributes.minutes)|| Math.max(5, Math.round((body||'').length/1100));
+      s.arc        = s.arc        || attributes.arc   || 'kainrax';
+      s.tags       = s.tags       || normalizeTags(attributes.tags);
+      s.annotation = s.annotation || attributes.annotation || '';
+      const yRaw   = (attributes.year ?? attributes.worldYear ?? attributes.pergYear);
+      s.year       = s.year ?? safeYear(yRaw);
+      s.text       = body || '';
+    }catch(e){}
+    return s;
+  }
+
+  async function loadMdIntoNote(n, isAdmin){
+    if (!n) return n;
+    let file = n.file;
+    if(!file){
+      const name=(n.slug||n.id||'').trim();
+      if(name) file = `content/notes/${name}.md`;
+    }
+    if(!file || n.text) return n;
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      n.file       = file;
+      n.title      = n.title || attributes.title || n.id;
+      n.date       = n.date  || attributes.date  || '';
+      n.tags       = n.tags  || normalizeTags(attributes.tags);
+      n.annotation = n.annotation || attributes.annotation || '';
+      n.text       = body || '';
+    }catch(e){}
+    return n;
+  }
+
+  async function loadMdIntoArticle(a, isAdmin){
+    if (!a) return a;
+    let file = a.file;
+    if(!file){
+      const name=(a.slug||a.id||'').trim();
+      if(name) file = `content/articles/${name}.md`;
+    }
+    if(!file || a.text) return a;
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 7000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      a.file       = file;
+      a.title      = a.title      || attributes.title || a.id;
+      a.date       = a.date       || attributes.date  || '';
+      a.minutes    = a.minutes    || Number(attributes.minutes)|| Math.max(6, Math.round((body||'').length/1000));
+      a.tags       = a.tags       || normalizeTags(attributes.tags);
+      a.annotation = a.annotation || attributes.annotation || '';
+      a.year       = a.year ?? safeYear(attributes.year);
+      a.author     = a.author     || attributes.author || '';
+      a.outlet     = a.outlet     || attributes.outlet || attributes.journal || '';
+      a.cover      = a.cover      || attributes.cover  || '';
+      a.text       = body || '';
+    }catch(e){}
+    return a;
+  }
+
   function renderArticlesList(){
     const q = state.q;
     const ySel = currentYearSelection();
@@ -799,6 +892,7 @@
   async function renderArticleRead(id){
     const a=findArticleByKey(id); if(!a){ location.hash='#/articles'; return; }
     try{ await loadMdIntoArticle(a, isAdmin); }catch(e){}
+
     app.innerHTML = `
       <a class="back" href="#/articles">← К статьям</a>
       <article class="with-margin" data-id="${a.id}" data-slug="${a.slug||a.id}">
@@ -820,77 +914,19 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
+
     await typesetMath(document.querySelector('.article-body'));
+    KX_refitMath(document);
     mountComments('article:'+(a.slug||a.id));
     setTimeout(restoreScroll,0);
     adminDockFor('article', a.slug||a.id);
     ensureAdminUI();
-    window.hit('article:'+(a.slug||a.id)).catch(()=>{});
+    window.hit && window.hit('article:'+(a.slug||a.id)).catch(()=>{});
   }
+  </script>
 
-  /* ===== Заметки / Проект / Пергамент ===== */
-  function renderNotes(){
-    const items = notes || [];
-    app.innerHTML = `
-      <section class="card">
-        <a class="back" href="#/">← На главную</a>
-        <h1>Заметки</h1>
-        <div class="list">
-          ${ items.length ? items.map(n => `
-            <div class="story-item" data-arc="${n.arc||'kainrax'}">
-              <a href="#/note/${n.id}">
-                <div class="title">✶ ${n.title || 'Без названия'}</div>
-                <div class="muted">${fmtHumanDate(n.date)} · ${(n.tags||[]).join(', ')}</div>
-              </a>
-              ${getAnno(n)?`<div class="anno">${getAnno(n)}</div>`:''}
-            </div>`).join('') : '<div class="muted">Пусто. Проверь <code>content/notes</code>.</div>' }
-        </div>
-      </section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-
-  async function renderNote(id){
-    const n=(notes||[]).find(x=>x.id===id||x.slug===id); if(!n){location.hash='#/notes';return;}
-    try{ await loadMdIntoNote(n, isAdmin); }catch(e){}
-    app.innerHTML=`<a class="back" href="#/notes">← К заметкам</a>
-      <article class="prose readbox with-margin" data-id="${n.id}" data-slug="${n.slug||n.id}">
-        <div>
-          <h1>${n.title}</h1>
-          <div class="muted">${fmtHumanDate(n.date)}</div>
-          ${(n.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
-        </div>
-        <aside class="margin-notes">${(Array.isArray(n.margin)?n.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}</aside>
-      </article>
-      <div class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></div>`;
-    mountComments('note:'+(n.slug||n.id)); setTimeout(restoreScroll,0); adminDockFor('note', n.slug||n.id); ensureAdminUI();
-    window.hit('note:'+(n.slug||n.id)).catch(()=>{});
-  }
-
-  async function renderProject() {
-    let title = 'О проекте | планы'; let updated = ''; let body = 'Здесь будет описание проекта.';
-    try { const raw = await fetchText('content/project.md',{ timeoutMs: 3000, cacheMode: isAdmin?'no-store':undefined });
-      const { attributes, body: mdBody } = parseFrontMatter(raw);
-      title = attributes.title || title; updated = attributes.updated || ''; body = mdBody || body;
-    } catch(_) {}
-    const intro = `
-      <div class="prose">
-        <p><strong>У нас магия — это сбой в физике.</strong> Когда прошлое болит — его лечат. Побочка: вероятность распада личности — 0.37.</p>
-        <p>Я пишу истории <strong>Кайнракс</strong> — подземной цивилизации, сбежавшей от богов — сломанных ИИ. Тёмная НФ/фэнтези, фантастические допущения и человеческая цена.</p>
-        <p>Обновления-рассказы: <strong>пятницы или субботы</strong>.</p>
-        <p><em>Поддержать:</em> лучшая поддержка — поделиться с друзьями.</p>
-        <div class="anno-box"><strong>Прямо сейчас пишется:</strong> роман и фолк-хоррор-повесть</div>
-      </div>`;
-    app.innerHTML = `
-      <section class="card">
-        <a class="back" href="#/">← На главную</a>
-        <h1>${title}</h1>
-        ${updated ? `<div class="muted">обновлено: ${fmtHumanDate(updated)}</div>` : ''}
-        ${intro}
-        <div class="prose readbox" style="margin-top:10px">${mdToHtml(body)}</div>
-      </section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-
+  <script>
+  /* ===== Истории, заметки, пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function renderPergList(){
     const items = pergDocs;
@@ -1001,7 +1037,7 @@
           </div>
           <div class="edhint">${currLabel} → последняя: ${lastLabel}</div>
           <div class="edbar"><div class="fill" id="edProgress" style="width:${frac.toFixed(1)}%"></div></div>
-          ${d.annotation?`<div class="anno" style="margin-top:6px">${d.annotation}</div>`:''}
+          ${d.annotation?`<div class="anno">${d.annotation}</div>`:''}
           ${prevBlock}
           <div class="scroll-body">${(body||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>
         </div>
@@ -1045,10 +1081,12 @@
     setTimeout(restoreScroll,0);
     adminDockFor('perg', d.slug||d.id);
     ensureAdminUI();
-    window.hit('perg:'+(d.slug||d.id)+':'+(e.id||'')).catch(()=>{});
+    window.hit && window.hit('perg:'+(d.slug||d.id)+':'+(e.id||'')).catch(()=>{});
   }
+  </script>
 
-  /* ===== Комменты / служебки ===== */
+  <script>
+  /* ===== Комменты / служебки / прогресс ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -1104,7 +1142,10 @@
     const y=+localStorage.getItem('read:'+id)||0;
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
+  </script>
 
+  <script>
+  /* ===== Косметика (звёзды и т.д.) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1141,7 +1182,9 @@
     });
     requestAnimationFrame(updatePosition);
   }
+  </script>
 
+  <script>
   /* ===== Роутинг ===== */
   async function render(){
     const r=state.route;
@@ -1200,13 +1243,16 @@
       </section>`;
 
     await typesetMath(document.querySelector('.prose.readbox'));
+    KX_refitMath(document);
     mountComments('story:'+(s.slug||s.id));
     setTimeout(restoreScroll,0);
     adminDockFor('story', s.slug||s.id);
     ensureAdminUI();
-    window.hit('story:'+(s.slug||s.id)).catch(()=>{});
+    window.hit && window.hit('story:'+(s.slug||s.id)).catch(()=>{});
   }
+  </script>
 
+  <script>
   /* ===== Инициализация ===== */
   (async function init(){
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
@@ -1214,55 +1260,68 @@
     applyTheme();
     render();
     ensureAdminUI();
-    (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); if (!prefersReduced) requestAnimationFrame(drawStars); })();
+    (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!prefersReduced) requestAnimationFrame(drawStars); })();
     initSkyLine();
   })();
+  </script>
 
-  /* ===== Автоподгонка блочных формул: единственная версия ===== */
-  (function(){
-    let raf=0;
-    function fitLargeMath(root){
-      const scope = root || document;
-      const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
-      blocks.forEach(el=>{
-        // обернуть один раз
-        let wrap = el.parentElement;
-        if(!wrap || !wrap.classList.contains('kx-math-fit')){
-          const w = document.createElement('div');
-          w.className = 'kx-math-fit';
-          (wrap || el.parentNode).insertBefore(w, el);
-          w.appendChild(el);
-          wrap = w;
-        }
+  <script>
+/* ===== Надёжный автоскейл блочных формул ===== */
+(function(){
+  function fitLargeMath(root){
+    const scope = root || document;
+    const blocks = scope.querySelectorAll(
+      '.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]'
+    );
 
-        // сброс и замер
-        el.style.transform = '';
-        wrap.style.height  = '';
-        const cs = getComputedStyle(wrap);
-        const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
-        const need  = el.scrollWidth;
+    blocks.forEach(el=>{
+      // одна обёртка на всю жизнь формулы
+      let wrap = el.parentElement;
+      if(!wrap || !wrap.classList.contains('kx-math-fit')){
+        const w = document.createElement('div');
+        w.className = 'kx-math-fit';
+        (wrap || el.parentNode).insertBefore(w, el);
+        w.appendChild(el);
+        wrap = w;
+      }
 
-        if(need > avail && avail > 0){
-          const scale = Math.max(0.30, Math.min(1, avail / need)); // не мельче 0.30
-          const h0 = el.getBoundingClientRect().height;
-          el.style.transform = `scale(${scale})`;
-          wrap.style.height  = (h0 * scale + 2) + 'px';
-        }
-      });
-    }
-    window.KX_refitMath = (target)=>{
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(()=> fitLargeMath(target||document));
-    };
-    addEventListener('resize', ()=> KX_refitMath(), {passive:true});
-    addEventListener('orientationchange', ()=> KX_refitMath(), {passive:true});
-    addEventListener('hashchange', ()=> KX_refitMath(), {passive:true});
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', ()=> KX_refitMath(), {once:true});
-    } else {
-      KX_refitMath();
-    }
-  })();
+      // сброс и измерение
+      el.style.transform = '';
+      wrap.style.height = '';
+      const cs = getComputedStyle(wrap);
+      const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
+      const need  = el.scrollWidth;
+
+      if(need > avail && avail > 0){
+        // нижний порог масштаба — 0.3, ниже читать больно
+        const scale = Math.max(0.30, Math.min(1, avail / need));
+        const rect  = el.getBoundingClientRect(); // высота ДО скейла
+        el.style.transform = `scale(${scale})`;
+        wrap.style.height = (rect.height * scale + 2) + 'px';
+      }
+    });
+  }
+
+  // Триггеры: после рендера, ресайза и смены хэша (SPA)
+  let raf = 0;
+  function scheduleFit(target){
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(()=> fitLargeMath(target || document));
+  }
+  addEventListener('resize', ()=> scheduleFit(), {passive:true});
+  addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
+  addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
+
+  // доступно из других мест
+  window.KX_refitMath = scheduleFit;
+
+  // автозапуск
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
+  } else {
+    scheduleFit();
+  }
+})();
   </script>
 </body>
 </html>
