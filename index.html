@@ -42,7 +42,10 @@
   <!-- MathJax для формул -->
   <script>
     window.MathJax = {
-      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']]
+      },
       options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
     };
   </script>
@@ -153,9 +156,15 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  .parchment{ position:relative; background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3); color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply; }
-  .parchment::before{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>"); }
+  .parchment{
+    position:relative;
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
+    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply;
+  }
+  .parchment::before{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>");
+  }
 
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
@@ -163,7 +172,7 @@
   .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
   .mnote .linklike{cursor:pointer; text-decoration:underline}
 
-  /* Годы: панель фильтра */
+  /* ГОДА: панель фильтра */
   .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
   .pill.year{cursor:pointer;position:relative;user-select:none}
   .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
@@ -171,21 +180,14 @@
 
   /* Статья: стили контента */
   .prose img{ max-width:100%; height:auto; border-radius:12px; display:block; margin:8px auto }
-  figure{ margin:10px 0; } figure img{ max-width:100%; display:block } figcaption{ font-size:13px; color:var(--muted); text-align:center; margin-top:4px }
+  figure{ margin:10px 0; }
+  figure img{ max-width:100%; display:block }
+  figcaption{ font-size:13px; color:var(--muted); text-align:center; margin-top:4px }
   .byline{ color:var(--muted); display:flex; gap:10px; flex-wrap:wrap }
   .byline .dot::before{ content:"•"; margin:0 6px; color:var(--muted) }
-  code, pre{ background:var(--code); color:var(--fg); padding:2px 6px; border-radius:6px } pre{ padding:10px 12px; overflow:auto }
+  code, pre{ background:var(--code); color:var(--fg); padding:2px 6px; border-radius:6px }
+  pre{ padding:10px 12px; overflow:auto }
   blockquote{ border-left:3px solid var(--line); padding-left:12px; color:var(--muted) }
-
-  /* Модалка (Пергамент) */
-  .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.45); z-index:10; }
-  .modal .box{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; width:min(92vw,420px); box-shadow:var(--shadow) }
-  .modal .seal{ width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); }
-
-  /* Прогресс редакции (Пергамент) */
-  .edbar{ height:6px; background:var(--line); border-radius:999px; overflow:hidden; margin:6px 0 8px }
-  .edbar .fill{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
-
   </style>
 </head>
 
@@ -230,13 +232,11 @@
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
-
   const API_INDEX_CANDIDATES = [
     '/api/content-index',
     '/.netlify/functions/content-index',
     'content/index.json'
   ];
-  const API_HIT = '/api/hit';
 
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
@@ -260,56 +260,23 @@
     return src; // относительные из репо оставить
   }
 
-  /* ===== Счётчик просмотров ===== */
-  window.hit = async function(slug, outEl){
-    try{
-      const r=await fetch(API_HIT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
-      const j=await r.json();
-      if(outEl) outEl.textContent = j?.count ?? '—';
-      return Number(j?.count ?? 0);
-    }catch(e){ if(outEl) outEl.textContent='—'; return 0; }
-  };
-
   /* ===== Состояние ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
 
-  /* ===== Дата/время утилиты ===== */
+  /* ===== Утилиты ===== */
   function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
     if(typeof val==='number') return new Date(val);
     if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; }
     return null;
   }
-  function tsDate(val){ const d=toDate(val); return d? d.getTime() : 0; }
+  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
   function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
   function fmtHumanDateTime(v){ const d=toDate(v); return d ? d.toLocaleString('ru-RU',{year:'numeric',month:'long',day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''; }
   function fmtPergDayYear(s){ if(typeof s!=='string') return String(s||''); const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s); const year=+m[1], day=+m[2]; return `${day}-й день ${year}-го года.`; }
-
-  /* ===== Год: безопасная нормализация ===== */
-  function cleanYear(v){
-    if (v === undefined || v === null) return null;
-    if (typeof v === 'string'){
-      const t = v.trim();
-      if (t === '') return null;
-      const n = Number(t);
-      return Number.isFinite(n) && n !== 0 ? n : null;
-    }
-    if (typeof v === 'number'){
-      return Number.isFinite(v) && v !== 0 ? v : null;
-    }
-    return null;
-  }
-  const hasYear = (v) => typeof v === 'number' && Number.isFinite(v) && v !== 0;
-
-  const getAnno = (s) => {
-    const a=(s.annotation||s.anno||s.summary||'').trim();
-    if(a) return a;
-    const txt=(s.text||'').replace(/\s+/g,' ').trim();
-    if(!txt) return '';
-    const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt;
-  };
+  const getAnno = (s) => { const a=(s.annotation||s.anno||s.summary||'').trim(); if(a) return a; const txt=(s.text||'').replace(/\s+/g,' ').trim(); if(!txt) return ''; const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt; };
 
   function normalizeTags(val){
     if (Array.isArray(val)) return val;
@@ -379,7 +346,9 @@
       s.arc        = s.arc        || attributes.arc   || 'kainrax';
       s.tags       = s.tags       || normalizeTags(attributes.tags);
       s.annotation = s.annotation || attributes.annotation || '';
-      s.year       = cleanYear(s.year ?? (attributes.year ?? attributes.pergYear));
+      const yrAttr = attributes.year ?? attributes.pergYear ?? null;
+      const yrNum  = Number(yrAttr);
+      s.year       = s.year ?? (Number.isFinite(yrNum) && yrNum > 0 ? yrNum : null);
       s.text       = body || '';
     }catch(e){}
     return s;
@@ -423,10 +392,11 @@
       a.minutes    = a.minutes    || Number(attributes.minutes)|| Math.max(6, Math.round((body||'').length/1000));
       a.tags       = a.tags       || normalizeTags(attributes.tags);
       a.annotation = a.annotation || attributes.annotation || '';
-      a.year       = cleanYear(a.year ?? attributes.year);
       a.author     = a.author     || attributes.author || '';
       a.outlet     = a.outlet     || attributes.outlet || attributes.journal || '';
       a.cover      = a.cover      || attributes.cover  || '';
+      const yrNum  = Number(attributes.year);
+      a.year       = a.year ?? (Number.isFinite(yrNum) && yrNum > 0 ? yrNum : null);
       a.text       = body || '';
     }catch(e){}
     return a;
@@ -435,7 +405,6 @@
   /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
-  // helper: пробуем список URL по одному, пока не получим валидный JSON с массивами
   async function firstJson(urls, {timeouts=[8000,8000,5000]} = {}) {
     for (let i = 0; i < urls.length; i++) {
       const url = urls[i];
@@ -445,7 +414,7 @@
           console.info('[content] loaded from', url);
           return j;
         }
-        if (Array.isArray(j)) { // случай content/articles/index.json как массива
+        if (Array.isArray(j)) {
           return { stories:[], notes:[], articles:j };
         }
       } catch(e) {
@@ -456,7 +425,6 @@
   }
 
   async function loadContent(){
-    // основной индекс: функция/статика
     let j = await firstJson(API_INDEX_CANDIDATES);
     if (!j) j = { stories:[], notes:[], articles:[] };
 
@@ -468,18 +436,22 @@
       } catch(_) {}
     }
 
-    // пергамент — статикой (как было)
     try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
     catch{ pergDocs = []; }
 
-    // нормализация полей
-    const tie = (a,b)=> String((a.slug||a.id||'')).localeCompare(String(b.slug||b.id||''), 'ru');
+    const coerceYear = (y, wy) => {
+      const v = (y ?? wy);
+      const n = Number(v);
+      return (Number.isFinite(n) && n > 0) ? n : null;
+    };
+    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
 
     stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
       ...s,
       id:   s.id   || s.slug || '',
       slug: s.slug || s.id   || '',
-      year: cleanYear(s.year ?? s.worldYear),
+      arc:  s.arc  || 'kainrax',
+      year: coerceYear(s.year, s.worldYear),
       file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
       tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
@@ -494,17 +466,16 @@
       ...a,
       id:   a.id   || a.slug || '',
       slug: a.slug || a.id   || '',
-      year: cleanYear(a.year),
+      year: coerceYear(a.year, null),
       file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
       tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
 
-    // сортировки по дате
-    stories.sort ((a,b)=> tsDate(b.date)-tsDate(a.date) || tie(a,b));
-    notes.sort   ((a,b)=> tsDate(b.date)-tsDate(a.date) || tie(a,b));
-    articles.sort((a,b)=> tsDate(b.date)-tsDate(a.date) || tie(a,b));
+    const tss = v=>{ const d=v?new Date(v):null; return d && !isNaN(+d) ? +d : 0; };
+    stories.sort ((a,b)=> tss(b.date)-tss(a.date) || tie(a,b));
+    notes.sort   ((a,b)=> tss(b.date)-tss(a.date) || tie(a,b));
+    articles.sort((a,b)=> tss(b.date)-tss(a.date) || tie(a,b));
 
-    // пергамент — те же сортировки редакций
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
       const ad=(a.editions||[]), bd=(b.editions||[]);
@@ -512,7 +483,6 @@
       return String(bl).localeCompare(String(al));
     });
 
-    // экспорт для быстрых проверок
     window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
   }
 
@@ -558,7 +528,7 @@
       map[id].items.push(s);
     }
     for(const k in map){
-      map[k].items.sort((a,b)=> tsDate(a.date)-tsDate(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
+      map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
     }
     return Object.values(map);
   }
@@ -568,7 +538,7 @@
     let s = stories.find(x=> (x.id||'') === key);
     if(s) return s;
     const bySlug = stories.filter(x=> (x.slug||'') === key);
-    bySlug.sort((a,b)=> tsDate(b.date)-tsDate(a.date) || String(a.id).localeCompare(String(b.id)));
+    bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
     return bySlug[0] || null;
   }
   function findArticleByKey(key){
@@ -576,22 +546,14 @@
     let a = articles.find(x=> (x.id||'') === key);
     if(a) return a;
     const bySlug = articles.filter(x=> (x.slug||'') === key);
-    bySlug.sort((a,b)=> tsDate(b.date)-tsDate(a.date) || String(a.id).localeCompare(String(b.id)));
+    bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
     return bySlug[0] || null;
   }
 
   /* ===== Список на главной (рассказы + статьи, общий год/поиск) ===== */
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
-  function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? cleanYear(+hq.year) : null; state.year = ySel; return ySel; }
-
-  function collectYearCounts(list){
-    return list.reduce((acc, it)=>{
-      const y = cleanYear(it.year);
-      if (y !== null) acc[y] = (acc[y]||0)+1;
-      return acc;
-    }, {});
-  }
-
+  function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null; state.year = ySel; return ySel; }
+  function collectYearCounts(list){ return list.reduce((acc, it)=>{ const y = Number(it.year); if (Number.isFinite(y) && y > 0) acc[y] = (acc[y]||0)+1; return acc; }, {}); }
   function yearBarHtml(years, counts, ySel){
     return `
       <div class="yearbar" id="yearbar">
@@ -621,10 +583,10 @@
 
     const union = baseStories.concat(baseArticles);
     const counts = collectYearCounts(union);
-    const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
+    const years  = Object.keys(counts).map(Number).filter(n=>Number.isFinite(n)&&n>0).sort((a,b)=>a-b);
 
-    const itemsStories  = baseStories.filter(s=> ySel==null ? true : s.year === ySel);
-    const itemsArticles = baseArticles.filter(a=> ySel==null ? true : a.year === ySel);
+    const itemsStories = baseStories.filter(s=> ySel==null ? true : Number(s.year)===ySel);
+    const itemsArticles = baseArticles.filter(a=> ySel==null ? true : Number(a.year)===ySel);
 
     const yearBar = yearBarHtml(years, counts, ySel);
 
@@ -643,7 +605,7 @@
                     ${fmtHumanDate(s.date)}
                     · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения
                     · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}
-                    ${(s.arc!=='ibut' && hasYear(s.year))?` · год: ${s.year}`:''}
+                    ${(String(s.arc||'')!=='ibut' && Number.isFinite(+s.year) && +s.year>0)?` · год: ${s.year}`:''}
                   </div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
@@ -659,7 +621,7 @@
                   <div class="title">📰 ${a.title||'Без названия'}</div>
                   <div class="muted">
                     ${fmtHumanDateTime(a.date)}
-                    ${hasYear(a.year)?` · год: ${a.year}`:''}
+                    ${(Number.isFinite(+a.year) && +a.year>0)?` · год: ${a.year}`:''}
                     ${a.outlet?` · ${a.outlet}`:''}
                     ${a.author?` · ${a.author}`:''}
                     · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
@@ -743,8 +705,8 @@
       return hay.includes(q);
     });
     const counts = collectYearCounts(base);
-    const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-    const items = base.filter(a=> ySel==null ? true : a.year === ySel);
+    const years  = Object.keys(counts).map(Number).filter(n=>Number.isFinite(n)&&n>0).sort((a,b)=>a-b);
+    const items = base.filter(a=> ySel==null ? true : Number(a.year)===ySel);
     const yearBar = yearBarHtml(years, counts, ySel);
 
     app.innerHTML = `
@@ -762,7 +724,7 @@
                     <div class="title">📰 ${a.title || 'Без названия'}</div>
                     <div class="muted">
                       ${fmtHumanDateTime(a.date)}
-                      ${hasYear(a.year)?` · год: ${a.year}`:''}
+                      ${(Number.isFinite(+a.year) && +a.year>0)?` · год: ${a.year}`:''}
                       ${a.outlet?` · ${a.outlet}`:''}
                       ${a.author?` · ${a.author}`:''}
                       · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
@@ -788,8 +750,9 @@
 
   async function renderArticleRead(id){
     const a = findArticleByKey(id);
-    if(!a){ location.hash='#/articles'; return; }
+    if(!a){ location.hash = '#/articles'; return; }
     try{ await loadMdIntoArticle(a, isAdmin); }catch(e){}
+
     app.innerHTML = `
       <a class="back" href="#/articles">← К статьям</a>
       <article class="with-margin" data-id="${a.id}" data-slug="${a.slug||a.id}">
@@ -812,26 +775,11 @@
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
 
-    (async () => {
-      const count = await window.hit('article:'+(a.slug||a.id));
-      const box = document.createElement('div');
-      box.className='muted'; box.textContent = `${count} просмотров`;
-      const rb = document.querySelector('.readbox'); rb && rb.appendChild(box);
-    })();
-
     typesetMath(document.querySelector('.article-body'));
     mountComments('article:'+(a.slug||a.id));
     setTimeout(restoreScroll,0);
     adminDockFor('article', a.slug||a.id);
     ensureAdminUI();
-  }
-
-  function typesetMath(scope){
-    try{
-      if(window.MathJax && MathJax.typesetPromise && scope){
-        MathJax.typesetPromise([scope]).catch(()=>{});
-      }
-    }catch(_){}
   }
 
   /* ===== Теги ===== */
@@ -1107,9 +1055,9 @@
   function adminDockHide(){ adminDock.style.display='none'; }
   function adminDockFor(kind, slug){
     if (!isAdmin) return adminDockHide();
-    if(kind==='story')      editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
-    else if(kind==='note')  editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
-    else if(kind==='perg')  editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
+    if(kind==='story')   editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
+    else if(kind==='note')   editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
+    else if(kind==='perg')   editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
     else if(kind==='article')editThisBtn.href=`/admin/#/collections/articles/entries/${slug}`;
     adminDock.style.display='block';
   }
@@ -1135,7 +1083,6 @@
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
 
-  // звёзды и линия
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1168,7 +1115,7 @@
     requestAnimationFrame(updatePosition);
   }
 
-  /* ===== Рендер ===== */
+  /* ===== Роутинг ===== */
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -1189,6 +1136,7 @@
     const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
+
     renderList();
   }
 
@@ -1210,7 +1158,6 @@
             ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
             · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
             (${pos+1}/${order.length})
-            · <span id="viewsBox" data-admin-only style="display:none">—</span>
           </div>
           <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
           ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
@@ -1225,12 +1172,6 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
-
-    (async () => {
-      const count = await window.hit('story:'+(s.slug||s.id));
-      const box = document.getElementById('viewsBox');
-      if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
-    })();
 
     typesetMath(document.querySelector('.prose.readbox'));
     mountComments('story:'+(s.slug||s.id));
