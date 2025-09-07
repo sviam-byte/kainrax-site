@@ -391,6 +391,50 @@
       setHeaderCollapsed(!document.body.classList.contains('header-collapsed'));
     }
   });
+    
+  <script>
+  (function(){
+    const headerEl = document.querySelector('header');
+    if (!headerEl || !('ontouchstart' in window)) return;
+  
+    const SWIPE_DIST = 22, SWIPE_TIME = 700, SIDE_DRIFT = 80;
+  
+    // Скрыть: свайп вверх по самой шапке
+    let hStartY = 0, hStartX = 0, hStartT = 0, hActive = false;
+    function onHeaderStart(e){
+      const t = (e.touches && e.touches[0]) || e;
+      hStartY = t.clientY; hStartX = t.clientX; hStartT = performance.now(); hActive = true;
+    }
+    function onHeaderEnd(e){
+      if (!hActive) return; hActive = false;
+      const t = (e.changedTouches && e.changedTouches[0]) || e;
+      const dy = t.clientY - hStartY;
+      const dx = t.clientX - hStartX;
+      const dt = performance.now() - hStartT;
+      if (dt <= SWIPE_TIME && dy < -SWIPE_DIST && Math.abs(dx) <= SIDE_DRIFT) {
+        if (!document.body.classList.contains('header-collapsed')) setHeaderCollapsed(true);
+      }
+    }
+    headerEl.addEventListener('touchstart', onHeaderStart, {passive:true});
+    headerEl.addEventListener('touchend',   onHeaderEnd,   {passive:true});
+  
+    // Показать: свайп вниз, когда прокрутка у верхней кромки
+    let gStartY = 0, gStartT = 0;
+    function onDocStart(e){ const t = e.touches[0]; gStartY = t.clientY; gStartT = performance.now(); }
+    function onDocEnd(e){
+      const t = e.changedTouches[0];
+      const dy = t.clientY - gStartY;
+      const dt = performance.now() - gStartT;
+      const nearTop = (window.scrollY || window.pageYOffset || 0) <= 4;
+      if (nearTop && dt <= SWIPE_TIME && dy > SWIPE_DIST) {
+        if (document.body.classList.contains('header-collapsed')) setHeaderCollapsed(false);
+      }
+    }
+    document.addEventListener('touchstart', onDocStart, {passive:true});
+    document.addEventListener('touchend',   onDocEnd,   {passive:true});
+  })();
+  </script>
+
 
   /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
