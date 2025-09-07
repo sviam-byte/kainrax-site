@@ -242,7 +242,6 @@
   
   const API_HIT = '/api/hit';
 
-
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
       const s=document.createElement('script'); s.defer=true;
@@ -417,93 +416,92 @@
   /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
- // helper: попробовать список URL по одному, пока не получим валидный JSON с массивами
-async function firstJson(urls, {timeouts=[8000,8000,5000]} = {}) {
-  for (let i = 0; i < urls.length; i++) {
-    const url = urls[i];
-    try {
-      const j = await fetchJson(url, { timeoutMs: timeouts[i] ?? 6000, headers:{'Accept':'application/json'} });
-      if (j && (Array.isArray(j.stories) || Array.isArray(j.notes) || Array.isArray(j.articles))) {
-        console.info('[content] loaded from', url);
-        return j;
+  // helper: попробовать список URL по одному, пока не получим валидный JSON с массивами
+  async function firstJson(urls, {timeouts=[8000,8000,5000]} = {}) {
+    for (let i = 0; i < urls.length; i++) {
+      const url = urls[i];
+      try {
+        const j = await fetchJson(url, { timeoutMs: timeouts[i] ?? 6000, headers:{'Accept':'application/json'} });
+        if (j && (Array.isArray(j.stories) || Array.isArray(j.notes) || Array.isArray(j.articles))) {
+          console.info('[content] loaded from', url);
+          return j;
+        }
+        if (Array.isArray(j)) { // случай content/articles/index.json как массива
+          return { stories:[], notes:[], articles:j };
+        }
+      } catch(e) {
+        console.warn('[content] failed', url, String(e));
       }
-      if (Array.isArray(j)) { // случай content/articles/index.json как массива
-        return { stories:[], notes:[], articles:j };
-      }
-    } catch(e) {
-      console.warn('[content] failed', url, String(e));
     }
-  }
-  return null;
-}
-
-async function loadContent(){
-  // основной индекс: функция/статика
-  let j = await firstJson(API_INDEX_CANDIDATES);
-  if (!j) j = { stories:[], notes:[], articles:[] };
-
-  // подстраховка: если в основном индексе нет статей — пробуем отдельный
-  if (!Array.isArray(j.articles) || !j.articles.length) {
-    try {
-      const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
-      j.articles = Array.isArray(aj) ? aj : (aj.articles||[]);
-    } catch(_) {}
+    return null;
   }
 
-  // пергамент — статикой (как было)
-  try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
-  catch{ pergDocs = []; }
+  async function loadContent(){
+    // основной индекс: функция/статика
+    let j = await firstJson(API_INDEX_CANDIDATES);
+    if (!j) j = { stories:[], notes:[], articles:[] };
 
-  // нормализация полей
-  const coerceYear = (y, wy) => {
-    const v = (y ?? wy);
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  };
-  const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
+    // подстраховка: если в основном индексе нет статей — пробуем отдельный
+    if (!Array.isArray(j.articles) || !j.articles.length) {
+      try {
+        const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
+        j.articles = Array.isArray(aj) ? aj : (aj.articles||[]);
+      } catch(_) {}
+    }
 
-  stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
-    ...s,
-    id:   s.id   || s.slug || '',
-    slug: s.slug || s.id   || '',
-    year: (s.year ?? coerceYear(s.year, s.worldYear)),
-    file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
-    tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
-  }));
-  notes    = (Array.isArray(j.notes)?j.notes:[]).map(n=>({
-    ...n,
-    id:   n.id   || n.slug || '',
-    slug: n.slug || n.id   || '',
-    file: n.file || (n.slug||n.id ? `content/notes/${(n.slug||n.id)}.md` : undefined),
-    tags: Array.isArray(n.tags) ? n.tags : (typeof n.tags==='string' ? n.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
-  }));
-  articles = (Array.isArray(j.articles)?j.articles:[]).map(a=>({
-    ...a,
-    id:   a.id   || a.slug || '',
-    slug: a.slug || a.id   || '',
-    year: (a.year ?? null),
-    file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
-    tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
-  }));
+    // пергамент — статикой (как было)
+    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
+    catch{ pergDocs = []; }
 
-  // сортировки по дате
-  const ts = (v)=> { const d = (v?new Date(v):null); return d && !isNaN(+d) ? +d : 0; };
-  stories.sort ((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
-  notes.sort   ((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
-  articles.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+    // нормализация полей
+    const coerceYear = (y, wy) => {
+      const v = (y ?? wy);
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
 
-  // пергамент — те же сортировки редакций
-  pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
-  pergDocs.sort((a,b)=> {
-    const ad=(a.editions||[]), bd=(b.editions||[]);
-    const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
-    return String(bl).localeCompare(String(al));
-  });
+    stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
+      ...s,
+      id:   s.id   || s.slug || '',
+      slug: s.slug || s.id   || '',
+      year: (s.year ?? coerceYear(s.year, s.worldYear)),
+      file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
+      tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+    }));
+    notes    = (Array.isArray(j.notes)?j.notes:[]).map(n=>({
+      ...n,
+      id:   n.id   || n.slug || '',
+      slug: n.slug || n.id   || '',
+      file: n.file || (n.slug||n.id ? `content/notes/${(n.slug||n.id)}.md` : undefined),
+      tags: Array.isArray(n.tags) ? n.tags : (typeof n.tags==='string' ? n.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+    }));
+    articles = (Array.isArray(j.articles)?j.articles:[]).map(a=>({
+      ...a,
+      id:   a.id   || a.slug || '',
+      slug: a.slug || a.id   || '',
+      year: (a.year ?? null),
+      file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
+      tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+    }));
 
-  // экспорт для быстрых проверок
-  window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
-}
+    // сортировки по дате
+    const ts = (v)=> { const d = (v?new Date(v):null); return d && !isNaN(+d) ? +d : 0; };
+    stories.sort ((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+    notes.sort   ((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
+    articles.sort((a,b)=> ts(b.date)-ts(a.date) || tie(a,b));
 
+    // пергамент — те же сортировки редакций
+    pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
+    pergDocs.sort((a,b)=> {
+      const ad=(a.editions||[]), bd=(b.editions||[]);
+      const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
+      return String(bl).localeCompare(String(al));
+    });
+
+    // экспорт для быстрых проверок
+    window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
+  }
 
   /* ===== Тема ===== */
   function applyTheme(){
@@ -767,13 +765,19 @@ async function loadContent(){
     adminDockHide(); ensureAdminUI();
   }
 
+  // >>> Правильная функция чтения статьи <<<
+  async function renderArticleRead(id){
+    const a = findArticleByKey(id);
+    if (!a) { location.hash = '#/articles'; return; }
+
+    try { await loadMdIntoArticle(a, isAdmin); } catch (_){}
 
     app.innerHTML = `
       <a class="back" href="#/articles">← К статьям</a>
       <article class="with-margin" data-id="${a.id}" data-slug="${a.slug||a.id}">
         <div class="prose readbox">
           ${a.cover?`<img src="${rewriteMediaUrl(a.cover)}" alt="cover" loading="lazy" decoding="async" referrerpolicy="no-referrer" style="margin-bottom:10px">`:''}
-          <h1>${a.title}</h1>
+          <h1>${a.title||'Без названия'}</h1>
           <div class="byline">
             ${a.outlet?`<span>${a.outlet}</span>`:''}
             ${a.author?`<span class="dot">${a.author}</span>`:''}
@@ -790,11 +794,14 @@ async function loadContent(){
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
 
+    // Не заставляем счётчик падать страницу, но если нужен — можно оставить:
     (async () => {
-      const count = await window.hit('article:'+(a.slug||a.id));
-      const box = document.createElement('div');
-      box.className='muted'; box.textContent = `${count} просмотров`;
-      const rb = document.querySelector('.readbox'); rb && rb.appendChild(box);
+      try {
+        const count = await window.hit('article:'+(a.slug||a.id));
+        const box = document.createElement('div');
+        box.className='muted'; box.textContent = `${count} просмотров`;
+        const rb = document.querySelector('.readbox'); rb && rb.appendChild(box);
+      } catch(_) {}
     })();
 
     typesetMath(document.querySelector('.article-body'));
@@ -1077,7 +1084,7 @@ async function loadContent(){
     wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
     const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
   }
-  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
+  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utterances.es'); }
   function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
 
   const adminDock=document.getElementById('adminDock');
@@ -1182,7 +1189,7 @@ async function loadContent(){
       <a class="back" href="#/">← К списку</a>
       <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <div class="prose readbox">
-          <h1>${s.title}</h1>
+          <h1>${s.title||'Без названия'}</h1>
           <div class="muted">
             ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
             · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
@@ -1204,9 +1211,11 @@ async function loadContent(){
       </section>`;
 
     (async () => {
-      const count = await window.hit('story:'+(s.slug||s.id));
-      const box = document.getElementById('viewsBox');
-      if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
+      try {
+        const count = await window.hit('story:'+(s.slug||s.id));
+        const box = document.getElementById('viewsBox');
+        if (isAdmin && box) { box.textContent = `${count} просмотров`; box.style.display=''; }
+      } catch(_) {}
     })();
 
     typesetMath(document.querySelector('.prose.readbox'));
