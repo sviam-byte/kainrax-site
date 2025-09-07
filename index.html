@@ -624,7 +624,7 @@ async function loadContent(){
                     ${fmtHumanDate(s.date)}
                     · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения
                     · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}
-                    ${(a.arc!=='ibut' && Number.isFinite(+a.year))?` · год: ${a.year}`:''}
+                    ${(s.arc!=='ibut' && Number.isFinite(+s.year))?` · год: ${s.year}`:''}
                   </div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
