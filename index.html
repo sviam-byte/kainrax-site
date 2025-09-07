@@ -167,18 +167,18 @@
     display:block;
     max-width:100%;
   }
-  /* инлайн-математика — можно скроллить по оси X в крайних случаях */
+  /* инлайн-математика — допускаем скролл по X в крайних случаях */
   .prose .mjx-container:not([display="true"]){
     overflow-x:auto;
     overflow-y:hidden;
     -webkit-overflow-scrolling: touch;
   }
-  /* блочные не скроллим, мы их вписываем */
+  /* блочные не скроллим — вписываем их */
   .prose .mjx-container[display="true"]{
     overflow:visible;
     margin:12px 0;
   }
-  /* переносы внутри \text{...} и длинных токенов */
+  /* переносы в \text{...} и длинных токенах */
   .prose .mjx-container mjx-mtext,
   .prose .mjx-container mjx-mi,
   .prose .mjx-container mjx-mn{
@@ -582,7 +582,7 @@
       ...n,
       id:   n.id   || n.slug || '',
       slug: n.slug || n.id   || '',
-      file: n.file || (n.slug||n.id ? `content/notes/${(n.slug||n.id)}.md` : undefined),
+      file: n.file || (n.slug||n.id ? `content/notes/${(n.slug||н.id)}.md` : undefined),
       tags: Array.isArray(n.tags) ? n.tags : (typeof n.tags==='string' ? n.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
     articles = (Array.isArray(j.articles)?j.articles:[]).map(a=>({
@@ -933,7 +933,7 @@
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
     await typesetMath(document.querySelector('.article-body'));
-    fitLargeMath(document); // на всякий, сразу после
+    fitLargeMath(document);
     mountComments('article:'+(a.slug||a.id));
     setTimeout(restoreScroll,0);
     adminDockFor('article', a.slug||a.id);
@@ -941,7 +941,7 @@
     window.hit('article:'+(a.slug||a.id)).catch(()=>{});
   }
 
-  /* ===== Заметки / Проект / Пергамент (без изменений в логике) ===== */
+  /* ===== Заметки / Проект / Пергамент ===== */
   function renderNotes(){
     const items = notes || [];
     app.innerHTML = `
@@ -1328,7 +1328,7 @@
     applyTheme();
     render();
     ensureAdminUI();
-    (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); if (!prefersReduced) requestAnimationFrame(drawStars); })();
+    (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!prefersReduced) requestAnimationFrame(drawStars); })();
     initSkyLine();
   })();
   </script>
