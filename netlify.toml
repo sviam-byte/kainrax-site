@@ -1,12 +1,18 @@
 # ── Сборка ───────────────────────────────────────────────────────
 [build]
-  command   = "node scripts/build-index.mjs && node scripts/build-pergament.mjs"
+  # Индекс собирается функцией, так что build-index можно выкинуть.
+  command   = "node scripts/build-pergament.mjs"
   publish   = "."
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
+  # Настройки медиапрокси (заполни в UI или здесь локально)
+  # MEDIA_HUB_BASE       = "https://hub.example.com/media"
+  # MEDIA_ASSETS_BASE    = "https://assets.example.com"
+  # MEDIA_DOMAIN_WHITELIST = "hub.example.com,assets.example.com,cdn.example.org"
 
+# ── Функции ──────────────────────────────────────────────────────
 [functions]
   node_bundler   = "esbuild"
   included_files = ["content/**"]
@@ -25,7 +31,6 @@
   status = 200
 
 # ── Функции: безопасный алиас /api/* → /.netlify/functions/:splat ─
-# (нельзя использовать /.netlify/... в "from", поэтому даём внешний путь)
 [[redirects]]
   from   = "/api/*"
   to     = "/.netlify/functions/:splat"
@@ -37,13 +42,25 @@
   to     = "/content/:splat"
   status = 200
 
-# Кеш для статического контента
+# Кэш для статического контента
 [[headers]]
   for = "/content/*"
   [headers.values]
     Cache-Control = "public, max-age=600"
 
-# ── Общий SPA-фоллбек для основного сайта (последним!) ─────────
+# Быстрый SPA: index.html не кэшируем, чтобы роутер и мета всегда свежие
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store"
+
+# (опционально) долгий кэш для /o2log/*
+# [[headers]]
+#   for = "/o2log/*"
+#   [headers.values]
+#     Cache-Control = "public, max-age=31536000, immutable"
+
+# ── Общий SPA-фоллбек для основного сайта (последним!) ──────────
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
