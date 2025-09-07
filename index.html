@@ -7,23 +7,6 @@
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
 
-  <!-- Я.Метрика -->
-  <script>
-    (function(m,e,t,r,i,k,a){
-      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-      m[i].l=1*new Date();
-      for (var j=0;j<document.scripts.length;j++){ if(document.scripts[j].src===r){ return; } }
-      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
-    ym(103716449,'init',{webvisor:true,clickmap:true,trackLinks:true,accurateTrackBounce:true,ecommerce:'dataLayer'});
-    (function(){
-      var last=location.href;
-      function hit(){ try{ ym(103716449,'hit',location.href,{referer:last,title:document.title}); last=location.href; }catch(e){} }
-      if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
-      addEventListener('hashchange', hit);
-    })();
-  </script>
-
   <!-- OG/Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Кайнракс — рассказы и статьи">
@@ -36,29 +19,13 @@
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
 
+  <!-- perf hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://plausible.io">
+
   <!-- Favicon -->
   <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
-
-  <!-- MathJax: конфиг с переносами по контейнеру -->
-  <script>
-    window.MathJax = {
-      tex: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        displayMath: [['$$','$$'], ['\\[','\\]']],
-        tags: 'ams'
-      },
-      chtml: {
-        linebreaks: { automatic: true, width: 'container' },
-        scale: 1,
-        mtextInheritFont: true,
-        matchFontHeight: false
-      },
-      options: {
-        skipHtmlTags: ['script','noscript','style','textarea','pre','code']
-      }
-    };
-  </script>
-  <script id="mathjax" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
   <style>
   :root{
@@ -92,12 +59,9 @@
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
   .card::after{
-    content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.35;
+    content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.28;
     background-image:
-      radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><path d='M80 6 L87 27 L109 31 L87 35 L80 56 L73 35 L51 31 L73 27 Z' fill='rgba(125,211,252,0.06)'/></svg>"),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'><defs><pattern id='hex' width='16' height='14' patternUnits='userSpaceOnUse' patternTransform='skewX(-12)'><path d='M4 0 L12 0 L16 7 L12 14 L4 14 L0 7 Z' fill='none' stroke='rgba(125,211,252,0.05)'/></pattern></defs><rect width='100%' height='100%' fill='url(%23hex)'/></svg>");
-    background-repeat:no-repeat, repeat, repeat; background-size:auto, 160px 160px, auto;
+      radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%);
   }
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
@@ -187,7 +151,7 @@
   .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
   .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
 
-  /* Статья: стили контента */
+  /* Контент */
   .prose img{ max-width:100%; height:auto; border-radius:12px; display:block; margin:8px auto }
   figure{ margin:10px 0; }
   figure img{ max-width:100%; display:block }
@@ -198,15 +162,17 @@
   pre{ padding:10px 12px; overflow:auto }
   blockquote{ border-left:3px solid var(--line); padding-left:12px; color:var(--muted) }
 
-  /* MathJax страховка — не вываливаться и давать скролл при необходимости */
-  .prose .mjx-container { max-width:100%; overflow-x:auto; overflow-y:hidden; }
-  .prose .mjx-container[jax="CHTML"][display="true"] { display:block; }
+  /* MathJax контейнеры не разламывают верстку */
+  .prose .mjx-container{ max-width:100%; overflow-x:auto; overflow-y:hidden; }
+  .prose .mjx-container[jax="CHTML"][display="true"]{ display:block; }
   @media (max-width:640px){ .prose .mjx-container{ font-size:.97em; } }
   </style>
 </head>
 
 <body>
+  <!-- noscript пиксель для метрики -->
   <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+
   <div id="sky-line" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
   <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
@@ -248,21 +214,94 @@
   const MEDIA_PROXY = '/api/media';
 
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  const API_HIT = '/api/hit'; // оставлен эндпоинт, но UI счётчик не показываем
+  const API_HIT = '/api/hit'; // UI счётчик не показываем
 
+  // Plausible — только на проде, лениво
   (function loadPlausibleOnProd(){
     if (PROD_HOSTS.includes(location.hostname)) {
-      const s=document.createElement('script'); s.defer=true;
-      s.setAttribute('data-domain', location.hostname);
-      s.src='https://plausible.io/js/script.js';
-      document.head.appendChild(s);
+      window.addEventListener('load', () => {
+        const loader = () => {
+          const s=document.createElement('script'); s.defer=true;
+          s.setAttribute('data-domain', location.hostname);
+          s.src='https://plausible.io/js/script.js';
+          document.head.appendChild(s);
+        };
+        ('requestIdleCallback' in window) ? requestIdleCallback(loader) : setTimeout(loader, 1200);
+      });
     }
   })();
+
+  /* ===== Я.Метрика — ленивый старт после загрузки ===== */
+  function initYM(){
+    if (window.__ymInited) return; window.__ymInited = true;
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
+    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
+    try{
+      ym(103716449,'init',{webvisor:true,clickmap:true,trackLinks:true,accurateTrackBounce:true,ecommerce:'dataLayer'});
+      let last=location.href;
+      const hit=()=>{ try{ ym(103716449,'hit',location.href,{referer:last,title:document.title}); last=location.href; }catch(e){} };
+      if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
+      addEventListener('hashchange', hit);
+    }catch(_){}
+  }
+  window.addEventListener('load', () => {
+    ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
+  });
+
+  /* ===== Ленивая загрузка MathJax ===== */
+  let mjPending=null;
+  function ensureMathJax(){
+    if (window.MathJax) return Promise.resolve();
+    if (mjPending) return mjPending;
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        tags: 'ams'
+      },
+      chtml: {
+        linebreaks: { automatic: true, width: 'container' },
+        scale: 1,
+        mtextInheritFont: true,
+        matchFontHeight: false
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+    mjPending = new Promise(res=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+      s.async=true; s.onload=()=>res(); s.onerror=()=>res();
+      document.head.appendChild(s);
+    });
+    return mjPending;
+  }
+  async function typesetMath(scope){
+    try{
+      if(!scope) return;
+      const html = scope.innerHTML || '';
+      const hasMath = /\$\$[\s\S]*?\$\$|\\\[|\\\(|(^|[^\\])\$(?=\S)[\s\S]*?\$(?!\w)/.test(html);
+      if(!hasMath) return;
+      await ensureMathJax();
+      if(window.MathJax){
+        if (MathJax.typesetClear) MathJax.typesetClear([scope]);
+        await MathJax.typesetPromise([scope]);
+      }
+    }catch(_){}
+  }
 
   /* ===== Хелперы сети с таймаутами ===== */
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
   async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
   async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
+
+  /* ===== Небольшой кэш в sessionStorage на сессию ===== */
+  const CACHE = {
+    get(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(_){ return null; } },
+    set(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(_){ } }
+  };
 
   /* ===== Прокси медиа ===== */
   function rewriteMediaUrl(src){
@@ -288,6 +327,8 @@
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
 
   /* ===== Утилиты ===== */
+  const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
+
   function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
     if(typeof val==='number') return new Date(val);
     if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; }
@@ -325,7 +366,7 @@
     return { attributes: attrs, body };
   }
 
-  // markdown → html
+  // markdown → html (со вставкой картинок и ссылок)
   function mdToHtml(md) {
     let html = md
       .replace(/```([\s\S]*?)```/g, (m,code)=> `<pre><code>${code.replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</code></pre>`)
@@ -367,8 +408,8 @@
       s.arc        = s.arc        || attributes.arc   || 'kainrax';
       s.tags       = s.tags       || normalizeTags(attributes.tags);
       s.annotation = s.annotation || attributes.annotation || '';
-      const yRaw   = (attributes.year ?? attributes.pergYear);
-      s.year       = s.year ?? (Number.isFinite(+yRaw) ? +yRaw : null);
+      const yRaw   = (attributes.year ?? attributes.worldYear ?? attributes.pergYear);
+      s.year       = s.year ?? safeYear(yRaw);
       s.text       = body || '';
     }catch(e){}
     return s;
@@ -412,7 +453,7 @@
       a.minutes    = a.minutes    || Number(attributes.minutes)|| Math.max(6, Math.round((body||'').length/1000));
       a.tags       = a.tags       || normalizeTags(attributes.tags);
       a.annotation = a.annotation || attributes.annotation || '';
-      a.year       = a.year ?? (Number.isFinite(+attributes.year) ? +attributes.year : null);
+      a.year       = a.year ?? safeYear(attributes.year);
       a.author     = a.author     || attributes.author || '';
       a.outlet     = a.outlet     || attributes.outlet || attributes.journal || '';
       a.cover      = a.cover      || attributes.cover  || '';
@@ -438,9 +479,13 @@
   }
 
   async function loadContent(){
-    let j = await firstJson(API_INDEX_CANDIDATES);
+    // быстрый старт из кэша
+    let j = CACHE.get('__contentIndex');
+    if (!j) j = await firstJson(API_INDEX_CANDIDATES);
     if (!j) j = { stories:[], notes:[], articles:[] };
+    else CACHE.set('__contentIndex', j);
 
+    // подгрузим статьи, если отдельный индекс есть
     if (!Array.isArray(j.articles) || !j.articles.length) {
       try {
         const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
@@ -448,6 +493,7 @@
       } catch(_) {}
     }
 
+    // пергамент
     try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
     catch{ pergDocs = []; }
 
@@ -457,7 +503,7 @@
       ...s,
       id:   s.id   || s.slug || '',
       slug: s.slug || s.id   || '',
-      year: (Number.isFinite(+s.year) ? +s.year : Number.isFinite(+s.worldYear) ? +s.worldYear : null),
+      year: safeYear(s.year ?? s.worldYear),
       file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
       tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
@@ -472,7 +518,7 @@
       ...a,
       id:   a.id   || a.slug || '',
       slug: a.slug || a.id   || '',
-      year: (Number.isFinite(+a.year) ? +a.year : null),
+      year: safeYear(a.year),
       file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
       tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
     }));
@@ -489,6 +535,14 @@
     });
 
     window.__contentDebug = { storiesCount:stories.length, notesCount:notes.length, articlesCount:articles.length };
+
+    // в фоне обновим индекс с сети и перерисуем, если что-то поменялось
+    (async ()=> {
+      try{
+        const fresh = await firstJson(API_INDEX_CANDIDATES);
+        if (fresh) { CACHE.set('__contentIndex', fresh); }
+      }catch(_){}
+    })();
   }
 
   /* ===== Тема ===== */
@@ -508,7 +562,7 @@
   /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } });
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
   function ensureAdminUI(){
     document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
     document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
@@ -516,7 +570,7 @@
   }
 
   /* ===== Router ===== */
-  addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); });
+  addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
   /* ===== АРКИ ===== */
@@ -558,7 +612,15 @@
   /* ===== Список на главной (рассказы + статьи, общий год/поиск) ===== */
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
   function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null; state.year = ySel; return ySel; }
-  function collectYearCounts(list){ return list.reduce((acc, it)=>{ const y = Number(it.year); if (Number.isFinite(y)) acc[y] = (acc[y]||0)+1; return acc; }, {}); }
+
+  function collectYearCounts(list,{excludeArc}={}) {
+    return list.reduce((acc, it)=>{
+      if (excludeArc && it.arc === excludeArc) return acc;
+      const y = safeYear(it.year);
+      if (y != null) acc[y] = (acc[y]||0)+1;
+      return acc;
+    }, {});
+  }
   function yearBarHtml(years, counts, ySel){
     return `
       <div class="yearbar" id="yearbar">
@@ -586,12 +648,13 @@
       return hay.includes(q);
     });
 
-    const union = baseStories.concat(baseArticles);
-    const counts = collectYearCounts(union);
+    // «полоса времени» считает только объекты с валидным годом и НЕ из ibut
+    const unionForYears = baseStories.concat(baseArticles);
+    const counts = collectYearCounts(unionForYears, {excludeArc:'ibut'});
     const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
 
-    const itemsStories = baseStories.filter(s=> ySel==null ? true : Number(s.year)===ySel);
-    const itemsArticles = baseArticles.filter(a=> ySel==null ? true : Number(a.year)===ySel);
+    const itemsStories = baseStories.filter(s=> ySel==null ? true : safeYear(s.year)===ySel);
+    const itemsArticles = baseArticles.filter(a=> ySel==null ? true : safeYear(a.year)===ySel);
 
     const yearBar = yearBarHtml(years, counts, ySel);
 
@@ -610,7 +673,7 @@
                     ${fmtHumanDate(s.date)}
                     · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения
                     · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}
-                    ${(s.arc!=='ibut' && Number.isFinite(+s.year))?` · год: ${s.year}`:''}
+                    ${(s.arc!=='ibut' && safeYear(s.year)!=null)?` · год: ${safeYear(s.year)}`:''}
                   </div>
                 </a>
                 ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
@@ -626,7 +689,7 @@
                   <div class="title">📰 ${a.title||'Без названия'}</div>
                   <div class="muted">
                     ${fmtHumanDateTime(a.date)}
-                    ${Number.isFinite(+a.year)?` · год: ${a.year}`:''}
+                    ${safeYear(a.year)!=null?` · год: ${safeYear(a.year)}`:''}
                     ${a.outlet?` · ${a.outlet}`:''}
                     ${a.author?` · ${a.author}`:''}
                     · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
@@ -710,7 +773,7 @@
     });
     const counts = collectYearCounts(base);
     const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-    const items = base.filter(a=> ySel==null ? true : Number(a.year)===ySel);
+    const items = base.filter(a=> ySel==null ? true : safeYear(a.year)===ySel);
     const yearBar = yearBarHtml(years, counts, ySel);
 
     app.innerHTML = `
@@ -728,7 +791,7 @@
                     <div class="title">📰 ${a.title || 'Без названия'}</div>
                     <div class="muted">
                       ${fmtHumanDateTime(a.date)}
-                      ${Number.isFinite(+a.year)?` · год: ${a.year}`:''}
+                      ${safeYear(a.year)!=null?` · год: ${safeYear(a.year)}`:''}
                       ${a.outlet?` · ${a.outlet}`:''}
                       ${a.author?` · ${a.author}`:''}
                       · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
@@ -781,17 +844,7 @@
     setTimeout(restoreScroll,0);
     adminDockFor('article', a.slug||a.id);
     ensureAdminUI();
-    // без вывода просмотров
     window.hit('article:'+(a.slug||a.id)).catch(()=>{});
-  }
-
-  function typesetMath(scope){
-    try{
-      if(window.MathJax && MathJax.typesetPromise && scope){
-        if (MathJax.typesetClear) MathJax.typesetClear([scope]);
-        MathJax.typesetPromise([scope]).catch(()=>{});
-      }
-    }catch(_){}
   }
 
   /* ===== Теги ===== */
@@ -1100,13 +1153,18 @@
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
-  addEventListener('resize', resize);
-  function makeStars(){ const base = document.documentElement.getAttribute('data-theme')==='light' ? 60 : 120; const k = (W*H)/30000; const count = Math.floor(base + k); starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.1+0.3, s: Math.random()*0.5+0.2 })); }
+  addEventListener('resize', resize, {passive:true});
+  function makeStars(){
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80; // было 60/120, стало легче
+    const k = (W*H)/60000; // было /30000, снизили плотность
+    const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
+  }
   function drawStars(ts, once=false){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
     for(const st of starsArr){
-      const a = once ? 0.7 : 0.5 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.4;
+      const a = once ? 0.7 : 0.55 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.35;
       ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
     }
     if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
@@ -1185,6 +1243,7 @@
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
 
+    // Ленивое типосеттинг LaTeX, если вдруг спрятался в рассказе
     typesetMath(document.querySelector('.prose.readbox'));
     mountComments('story:'+(s.slug||s.id));
     setTimeout(restoreScroll,0);
