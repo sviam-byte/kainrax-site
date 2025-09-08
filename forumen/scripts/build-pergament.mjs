@@ -1,2 +1,2 @@
-// shim для совместимости: Netlify ищет "пергамент" — пусть найдёт и запустит реальный билд
-import './build-index.mjs';
+// no-op build: статика уже готова
+console.log('[forum] no build step, using committed content/');
