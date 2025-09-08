@@ -150,9 +150,12 @@
   .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
   .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
 
-  /* ===== MathJax ===== */
+  /* ===== MathJax: устойчивость ===== */
   html, body { max-width: 100%; overflow-x: hidden; }
-  .prose .mjx-container{ display:block; max-inline-size:100%; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; margin:12px 0; }
+  .prose .mjx-container{
+    display:block; max-inline-size:100%; box-sizing:border-box;
+    overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; margin:12px 0;
+  }
   .prose .mjx-container mjx-mtext,
   .prose .mjx-container mjx-mi,
   .prose .mjx-container mjx-mn{ white-space:normal !important; word-break:break-word; overflow-wrap:anywhere; }
@@ -160,9 +163,7 @@
   .kx-math-fit > .mjx-container{ will-change:transform; transform-origin:left top; }
   .with-margin > * { min-width: 0; }
 
-  /* ===========================
-     МОБИЛЬНАЯ КНОПКА И ДРАВЕР
-     =========================== */
+  /* ===== Мобилка: только логотип + кнопка меню ===== */
   .menu-btn{display:none}
   @media (max-width:980px){
     .search{display:none}            /* верхняя панель на телефоне прячется */
@@ -196,7 +197,6 @@
 </head>
 
 <body>
-  <!-- noscript пиксель для метрики -->
   <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
 
   <div id="sky-line" aria-hidden="true"></div>
@@ -275,16 +275,15 @@
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
+  <!-- ===== JS: без вложенных скриптов, без сюрпризов ===== -->
   <script>
-  /* ===== Конфиг / сервиски ===== */
+  /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
-
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  const API_HIT = '/api/hit'; // UI счётчик не показываем
 
-  // Plausible лениво на проде
+  /* Plausible на проде (лениво) */
   (function(){
     if (PROD_HOSTS.includes(location.hostname)) {
       window.addEventListener('load', () => {
@@ -299,7 +298,7 @@
     }
   })();
 
-  // Я.Метрика — лениво
+  /* Метрика (лениво) */
   function initYM(){
     if (window.__ymInited) return; window.__ymInited = true;
     (function(m,e,t,r,i,k,a){
@@ -317,39 +316,6 @@
   window.addEventListener('load', () => {
     ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
   });
-
-  /* ===== MathJax (лениво) ===== */
-  let mjPending=null;
-  function ensureMathJax(){
-    if (window.MathJax) return Promise.resolve();
-    if (mjPending) return mjPending;
-    window.MathJax = {
-      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], tags: 'ams' },
-      chtml: { linebreaks: { automatic: true, width: 'container' }, scale: 1, mtextInheritFont: true, matchFontHeight: false },
-      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
-    };
-    mjPending = new Promise(res=>{
-      const s=document.createElement('script');
-      s.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
-      s.async=true; s.onload=()=>res(); s.onerror=()=>res();
-      document.head.appendChild(s);
-    });
-    return mjPending;
-  }
-  async function typesetMath(scope){
-    try{
-      if(!scope) return;
-      const html = scope.innerHTML || '';
-      const hasMath = /\$\$[\s\S]*?\$\$|\\\[|\\\(|(^|[^\\])\$(?=\S)[\s\S]*?\$(?!\w)/.test(html);
-      if(!hasMath) return;
-      await ensureMathJax();
-      if(window.MathJax){
-        if (MathJax.typesetClear) MathJax.typesetClear([scope]);
-        await MathJax.typesetPromise([scope]);
-        KX_refitMath(scope);
-      }
-    }catch(_){}
-  }
 
   /* ===== Утилиты ===== */
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
@@ -370,8 +336,7 @@
   </script>
 
   <script>
-  /* ===== Состояние / тема ===== */
-  window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
+  /* ===== Тема, шапка, ДРАВЕР ===== */
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
@@ -390,59 +355,52 @@
   if (themeBtn) themeBtn.onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
   document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
-  /* ===== МОБИЛЬНЫЙ ДРАВЕР ===== */
-  const body = document.body;
-  const menuBtn = document.getElementById('menuBtn');
-  const scrim = document.getElementById('scrim');
-  const drawer = document.getElementById('mobileNav');
-  const drawerClose = document.getElementById('drawerClose');
-  const qMobile = document.getElementById('qMobile');
-  const themeBtnMobile = document.getElementById('themeBtnMobile');
+  /* Мобильный дровер: строгий, минималистичный JS без модных фич */
+  (function(){
+    var body   = document.body;
+    var btn    = document.getElementById('menuBtn');
+    var drawer = document.getElementById('mobileNav');
+    var scrim  = document.getElementById('scrim');
+    var xBtn   = document.getElementById('drawerClose');
+    var qMobile= document.getElementById('qMobile');
+    var themeBtnMobile = document.getElementById('themeBtnMobile');
 
-  function openDrawer(){ body.classList.add('drawer-open'); }
-  function closeDrawer(){ body.classList.remove('drawer-open'); }
-  function toggleDrawer(){ body.classList.toggle('drawer-open'); }
+    function open(){ body.classList.add('drawer-open'); }
+    function close(){ body.classList.remove('drawer-open'); }
+    function toggle(){ body.classList.toggle('drawer-open'); }
 
-  if(menuBtn) menuBtn.addEventListener('click', toggleDrawer);
-  if(drawerClose) drawerClose.addEventListener('click', closeDrawer);
-  if(scrim) scrim.addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer(); }, {passive:true});
+    if(btn) btn.addEventListener('click', toggle);
+    if(xBtn) xBtn.addEventListener('click', close);
+    if(scrim) scrim.addEventListener('click', close);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
 
-  if (themeBtnMobile) themeBtnMobile.onclick = ()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+    if (themeBtnMobile) themeBtnMobile.onclick = function(){ 
+      state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); 
+      applyTheme(); 
+    };
 
-  // Синхронизация поиска между мобильным и десктопным
-  function syncQ(val){
-    try{
-      if (qEl && qEl.value !== val) qEl.value = val;
-      if (qMobile && qMobile.value !== val) qMobile.value = val;
-      state.q = (val||'').trim().toLowerCase();
-      renderList();
-    }catch(_){}
-  }
-  if(qEl) qEl.addEventListener('input', ()=> syncQ(qEl.value));
-  if(qMobile) qMobile.addEventListener('input', ()=> syncQ(qMobile.value));
+    // Синхронизация поиска между мобильным и десктопным
+    function syncQ(val){
+      try{
+        if (qEl && qEl.value !== val) qEl.value = val;
+        if (qMobile && qMobile.value !== val) qMobile.value = val;
+        state.q = (val||'').trim().toLowerCase();
+        renderList();
+      }catch(_){}
+    }
+    if(qEl) qEl.addEventListener('input', function(){ syncQ(qEl.value); });
+    if(qMobile) qMobile.addEventListener('input', function(){ syncQ(qMobile.value); });
 
-  // Закрывать дровер после клика по ссылке
-  drawer?.addEventListener('click', (e)=>{
-    const a = e.target.closest('a[href^="#/"]');
-    if(a){ setTimeout(closeDrawer, 0); }
-  });
-
-  /* ===== Admin mode ===== */
-  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
-  function ensureAdminUI(){
-    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
-    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
-    const mob = document.getElementById('adminMobile');
-    if (mob) mob.style.display = isAdmin ? '' : 'none';
-    if(!isAdmin) adminDockHide();
-  }
+    // Закрывать после клика по ссылке SPA
+    if (drawer) drawer.addEventListener('click', function(e){
+      var a = e.target.closest && e.target.closest('a[href^="#/"]');
+      if(a){ setTimeout(close, 0); }
+    });
+  })();
   </script>
 
   <script>
-  /* ===== Markdown / фронтматтер ===== */
+  /* ===== Markdown / парсинг ===== */
   const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
 
   function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
@@ -585,6 +543,7 @@
   <script>
   /* ===== Роутер и рендер списков ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
+  qEl && qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
@@ -801,7 +760,7 @@
   </script>
 
   <script>
-  /* ===== Статьи и истории ===== */
+  /* ===== Загрузка статей/историй ===== */
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -1203,7 +1162,7 @@
   </script>
 
   <script>
-  /* ===== Косметика (звёзды и линия неба) ===== */
+  /* ===== Косметика ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1243,7 +1202,22 @@
   </script>
 
   <script>
-  /* ===== Роутинг ===== */
+  /* ===== Роутинг и запуск ===== */
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
+  function ensureAdminUI(){
+    const adminBtns = document.getElementById('adminBtns');
+    if (adminBtns) adminBtns.style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    const mob = document.getElementById('adminMobile');
+    if (mob) mob.style.display = isAdmin ? '' : 'none';
+    if(!isAdmin) adminDockHide();
+  }
+
+  function renderNotes(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`; }
+  function renderProject(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>О проекте</h1><div class="muted">Кайнракс — тёмная НФ. Обновления по пятницам и субботам.</div></section>`; }
+
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
@@ -1267,11 +1241,7 @@
     renderList();
   }
 
-  // Заглушки для редких страниц (чтобы не падать, если их нет)
-  function renderNotes(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`; }
-  function renderProject(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>О проекте</h1><div class="muted">Кайнракс — тёмная НФ. Обновления по пятницам и субботам.</div></section>`; }
-
-  async function renderInit(){
+  async function init(){
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
     try { await loadContent(); } catch(_) {}
     applyTheme();
@@ -1280,11 +1250,9 @@
     (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!prefersReduced) requestAnimationFrame(drawStars); })();
     initSkyLine();
   }
-  renderInit();
-  </script>
+  init();
 
-  <script>
-  /* ===== Надёжный автоскейл блочных формул ===== */
+  /* Надёжный автоскейл блочных формул */
   (function(){
     function fitLargeMath(root){
       const scope = root || document;
@@ -1326,6 +1294,41 @@
       scheduleFit();
     }
   })();
+  </script>
+
+  <!-- MathJax loader (лениво) -->
+  <script>
+  let mjPending=null;
+  function ensureMathJax(){
+    if (window.MathJax) return Promise.resolve();
+    if (mjPending) return mjPending;
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], tags: 'ams' },
+      chtml: { linebreaks: { automatic: true, width: 'container' }, scale: 1, mtextInheritFont: true, matchFontHeight: false },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+    mjPending = new Promise(res=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+      s.async=true; s.onload=()=>res(); s.onerror=()=>res();
+      document.head.appendChild(s);
+    });
+    return mjPending;
+  }
+  async function typesetMath(scope){
+    try{
+      if(!scope) return;
+      const html = scope.innerHTML || '';
+      const hasMath = /\$\$[\s\S]*?\$\$|\\\[|\\\(|(^|[^\\])\$(?=\S)[\s\S]*?\$(?!\w)/.test(html);
+      if(!hasMath) return;
+      await ensureMathJax();
+      if(window.MathJax){
+        if (MathJax.typesetClear) MathJax.typesetClear([scope]);
+        await MathJax.typesetPromise([scope]);
+        KX_refitMath(scope);
+      }
+    }catch(_){}
+  }
   </script>
 </body>
 </html>
