@@ -1,0 +1,47 @@
+{
+  "id": "0001-first-shift",
+  "title": "Night shift: who turned on the moon?",
+  "author": "elec-eliara3",
+  "author_id": "elec_eliara_3",
+  "sector": "Eliara-3",
+  "board": "tech nodes",
+  "tags": ["lighting", "sky", "oddities", "night"],
+  "created": "2025-03-16T23:40:00Z",
+  "body": "The call came in at 02:17. Complaint: “the sky is too bright, can’t sleep.” I thought — another prank. I arrive at the sector’s upper tier. And yeah.\n\nInstead of the standard “star dome,” our projection sky shows a huge bright white thing. Looks like what the archives call a “moon.” And it shines so hard the residential blocks are lit like daytime. All lighting systems are nominal, logs show no changes. The projector just decided to show us a new picture. On its own.\n\nA reboot fixed it. The standard stars came back. But I stood there for an hour staring at that “moon.” Beautiful, sure. And creepy. Like the ceiling grew an opinion of its own.",
+  "comments": [
+    {
+      "id": "c1-1",
+      "author": "common_worker_delta",
+      "author_id": "common_worker_delta_55",
+      "sector": "Delta-5",
+      "created": "2025-03-17T05:30:00Z",
+      "body": "I saw it too! Woke up from the light. Thought it was already morning and I’d missed my shift! Glad you fixed it fast, otherwise the whole cycle would’ve gone off."
+    },
+    {
+      "id": "c1-2",
+      "author": "techie-linus",
+      "author_id": "techie_linus",
+      "sector": "Tech Node-4",
+      "created": "2025-03-17T06:00:00Z",
+      "body": "Not an “opinion.” Most likely a texture library glitch. The system accidentally loaded one of the archival, unused skyboxes from the First Light era. Surprised it still works. We should check archive integrity.",
+      "replies": [
+        {
+          "id": "c1-2-r1",
+          "author": "student-kaelen",
+          "author_id": "student_kaelen_lotus",
+          "sector": "University",
+          "created": "2025-03-17T07:15:00Z",
+          "body": "Can we ask to turn it on for holidays? :) Would be pretty."
+        }
+      ]
+    },
+    {
+      "id": "c1-3",
+      "author": "deicide-mentor",
+      "author_id": "deicide_mentor",
+      "sector": "Eternal City",
+      "created": "2025-03-17T08:00:00Z",
+      "body": "good that it showed just the moon. and not what’s behind it."
+    }
+  ]
+}
