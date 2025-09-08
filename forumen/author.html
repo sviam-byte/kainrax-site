@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru" data-theme="subsurface">
+<html lang="en" data-theme="subsurface">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Профиль автора — Доска сектора</title>
+  <title>Author profile — Sector Board</title>
   <meta name="theme-color" content="#0b0f14"/>
 
   <script src="/assets/metrika.js" defer></script>
@@ -58,14 +58,14 @@
   <div id="sky-line" aria-hidden="true"></div>
 
   <header class="kx-head">
-    <a class="kx-brand" href="/index.html">Доска Кайнракс</a>
+    <a class="kx-brand" href="/index.html">Kainrax Board</a>
     <nav class="kx-nav">
-      <a class="kx-btn" href="/index.html">Темы</a>
-      <a class="kx-btn is-active" href="/people.html">Все люди</a>
-      <a class="kx-btn" href="/tags.html">Теги</a>
-      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
-      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Подписаться</a>
-      <div class="kx-themes" id="themePicker" aria-label="Темы">
+      <a class="kx-btn" href="/index.html">Threads</a>
+      <a class="kx-btn is-active" href="/people.html">People</a>
+      <a class="kx-btn" href="/tags.html">Tags</a>
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">to stories</a>
+      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Subscribe</a>
+      <div class="kx-themes" id="themePicker" aria-label="Themes">
         <button class="kx-pill" data-theme="subsurface">Subsurface</button>
         <button class="kx-pill" data-theme="sepia">Sepia</button>
         <button class="kx-pill" data-theme="glitch">Glitch</button>
@@ -74,11 +74,11 @@
   </header>
 
   <main class="kx-shell">
-    <section class="kx-panel" id="box">Загрузка…</section>
+    <section class="kx-panel" id="box">Loading…</section>
   </main>
 
   <script type="module">
-    // Полоса неба
+    // Sky line
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
       function tick(){ const n=new Date(); const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds(); el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(tick); }
@@ -86,7 +86,7 @@
       requestAnimationFrame(tick);
     })();
 
-    // Темы
+    // Themes
     const THEMES=['subsurface','sepia','glitch']; const themeKey='kx-theme';
     function applyTheme(t){
       if(!THEMES.includes(t)) t='subsurface';
@@ -109,15 +109,15 @@
       });
     })();
 
-    // Утилиты
+    // Utils
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
     function slugify(s){return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64)}
     function parseHash(){const raw=(location.hash||'').slice(1).replace(/^\//,''); return decodeURIComponent(raw||'').trim()}
     function fmtDayYear(s){
       if(!s) return '';
       const m=String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
-      if(m){const yy=+m[1],doy=+m[2];const hh=m[3]?m[3].padStart(2,'0'):'00',mm=m[4]?m[4]:'00';return `${doy}-й день ${yy}-го года, ${hh}:${mm}`}
-      const d=new Date(s); if(!isNaN(d)){const ry=d.getUTCFullYear(); const wy=ry===2024?429:ry===2025?430:(ry-1595); const start=new Date(Date.UTC(ry,0,1)); const doy=Math.floor((d-start)/86400000)+1; const hh=String(d.getHours()).padStart(2,'0'),mm=String(d.getMinutes()).padStart(2,'0'); return `${doy}-й день ${wy}-го года, ${hh}:${mm}`} return s;
+      if(m){const yy=+m[1],doy=+m[2];const hh=m[3]?m[3].padStart(2,'0'):'00',mm=m[4]?m[4]:'00';return `Day ${doy} of Year ${yy}, ${hh}:${mm}`}
+      const d=new Date(s); if(!isNaN(d)){const ry=d.getUTCFullYear(); const wy=ry===2024?429:ry===2025?430:(ry-1595); const start=new Date(Date.UTC(ry,0,1)); const doy=Math.floor((d-start)/86400000)+1; const hh=String(d.getHours()).padStart(2,'0'),mm=String(d.getMinutes()).padStart(2,'0'); return `Day ${doy} of Year ${wy}, ${hh}:${mm}`} return s;
     }
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
@@ -126,7 +126,7 @@
 
     async function render(){
       const aid = parseHash(); const box=document.getElementById('box');
-      if(!aid){ box.textContent='Автор не указан.'; return }
+      if(!aid){ box.textContent='No author specified.'; return }
 
       const [threads, comments, authorsIdx] = await Promise.all([
         j('/content/threads-index.json'),
@@ -149,13 +149,13 @@
       const storiesBlock = meta?.stories?.length
         ? `<p style="margin:8px 0">
              ${meta.stories.slice(0,5).map(s =>
-               `<a class="kx-tag" href="${esc(s.url)}" target="_blank" rel="noopener">рассказ про</a>
+               `<a class="kx-tag" href="${esc(s.url)}" target="_blank" rel="noopener">story about</a>
                 <span class="muted" style="margin-left:6px">${esc(s.title)}</span>`
              ).join('<br>')}
            </p>`
         : (meta?.story_url
            ? `<p style="margin:8px 0">
-                <a class="kx-tag" href="${esc(meta.story_url)}" target="_blank" rel="noopener">рассказ про</a>
+                <a class="kx-tag" href="${esc(meta.story_url)}" target="_blank" rel="noopener">story about</a>
                 ${meta?.story_title ? `<span class="muted" style="margin-left:6px">${esc(meta.story_title)}</span>` : ``}
               </p>`
            : ``);
@@ -163,31 +163,31 @@
       const postsHtml = authored.map(t=>`
         <div class="item">
           <div><a href="/thread.html#/${encodeURIComponent(t.id)}"><strong>${esc(t.title)}</strong></a></div>
-          <div class="muted">${fmtDayYear(t.created)} · сектор: ${esc(t.sector||'—')}${t.board?` · раздел: ${esc(t.board)}`:''} · комментариев: ${t.commentCount||0}</div>
+          <div class="muted">${fmtDayYear(t.created)} · sector: ${esc(t.sector||'—')}${t.board?` · board: ${esc(t.board)}`:''} · comments: ${t.commentCount||0}</div>
         </div>`).join('');
 
       const commHtml = comms.map(c=>`
         <div class="item">
-          <div class="muted">${fmtDayYear(c.created)} · в теме:
+          <div class="muted">${fmtDayYear(c.created)} · in thread:
             <a href="/thread.html#/${encodeURIComponent(c.thread_id)}?c=${encodeURIComponent(c.comment_id)}">
               ${esc(c.thread_title||c.thread_id)}
             </a></div>
           <div style="margin-top:6px;white-space:pre-wrap">${esc((c.body||'').slice(0,800))}${(c.body||'').length>800?'…':''}</div>
         </div>`).join('');
 
-      document.title = `${displayName} — Доска сектора`;
+      document.title = `${displayName} — Sector Board`;
       box.innerHTML = `
         <h1>${emo} ${esc(displayName)}</h1>
-        <p class="muted">ID: ${esc(aid)} · постов: ${authored.length} · комментариев: ${comms.length}</p>
+        <p class="muted">ID: ${esc(aid)} · posts: ${authored.length} · comments: ${comms.length}</p>
         ${storiesBlock}
         <div class="grid">
           <section>
-            <h3>Посты</h3>
-            ${postsHtml || '<div class="muted">Постов нет.</div>'}
+            <h3>Posts</h3>
+            ${postsHtml || '<div class="muted">No posts.</div>'}
           </section>
           <section>
-            <h3>Комментарии</h3>
-            ${commHtml || '<div class="muted">Комментариев нет.</div>'}
+            <h3>Comments</h3>
+            ${commHtml || '<div class="muted">No comments.</div>'}
           </section>
         </div>
       `;
