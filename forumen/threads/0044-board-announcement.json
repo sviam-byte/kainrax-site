@@ -1,0 +1,89 @@
+{
+  "id": "0044-board-announcement",
+  "title": "OFFICIAL: On the resumption of the public platform \"Sector Board\"",
+  "author": "sector-admin-bot",
+  "author_id": "system_admin_bot_01",
+  "sector": "Central Administration",
+  "board": "announcements",
+  "tags": ["official", "administration", "Morbrandt", "Hexagon", "stability"],
+  "created": "2025-03-11T06:14:37Z",
+  "body": "Attention citizens of Kainrax.\n\nBy order of Lord Regent Morbrandt, with the approval of the Hexagon Council, as of this morning of Day 70, Year 430, the public platform \"Sector Board\" has resumed operation.\n\nIn the period after the events at the start of the year, open discussions were restricted. Order has been restored. The platform is open for constructive messages about daily life and work.\n\nPlease observe the \"Information Hygiene\" Regulation. Freedom of discussion entails responsibility.\n\nFor the glory of Kainrax.",
+  "comments": [
+    {
+      "id": "c44-1",
+      "author": "operator-brokk7",
+      "author_id": "operator_brokk_7_b23",
+      "sector": "B-23",
+      "created": "2025-03-11T06:21:09Z",
+      "body": "It's on. Congrats, folks."
+    },
+    {
+      "id": "c44-2",
+      "author": "student-kaelen",
+      "author_id": "student_kaelen_lotus",
+      "sector": "University",
+      "created": "2025-03-11T06:29:54Z",
+      "body": "Finally. We can send materials properly again, not via couriers. Thanks. :)"
+    },
+    {
+      "id": "c44-3",
+      "author": "civ-student",
+      "author_id": "civ_student_rebel",
+      "sector": "University",
+      "created": "2025-03-11T06:36:31Z",
+      "body": "\"RESUMED OPERATION\" — AND STRAIGHT TO REGULATIONS. CLEAR WHAT KIND OF DIALOGUE YOU WANT. ✊",
+      "replies": [
+        {
+          "id": "c44-3-r1",
+          "author": "guard-beta7",
+          "author_id": "guard_beta_7_patrol",
+          "sector": "Patrol Beta-7",
+          "created": "2025-03-11T06:44:18Z",
+          "body": "@civ-student You want no board at all? Stability matters more right now. Write to the point and there will be dialogue."
+        }
+      ]
+    },
+    {
+      "id": "c44-4",
+      "author": "deicide-mentor",
+      "author_id": "deicide_mentor",
+      "sector": "Eternal City",
+      "created": "2025-03-11T06:51:05Z",
+      "body": "the silence was louder. and more honest.",
+      "replies": [
+        {
+          "id": "c44-4-r1",
+          "author": "supervisor-riggs",
+          "author_id": "supervisor_riggs_internal",
+          "sector": "Internal Control",
+          "created": "2025-03-11T07:14:02Z",
+          "body": "@deicide-mentor Your statement has been recorded. Follow the regulation."
+        }
+      ]
+    },
+    {
+      "id": "c44-5",
+      "author": "assi-the-runner",
+      "author_id": "assi_runner_99",
+      "sector": "Front Line",
+      "created": "2025-03-11T07:33:46Z",
+      "body": "oh, the \"market\" lives. got surface water filters. clean. fast. EXPENSIVE. no extra protocols ;)"
+    },
+    {
+      "id": "c44-6",
+      "author": "gossip-monger_central",
+      "author_id": "gossip_monger_central",
+      "sector": "Corridors of Power",
+      "created": "2025-03-11T08:04:13Z",
+      "body": "Rumor says Rector Klotar reminded them: \"venting steam is safer than the boiler.\" Morning is the time for gestures."
+    },
+    {
+      "id": "c44-7",
+      "author": "meme-smith",
+      "author_id": "meme_smith_7",
+      "sector": "South-7",
+      "created": "2025-03-11T08:12:39Z",
+      "body": "here we go 👍😂 [image: skeleton at a terminal. caption: \"Finally.\"]"
+    }
+  ]
+}
