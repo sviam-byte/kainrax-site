@@ -1,0 +1,73 @@
+{
+  "id": "0003-what-should-i-do",
+  "title": "My master saved a man by faking a report. Now he’s making me sign it. What should I do?",
+  "author": "student-mavir",
+  "author_id": "student_mavir_uni",
+  "sector": "University",
+  "board": "advice",
+  "tags": ["dilemma", "work", "protocols", "human_factor", "ethics", "geodesy"],
+  "created": "2025-03-13T14:05:00Z",
+  "body": "I’m stuck. Writing here because there’s no one else to ask for advice...",
+  "comments": [
+    {
+      "id": "c0003-1",
+      "author": "deicide-mentor",
+      "author_id": "deicide_mentor",
+      "sector": "Eternal City",
+      "created": "2025-03-13T14:15:00Z",
+      "body": "sign it rookie. rules are for those who sit in offices. the old man was “in the field.” he did what had to be done. period."
+    },
+    {
+      "id": "c0003-2",
+      "author": "supervisor-riggs",
+      "author_id": "supervisor_riggs_internal",
+      "sector": "Internal Control",
+      "created": "2025-03-13T14:20:00Z",
+      "body": "Citizen Mavir. Your public appeal has been recorded and is sufficient grounds to initiate an internal investigation of Master Gideon for violations of articles 7.14 and 12.3. Thank you for your cooperation. Expect a summons to give testimony.",
+      "replies": [
+        {
+          "id": "c0003-2-r1",
+          "author": "student-mavir",
+          "author_id": "student_mavir_uni",
+          "sector": "University",
+          "created": "2025-03-13T14:22:00Z",
+          "body": "I… I was just asking for advice!"
+        },
+        {
+          "id": "c0002-2-r2",
+          "author": "assi-the-runner",
+          "author_id": "assi_runner_99",
+          "sector": "Frontline",
+          "created": "2025-03-13T14:30:00Z",
+          "body": "nice one, student. snitched on yourself. saved the control guys some paperwork ;) they’ll give themselves a bonus."
+        }
+      ]
+    },
+    {
+      "id": "c0003-3",
+      "author": "operator-brokk7",
+      "author_id": "operator_brokk_7_b23",
+      "sector": "B-23",
+      "created": "2025-03-13T14:45:00Z",
+      "body": "I’m Brokk. This is about me. My daughter sent me the link. Master Gideon, thank you. And you, student… I don’t know what you’ll decide. But I’m home now, hugging my youngest. She asked me to tell you you’ve got kind eyes. Please don’t sign. But don’t snitch either. Just burn that damned form.",
+      "replies": [
+        {
+          "id": "c0003-3-r1",
+          "author": "meme-smith",
+          "author_id": "meme_smith_7",
+          "sector": "South-7",
+          "created": "2025-03-13T14:55:00Z",
+          "body": "guys I’m crying 😭 what a story… riggs you’ve got no heart 💔 student burn the paper!! 🔥🔥🔥"
+        }
+      ]
+    },
+    {
+      "id": "c0003-4",
+      "author": "master-gideon",
+      "author_id": "master_gideon_geodezist",
+      "sector": "Geodesy Sector",
+      "created": "2025-03-13T15:10:00Z",
+      "body": "The choice is always yours, kid. I made mine. You make yours. Just remember: any protocol is dead until there’s a living person’s signature under it. And responsibility for it."
+    }
+  ]
+}
