@@ -168,12 +168,11 @@
     display:block;
     max-inline-size:100%;
     box-sizing:border-box;
-    overflow-x:auto;          /* при необходимости можно скроллить по X */
+    overflow-x:auto;
     overflow-y:hidden;
     -webkit-overflow-scrolling:touch;
     margin:12px 0;
   }
-  /* переносы в \text{...} и длинных токенах */
   .prose .mjx-container mjx-mtext,
   .prose .mjx-container mjx-mi,
   .prose .mjx-container mjx-mn{
@@ -181,8 +180,6 @@
     word-break:break-word;
     overflow-wrap:anywhere;
   }
-
-  /* обёртка для мягкого автоскейла дисплейных формул */
   .kx-math-fit{ width:100%; overflow:hidden; position:relative; }
   .kx-math-fit > .mjx-container{ will-change:transform; transform-origin:left top; }
 
@@ -202,8 +199,7 @@
     body.header-collapsed .show-header-fab{ display: inline-flex; }
   }
 
-  /* чтобы контент не дёргался по ширине в grid */
-  .with-margin > * { min-width: 0; }
+  .with-margin > * { min-width: 0; } /* grid страховка */
   </style>
 </head>
 
@@ -249,14 +245,13 @@
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
+  <!-- ===== Конфиг / аналитика ===== -->
   <script>
-  /* ===== Конфиг ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
-
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  const API_HIT = '/api/hit'; // UI счётчик не показываем
+  const API_HIT = '/api/hit';
 
   // Plausible — только на проде, лениво
   (function loadPlausibleOnProd(){
@@ -273,7 +268,7 @@
     }
   })();
 
-  /* ===== Я.Метрика — ленивый старт после загрузки ===== */
+  // Я.Метрика — лениво
   function initYM(){
     if (window.__ymInited) return; window.__ymInited = true;
     (function(m,e,t,r,i,k,a){
@@ -291,8 +286,10 @@
   window.addEventListener('load', () => {
     ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
   });
+  </script>
 
-  /* ===== Ленивая загрузка MathJax (+устойчивые настройки) ===== */
+  <!-- ===== MathJax (лениво) ===== -->
+  <script>
   let mjPending=null;
   function ensureMathJax(){
     if (window.MathJax) return Promise.resolve();
@@ -319,8 +316,6 @@
     });
     return mjPending;
   }
-
-  // Typeset + автоскейл дисплейных формул
   async function typesetMath(scope){
     try{
       if(!scope) return;
@@ -337,8 +332,8 @@
   }
   </script>
 
+  <!-- ===== Хелперы / кэш / утилы ===== -->
   <script>
-  /* ===== Мелкие хелперы ===== */
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
   async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
   async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
@@ -356,8 +351,8 @@
   }
   </script>
 
+  <!-- ===== Состояние / тема / кнопки / скрытие шапки по клику ===== -->
   <script>
-  /* ===== Состояние приложения ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
@@ -376,7 +371,6 @@
   document.getElementById('themeBtn').onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
   document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
-  /* ===== Скрываемая шапка (мобилки) ===== */
   const hideHeaderBtn = document.getElementById('hideHeaderBtn');
   const showHeaderFab = document.getElementById('showHeaderFab');
   function setHeaderCollapsed(v){
@@ -391,77 +385,66 @@
       setHeaderCollapsed(!document.body.classList.contains('header-collapsed'));
     }
   });
-    
+  </script>
+
+  <!-- ===== МОДУЛЬ ЖЕСТОВ: свайп вверх/вниз для скрытия/показа шапки ===== -->
   <script>
   (function(){
     const headerEl = document.querySelector('header');
-    if (!headerEl || !('ontouchstart' in window)) return;
-  
-    const SWIPE_DIST = 22, SWIPE_TIME = 700, SIDE_DRIFT = 80;
-  
-    // Скрыть: свайп вверх по самой шапке
+    if (!headerEl) return;
+
+    const supportsPointer = 'onpointerdown' in window;
+    const SWIPE_DIST = 22;   // px
+    const SWIPE_TIME = 700;  // ms
+    const SIDE_DRIFT = 80;   // px
+    const EDGE_TOL   = 4;    // px от верхней кромки для show-жеста
+
+    // Скрыть: быстрый свайп вверх по самой шапке
     let hStartY = 0, hStartX = 0, hStartT = 0, hActive = false;
-    function onHeaderStart(e){
-      const t = (e.touches && e.touches[0]) || e;
-      hStartY = t.clientY; hStartX = t.clientX; hStartT = performance.now(); hActive = true;
-    }
-    function onHeaderEnd(e){
+    function onHeaderStart(x, y, t){ hStartX = x; hStartY = y; hStartT = t; hActive = true; }
+    function onHeaderEnd(x, y, t){
       if (!hActive) return; hActive = false;
-      const t = (e.changedTouches && e.changedTouches[0]) || e;
-      const dy = t.clientY - hStartY;
-      const dx = t.clientX - hStartX;
-      const dt = performance.now() - hStartT;
-      if (dt <= SWIPE_TIME && dy < -SWIPE_DIST && Math.abs(dx) <= SIDE_DRIFT) {
-        if (!document.body.classList.contains('header-collapsed')) setHeaderCollapsed(true);
+      const dy = y - hStartY;
+      const dx = x - hStartX;
+      const dt = t - hStartT;
+      const isSwipeUp = dt <= SWIPE_TIME && dy < -SWIPE_DIST && Math.abs(dx) <= SIDE_DRIFT;
+      if (isSwipeUp && !document.body.classList.contains('header-collapsed')) {
+        setHeaderCollapsed(true);
       }
     }
-    headerEl.addEventListener('touchstart', onHeaderStart, {passive:true});
-    headerEl.addEventListener('touchend',   onHeaderEnd,   {passive:true});
-  
-    // Показать: свайп вниз, когда прокрутка у верхней кромки
-    let gStartY = 0, gStartT = 0;
-    function onDocStart(e){ const t = e.touches[0]; gStartY = t.clientY; gStartT = performance.now(); }
-    function onDocEnd(e){
-      const t = e.changedTouches[0];
-      const dy = t.clientY - gStartY;
-      const dt = performance.now() - gStartT;
-      const nearTop = (window.scrollY || window.pageYOffset || 0) <= 4;
-      if (nearTop && dt <= SWIPE_TIME && dy > SWIPE_DIST) {
-        if (document.body.classList.contains('header-collapsed')) setHeaderCollapsed(false);
+
+    // Показ: быстрый свайп вниз, когда у верхней кромки
+    let gStartY = 0, gStartT = 0, gActive = false;
+    function atTop(){ const y = window.scrollY || window.pageYOffset || 0; return y <= EDGE_TOL; }
+    function onDocStart(y, t){ gStartY = y; gStartT = t; gActive = true; }
+    function onDocEnd(y, t){
+      if (!gActive) return; gActive = false;
+      const dy = y - gStartY;
+      const dt = t - gStartT;
+      const isSwipeDown = dt <= SWIPE_TIME && dy > SWIPE_DIST;
+      if (isSwipeDown && atTop() && document.body.classList.contains('header-collapsed')) {
+        setHeaderCollapsed(false);
       }
     }
-    document.addEventListener('touchstart', onDocStart, {passive:true});
-    document.addEventListener('touchend',   onDocEnd,   {passive:true});
+
+    if (supportsPointer){
+      headerEl.addEventListener('pointerdown', (e)=>{ if (e.pointerType==='mouse') return; onHeaderStart(e.clientX, e.clientY, performance.now()); }, {passive:true});
+      headerEl.addEventListener('pointerup',   (e)=>{ if (e.pointerType==='mouse') return; onHeaderEnd(e.clientX, e.clientY, performance.now()); },   {passive:true});
+
+      document.addEventListener('pointerdown', (e)=>{ if (e.pointerType==='mouse') return; onDocStart(e.clientY, performance.now()); }, {passive:true});
+      document.addEventListener('pointerup',   (e)=>{ if (e.pointerType==='mouse') return; onDocEnd(e.clientY, performance.now()); },   {passive:true});
+    } else {
+      headerEl.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; if(!t) return; onHeaderStart(t.clientX, t.clientY, performance.now()); }, {passive:true});
+      headerEl.addEventListener('touchend',   (e)=>{ const t=e.changedTouches && e.changedTouches[0]; if(!t) return; onHeaderEnd(t.clientX, t.clientY, performance.now()); },   {passive:true});
+
+      document.addEventListener('touchstart', (e)=>{ const t=e.touches[0]; if(!t) return; onDocStart(t.clientY, performance.now()); }, {passive:true});
+      document.addEventListener('touchend',   (e)=>{ const t=e.changedTouches && e.changedTouches[0]; if(!t) return; onDocEnd(t.clientY, performance.now()); },   {passive:true});
+    }
   })();
   </script>
 
-
-  /* ===== Admin mode ===== */
-  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
-  function ensureAdminUI(){
-    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
-    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
-    if(!isAdmin) adminDockHide();
-  }
-  </script>
-
+  <!-- ===== Markdown / парсер ===== -->
   <script>
-  /* ===== Markdown / контент ===== */
-  const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
-
-  function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
-    if(typeof val==='number') return new Date(val);
-    if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; }
-    return null;
-  }
-  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
-  function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
-  function fmtHumanDateTime(v){ const d=toDate(v); return d ? d.toLocaleString('ru-RU',{year:'numeric',month:'long',day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''; }
-  function fmtPergDayYear(s){ if(typeof s!=='string') return String(s||''); const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s); const year=+m[1], day=+m[2]; return `${day}-й день ${year}-го года.`; }
-  const getAnno = (s) => { const a=(s.annotation||s.anno||s.summary||'').trim(); if(a) return a; const txt=(s.text||'').replace(/\s+/g,' ').trim(); if(!txt) return ''; const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt; };
-
   function normalizeTags(val){
     if (Array.isArray(val)) return val;
     if (typeof val === 'string') {
@@ -472,7 +455,6 @@
     }
     return [];
   }
-
   function parseFrontMatter(md){
     const m = md.match(/^---\s*([\s\S]*?)\s*---\s*\n?([\s\S]*)$/);
     if (!m) return { attributes:{}, body: md.trim() };
@@ -486,7 +468,6 @@
     });
     return { attributes: attrs, body };
   }
-
   function mdToHtml(md) {
     let html = md
       .replace(/```([\s\S]*?)```/g, (m,code)=> `<pre><code>${code.replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</code></pre>`)
@@ -510,9 +491,16 @@
   }
   </script>
 
+  <!-- ===== Данные / загрузка контента ===== -->
   <script>
-  /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
+  const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
+  function toDate(val){ if(!val) return null; if(val instanceof Date) return val; if(typeof val==='number') return new Date(val); if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; } return null; }
+  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
+  function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
+  function fmtHumanDateTime(v){ const d=toDate(v); return d ? d.toLocaleString('ru-RU',{year:'numeric',month:'long',day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''; }
+  function fmtPergDayYear(s){ if(typeof s!=='string') return String(s||''); const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s); const year=+m[1], day=+m[2]; return `${day}-й день ${year}-го года.`; }
+  const getAnno = (s) => { const a=(s.annotation||s.anno||s.summary||'').trim(); if(a) return a; const txt=(s.text||'').replace(/\s+/g,' ').trim(); if(!txt) return ''; const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt; };
 
   async function firstJson(urls,{timeouts=[8000,8000,5000]}={}) {
     for (let i=0;i<urls.length;i++){
@@ -588,8 +576,8 @@
   }
   </script>
 
+  <!-- ===== Рендер списков / роутер ===== -->
   <script>
-  /* ===== Роутер и рендер списков ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
   qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
@@ -754,8 +742,8 @@
   }
   </script>
 
+  <!-- ===== Ветки / теги / страницы ===== -->
   <script>
-  /* ===== Ветки/теги/страницы ===== */
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
@@ -807,8 +795,8 @@
   }
   </script>
 
+  <!-- ===== Статьи / чтение ===== -->
   <script>
-  /* ===== Статьи ===== */
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -969,8 +957,8 @@
   }
   </script>
 
+  <!-- ===== Истории / пергамент ===== -->
   <script>
-  /* ===== Истории, заметки, пергамент ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
   function renderPergList(){
     const items = pergDocs;
@@ -1129,8 +1117,8 @@
   }
   </script>
 
+  <!-- ===== Комменты / утилиты UI / прогресс ===== -->
   <script>
-  /* ===== Комменты / служебки / прогресс ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -1188,8 +1176,8 @@
   }
   </script>
 
+  <!-- ===== Косметика: звёзды / линия неба ===== -->
   <script>
-  /* ===== Косметика (звёзды и т.д.) ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1228,15 +1216,24 @@
   }
   </script>
 
+  <!-- ===== Роутинг / чтение историй / init ===== -->
   <script>
-  /* ===== Роутинг ===== */
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
+  function ensureAdminUI(){
+    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    if(!isAdmin) adminDockHide();
+  }
+
   async function render(){
     const r=state.route;
     if(r==='/'||r===''){ renderList(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
     if(r==='/articles'){ renderArticlesList(); return; }
-    if(r==='/notes'){ renderNotes(); return; }
-    if(r==='/project'){ renderProject(); return; }
+    if(r==='/notes'){ renderNotes?.(); return; }
+    if(r==='/project'){ renderProject?.(); return; }
     if(r==='/perg'){ renderPergList(); return; }
 
     const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
@@ -1247,7 +1244,7 @@
 
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote?.(mNote[1]); return; }
     const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
     const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
     renderList();
@@ -1294,13 +1291,10 @@
     ensureAdminUI();
     window.hit && window.hit('story:'+(s.slug||s.id)).catch(()=>{});
   }
-  </script>
 
-  <script>
-  /* ===== Инициализация ===== */
   (async function init(){
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    try { await loadContent(); } catch(_) {}
+    try { await loadContent(); } catch(_){}
     applyTheme();
     render();
     ensureAdminUI();
@@ -1309,63 +1303,53 @@
   })();
   </script>
 
+  <!-- ===== Надёжный автоскейл блочных формул ===== -->
   <script>
-/* ===== Надёжный автоскейл блочных формул ===== */
-(function(){
-  function fitLargeMath(root){
-    const scope = root || document;
-    const blocks = scope.querySelectorAll(
-      '.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]'
-    );
+  (function(){
+    function fitLargeMath(root){
+      const scope = root || document;
+      const blocks = scope.querySelectorAll(
+        '.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]'
+      );
 
-    blocks.forEach(el=>{
-      // одна обёртка на всю жизнь формулы
-      let wrap = el.parentElement;
-      if(!wrap || !wrap.classList.contains('kx-math-fit')){
-        const w = document.createElement('div');
-        w.className = 'kx-math-fit';
-        (wrap || el.parentNode).insertBefore(w, el);
-        w.appendChild(el);
-        wrap = w;
-      }
+      blocks.forEach(el=>{
+        let wrap = el.parentElement;
+        if(!wrap || !wrap.classList.contains('kx-math-fit')){
+          const w = document.createElement('div');
+          w.className = 'kx-math-fit';
+          (wrap || el.parentNode).insertBefore(w, el);
+          w.appendChild(el);
+          wrap = w;
+        }
+        el.style.transform = '';
+        wrap.style.height = '';
+        const cs = getComputedStyle(wrap);
+        const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
+        const need  = el.scrollWidth;
 
-      // сброс и измерение
-      el.style.transform = '';
-      wrap.style.height = '';
-      const cs = getComputedStyle(wrap);
-      const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
-      const need  = el.scrollWidth;
-
-      if(need > avail && avail > 0){
-        // нижний порог масштаба — 0.3, ниже читать больно
-        const scale = Math.max(0.30, Math.min(1, avail / need));
-        const rect  = el.getBoundingClientRect(); // высота ДО скейла
-        el.style.transform = `scale(${scale})`;
-        wrap.style.height = (rect.height * scale + 2) + 'px';
-      }
-    });
-  }
-
-  // Триггеры: после рендера, ресайза и смены хэша (SPA)
-  let raf = 0;
-  function scheduleFit(target){
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(()=> fitLargeMath(target || document));
-  }
-  addEventListener('resize', ()=> scheduleFit(), {passive:true});
-  addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
-  addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
-
-  // доступно из других мест
-  window.KX_refitMath = scheduleFit;
-
-  // автозапуск
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
-  } else {
-    scheduleFit();
-  }
-})();
+        if(need > avail && avail > 0){
+          const scale = Math.max(0.30, Math.min(1, avail / need));
+          const rect  = el.getBoundingClientRect();
+          el.style.transform = `scale(${scale})`;
+          wrap.style.height = (rect.height * scale + 2) + 'px';
+        }
+      });
+    }
+    let raf = 0;
+    function scheduleFit(target){
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=> fitLargeMath(target || document));
+    }
+    addEventListener('resize', ()=> scheduleFit(), {passive:true});
+    addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
+    addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
+    window.KX_refitMath = scheduleFit;
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
+    } else {
+      scheduleFit();
+    }
+  })();
   </script>
 </body>
 </html>
