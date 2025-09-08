@@ -1,0 +1,39 @@
+{
+  "id": "0002-human-factor-report",
+  "title": "REPORT: Inspection of Pump Station B-23. Anomaly detected: “human factor”.",
+  "author": "master-gideon",
+  "author_id": "master_gideon_geodezist",
+  "sector": "Geodesy Sector",
+  "board": "reports",
+  "tags": ["work", "anomaly", "protocols", "geodesy"],
+  "created": "2025-03-11T16:00:00Z",
+  "body": "Task: final calibration of pump station B-23 before commissioning.\n\nCourse of inspection: recorded 5 (five) local temporal fluctuations, entered into the protocol. During further checks with a manual gravimetric plumb, a sixth anomaly was found that standard equipment did not register. The source of the anomaly was the on-duty operator, citizen Brokk-7. The subject showed signs of temporal-gravitational instability typical of a pre-collapse phase.\n\nMeasures taken: Under protocol 14.8 I was obliged to report the operator’s instability. However, given patrol response lag (up to 12 hours) and the risk of a cascade failure at the facility, I decided to temporarily localize the threat.\n\nA falsified technical report was filed about a faulty pressure regulator on the operator’s panel. Subject Brokk-7 was removed from duty for 3 hours under the pretext of waiting for a repair crew. This window is sufficient for temporary self-stabilization of his field. This measure is more resource-efficient than eliminating the consequences of an explosion and paying compensation to the operator’s family. Trainee Mavir was instructed and signed the act.\n\nConclusion: The station is conditionally stable. I recommend adding “human factor” to the protocols as an admissible tolerance.",
+  "comments": [
+    {
+      "id": "0002-c1",
+      "author": "supervisor-riggs",
+      "author_id": "supervisor_riggs_internal",
+      "sector": "Internal Control",
+      "created": "2025-03-11T17:00:00Z",
+      "body": "Master Gideon, your report has been noted. As has the fact of willful document falsification. Expect a summons to the certification board. Protocol is not a recommendation — it is law.",
+      "replies": [
+        {
+          "id": "0002-c1-r1",
+          "author": "deicide-mentor",
+          "author_id": "deicide_mentor",
+          "sector": "Eternal City",
+          "created": "2025-03-11T17:15:00Z",
+          "body": "those boards are filled with people who never held a plumb when a sector’s life depended on it. the old man did the right thing."
+        }
+      ]
+    },
+    {
+      "id": "0002-c2",
+      "author": "techie-linus",
+      "author_id": "techie_linus",
+      "sector": "Tech Node-4",
+      "created": "2025-03-11T17:30:00Z",
+      "body": "And the trainee you “instructed” — was he informed about the falsification?"
+    }
+  ]
+}
