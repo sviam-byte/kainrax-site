@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en" data-theme="subsurface">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Thread — Sector Board</title>
+  <meta name="theme-color" content="#0b0f14"/>
+
+  <script src="/assets/metrika.js" defer></script>
+  <script src="/assets/hide-head.js" defer></script>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
+
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0e141d; --card:#0e141d; --text:#e6edf5; --muted:#9fb0c7;
+      --tag:#112131; --tag-on:#183140; --link:#bfe9ff; --ring:#7dd3fc; --brand:#7dd3fc;
+      --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
+      --head-h:56px; --safe-top: env(safe-area-inset-top, 0px);
+    }
+    html[data-theme="sepia"]{
+      --bg:#f8f4ec; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --brand:#d6b778; --link:#0b66d3; --tag:#efe3cc; --tag-on:#e6d8be; --ring:#d6b778;
+      --shadow:0 1px 0 rgba(0,0,0,.03) inset, 0 8px 30px rgba(0,0,0,.08)
+    }
+    html[data-theme="glitch"]{
+      --bg:#07090d; --panel:#0c121b; --card:#0c121b; --text:#e8f0ff; --muted:#9fb6d6;
+      --brand:#a78bfa; --link:#b9a4ff; --tag:#0d1a2a; --tag-on:#14253a; --ring:#a78bfa
+    }
+
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      padding-top: calc(var(--head-h) + var(--safe-top)); transition: padding-top .24s ease;}
+    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+
+    .kx-head{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid rgba(255,255,255,.05);
+      transform:translateY(0); transition:transform .24s ease, opacity .2s ease}
+    .kx-head.is-hidden{transform:translateY(calc(-100% - var(--safe-top))); opacity:.98}
+    body.head-hidden{padding-top:0}
+    html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0));border-bottom:1px solid rgba(0,0,0,.08)}
+    .kx-brand{font-weight:800;color:var(--text)}
+    .kx-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .kx-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--tag);border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow);color:var(--text)}
+    .kx-btn:hover{transform:translateY(-1px)} .is-active{outline:2px solid var(--ring)}
+    @media (prefers-reduced-motion: reduce){ .kx-head,body{transition:none} }
+
+    .kx-themes{display:flex;gap:6px}
+    .kx-pill{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--tag);color:var(--muted);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+    .kx-pill[data-on="true"]{background:var(--tag-on);color:var(--text);outline:1px solid var(--ring)}
+
+    .kx-shell{max-width:900px;margin:0 auto;padding:16px}
+    .kx-panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+    h1{margin:4px 0 8px 0;font-size:24px}
+    .kx-muted{color:var(--muted);font-size:14px}
+    .kx-tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+    .kx-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:10px;background:var(--tag);color:var(--muted);font-size:12px;border:1px solid rgba(255,255,255,.06)}
+    .kx-hr{border:0;height:1px;background:rgba(255,255,255,.08);margin:16px 0}
+    .comment{border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;background:var(--card)}
+
+    .post{padding:1rem 1.25rem;background:var(--card);border-radius:14px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.06)}
+    .post-head{margin-bottom:.5rem}
+    .post-title{margin:0;font-size:1.1rem;line-height:1.35}
+    .post-meta{font-size:.85rem;opacity:.75;color:var(--muted)}
+    .post-body{line-height:1.65}
+    .post-body p{margin:.6rem 0}
+    .post-media{margin-top:1rem;position:relative;z-index:1}
+    .post-media figure{margin:0 0 .75rem 0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden}
+    .post-media img{display:block;width:100%;height:auto}
+    .post-media figcaption{padding:.5rem .75rem;font-size:.9rem;color:var(--muted);text-align:center}
+    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
+  </style>
+</head>
+<body>
+  <div id="sky-line" aria-hidden="true"></div>
+
+  <header class="kx-head">
+    <a class="kx-brand" href="/index.html">Kainrax Board</a>
+    <nav class="kx-nav">
+      <a class="kx-btn is-active" href="/index.html">Threads</a>
+      <a class="kx-btn" href="/people.html">People</a>
+      <a class="kx-btn" href="/tags.html">Tags</a>
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">Project</a>
+      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Subscribe</a>
+      <div class="kx-themes" id="themePicker" aria-label="Themes">
+        <button class="kx-pill" data-theme="subsurface">Subsurface</button>
+        <button class="kx-pill" data-theme="sepia">Sepia</button>
+        <button class="kx-pill" data-theme="glitch">Glitch</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="kx-shell">
+    <article id="post" class="kx-panel">Loading…</article>
+  </main>
+
+  <script type="module">
+    (function sky(){
+      const el=document.getElementById('sky-line'); let run=true;
+      function tick(){ const n=new Date(); const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds(); el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(tick); }
+      document.addEventListener('visibilitychange',()=>{run=document.visibilityState==='visible'; if(run) requestAnimationFrame(tick)});
+      requestAnimationFrame(tick);
+    })();
+
+    const THEMES=['subsurface','sepia','glitch'], themeKey='kx-theme';
+    function applyTheme(t){
+      if(!THEMES.includes(t)) t='subsurface';
+      document.documentElement.setAttribute('data-theme',t);
+      try{ localStorage.setItem(themeKey, t) }catch(_){}
+      document.querySelectorAll('.kx-pill').forEach(b=> b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false');
+      const m=document.querySelector('meta[name="theme-color"]'); if(m){const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; m.setAttribute('content', bg)}
+    }
+    (function initTheme(){
+      let t='subsurface'; try{t=localStorage.getItem(themeKey)||t}catch(_){}
+      applyTheme(t);
+      document.getElementById('themePicker').addEventListener('click', e=>{
+        const btn=e.target.closest('.kx-pill'); if(!btn) return; applyTheme(btn.dataset.theme);
+      });
+      document.addEventListener('keyup', e=>{
+        if((e.key||'').toLowerCase()!=='t') return;
+        const cur=document.documentElement.getAttribute('data-theme')||'subsurface';
+        const next=THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]; applyTheme(next);
+      });
+    })();
+
+    function fmtDayYear(s){
+      if(!s) return '';
+      const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
+      if (m){
+        const yy=+m[1], doy=+m[2];
+        const hh=m[3]?m[3].padStart(2,'0'):'00', mm=m[4]?m[4]:'00';
+        return `Day ${doy} of Year ${yy}, ${hh}:${mm}`;
+      }
+      const d = new Date(s);
+      if (!isNaN(d)){
+        const ry = d.getUTCFullYear();
+        const wy = ry===2024 ? 429 : ry===2025 ? 430 : (ry - 1595);
+        const start=new Date(Date.UTC(ry,0,1));
+        const doy=Math.floor((d - start)/86400000)+1;
+        const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+        return `Day ${doy} of Year ${wy}, ${hh}:${mm}`;
+      }
+      return s;
+    }
+
+    function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+    async function getJSON(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(r.status); return await r.json() }
+    function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
+
+    const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
+    function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
+    function authorEmoji(name){ const i=hashStr(name||'anon')%EMO.length; return EMO[i] }
+
+    function renderCommentNode(c, depth=0){
+      const pad = Math.min(depth*14, 56);
+      const name = c.author || 'anon';
+      const aid = encodeURIComponent(c.author_id || slugify(name));
+      const emo = authorEmoji(name);
+      const cid = String(c.id || '');
+      return `
+        <div class="comment" data-cid="${esc(cid)}" style="margin-left:${pad}px">
+          <div class="kx-muted" style="font-size:12px">
+            ${fmtDayYear(c.created)} · <a href="/author.html#/${aid}">${emo} ${esc(name)}</a>${c.sector?` · sector: ${esc(c.sector)}`:''}
+          </div>
+          <div style="margin-top:6px;white-space:pre-wrap">${esc(c.body||'')}</div>
+          ${Array.isArray(c.replies)&&c.replies.length ? c.replies.map(r=>renderCommentNode(r, depth+1)).join('') : ''}
+        </div>
+      `;
+    }
+
+    function paragraphs(text){
+      const safe = (text || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+      return safe.split(/\n{2,}/).map(p=>`<p>${p.replace(/\n/g,"<br>")}</p>`).join("");
+    }
+
+    function parseHashId(){
+      const raw=(location.hash||'').slice(1).replace(/^\//,'');
+      const id=raw.split('?')[0].trim();
+      return id || "";
+    }
+    function parseQueryId(){
+      const q=new URLSearchParams(location.search); return (q.get('id')||"").trim();
+    }
+    function parsePathId(){
+      const path=location.pathname.replace(/\/+$/,'');
+      const parts=path.split('/');
+      const last=parts[parts.length-1]||"";
+      const prev=parts[parts.length-2]||"";
+      if(/^threads?$/i.test(prev) && last) return last.replace(/\.[a-z0-9]+$/i,'');
+      if(last && !/^(index|thread|post)$/i.test(last)) return last.replace(/\.[a-z0-9]+$/i,'');
+      return "";
+    }
+    async function resolvePostId(){
+      const fromHash=parseHashId(); if(fromHash) return fromHash;
+      const fromQ=parseQueryId(); if(fromQ) return fromQ;
+      const fromPath=parsePathId(); if(fromPath) return fromPath;
+      try{
+        const idx=await getJSON('/content/threads-index.json');
+        if(Array.isArray(idx) && idx.length){
+          const sorted=[...idx].sort((a,b)=> new Date(b.created||0)-new Date(a.created||0));
+          return sorted[0].id || "";
+        }
+      }catch(_){}
+      return "";
+    }
+
+    function renderPostCard(t){
+      const article=document.createElement('article');
+      article.className='post';
+
+      const head=document.createElement('header');
+      head.className='post-head';
+
+      const h2=document.createElement('h2');
+      h2.className='post-title';
+      h2.textContent=t.title||'(untitled)';
+
+      const meta=document.createElement('div');
+      meta.className='post-meta';
+      const when=fmtDayYear(t.created);
+      const auth=t.author||'anon';
+      const aId=encodeURIComponent(t.author_id||slugify(auth));
+      meta.innerHTML = `${when} · <a href="/author.html#/${aId}">${authorEmoji(auth)} ${esc(auth)}</a> · sector: ${esc(t.sector||'—')}${t.board?` · board: ${esc(t.board)}`:''}`;
+
+      head.appendChild(h2); head.appendChild(meta);
+      article.appendChild(head);
+
+      const body=document.createElement('div');
+      body.className='post-body';
+      body.innerHTML=paragraphs(t.body);
+      article.appendChild(body);
+
+      if(Array.isArray(t.media) && t.media.length){
+        const mediaWrap=document.createElement('div');
+        mediaWrap.className='post-media';
+        t.media.forEach(m=>{
+          if(m.type==='image' && m.src){
+            const fig=document.createElement('figure');
+            const img=document.createElement('img');
+            img.src=m.src; img.alt=m.alt||''; img.loading='lazy';
+            const cap=document.createElement('figcaption');
+            cap.textContent=m.caption||'';
+            fig.appendChild(img);
+            if(m.caption) fig.appendChild(cap);
+            mediaWrap.appendChild(fig);
+          }
+        });
+        article.appendChild(mediaWrap);
+      }
+
+      return article;
+    }
+
+    async function render(){
+      const box=document.getElementById('post');
+      box.textContent='Loading…';
+
+      const id = await resolvePostId();
+      if(!id){ box.innerHTML='<div class="kx-muted">No thread id and index is empty.</div>'; return; }
+
+      try{
+        const t=await getJSON(`/content/threads/${id}.json`);
+        document.title = `${t.title||id} — Sector Board`;
+
+        const tags=(t.tags||[]).map(x=>`<a class="kx-tag" href="/tags.html#/${encodeURIComponent(x)}">${esc(x)}</a>`).join(' ');
+
+        const card=renderPostCard(t);
+
+        box.innerHTML='';
+        const wrap=document.createElement('div');
+        wrap.className='kx-panel';
+        wrap.appendChild(card);
+
+        const tagBar=document.createElement('div');
+        tagBar.className='kx-tags';
+        tagBar.innerHTML=tags;
+        wrap.appendChild(tagBar);
+
+        const hr=document.createElement('hr'); hr.className='kx-hr';
+        wrap.appendChild(hr);
+
+        const related=document.createElement('div'); related.id='related';
+        if(Array.isArray(t.comments) && t.comments.length){
+          related.innerHTML = `
+            <div><strong>Comments:</strong></div>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:10px">
+              ${t.comments.map(c=>renderCommentNode(c,0)).join('')}
+            </div>
+          `;
+        } else {
+          try{
+            const idx=await getJSON('/content/threads-index.json');
+            const kids=idx.filter(x=>x.parentId===t.id);
+            const comments=kids.filter(x=>(x.board||'')==='комментарии');
+            const subthreads=kids.filter(x=>(x.board||'')!=='комментарии');
+            let html='';
+            if(comments.length){
+              html += `<div><strong>Comments:</strong><div style="margin-top:6px;display:flex;flex-direction:column;gap:10px">
+                ${comments.map(c=>`
+                  <div class="comment">
+                    <div class="kx-muted" style="font-size:12px">${fmtDayYear(c.created)} · ${esc(c.author||'anon')}</div>
+                    <div style="margin-top:6px">${esc((c.body||'').slice(0,600))}${(c.body||'').length>600?'…':''}</div>
+                  </div>`).join('')}
+              </div></div>`;
+            }
+            if(subthreads.length){
+              html += `<div style="margin-top:12px"><strong>Subthreads:</strong><ul>${subthreads.map(x=>`<li><a href="/thread.html#/${encodeURIComponent(x.id)}">${esc(x.title)}</a></li>`).join('')}</ul></div>`;
+            }
+            related.innerHTML = html || '';
+          }catch(_){}
+        }
+        wrap.appendChild(related);
+        box.appendChild(wrap);
+
+        const q = new URLSearchParams(location.search);
+        const target = q.get('c') || (location.hash.includes('?c=') ? new URLSearchParams(location.hash.split('?')[1]).get('c') : '');
+        if (target){
+          const el = document.querySelector(`[data-cid="${CSS.escape(String(target))}"]`);
+          if (el){
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.outline = '1px solid var(--ring)';
+            setTimeout(()=> el.style.outline='none', 1600);
+          }
+        }
+
+      }catch(e){
+        document.getElementById('post').innerHTML =
+          `<div class="kx-muted">Thread not found. Check <code>/content/threads/${esc(id)}.json</code>.</div>`;
+      }
+    }
+
+    addEventListener('hashchange', render);
+    addEventListener('popstate', render);
+    render();
+  </script>
+</body>
+</html>
