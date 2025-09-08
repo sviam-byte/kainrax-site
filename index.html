@@ -53,11 +53,15 @@
   body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
   a{color:var(--link); text-decoration:none; position:relative}
   a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
+
   h1{margin:6px 0 10px;font-size:28px}
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
-  .card::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;opacity:.28;background-image:radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%)}
+  .card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.28;
+    background-image: radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%);
+  }
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
@@ -113,33 +117,23 @@
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
 
-  .parchment{position:relative;background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);color:#2b2418;border:1px solid #e4d7bd;box-shadow:0 10px 30px rgba(0,0,0,.18);background-blend-mode:multiply}
-  .parchment::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;mix-blend-mode:multiply;opacity:.55;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>")}
+  .parchment{
+    position:relative;
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
+    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply;
+  }
+  .parchment::before{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>");
+  }
 
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
   .margin-notes{position:sticky;top:76px;align-self:start}
-  .margin-notes .mnote{font-size:13px;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;margin-bottom:12px}
-  .mnote .linklike{cursor:pointer;text-decoration:underline}
+  .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
+  .mnote .linklike{cursor:pointer; text-decoration:underline}
 
-  /* ===== Панель выбора года ===== */
-  .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
-  .pill.year{cursor:pointer;position:relative;user-select:none}
-  .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
-  .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
-
-  /* ===== Контент ===== */
-  .prose img{ max-width:100%; height:auto; border-radius:12px; display:block; margin:8px auto }
-  figure{ margin:10px 0; }
-  figure img{ max-width:100%; display:block }
-  figcaption{ font-size:13px; color:var(--muted); text-align:center; margin-top:4px }
-  .byline{ color:var(--muted); display:flex; gap:10px; flex-wrap:wrap }
-  .byline .dot::before{ content:"•"; margin:0 6px; color:var(--muted) }
-  code, pre{ background:var(--code); color:var(--fg); padding:2px 6px; border-radius:6px }
-  pre{ padding:10px 12px; overflow:auto }
-  blockquote{ border-left:3px solid var(--line); padding-left:12px; color:var(--muted) }
-
-  /* ===== ЛЕВАЯ БОКОВАЯ ПАНЕЛЬ ===== */
+  /* ===== Сайд-панель ===== */
   .panel-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); backdrop-filter: blur(2px); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7; }
   .mobile-panel{
     position:fixed; top:0; left:0; width:86vw; max-width:360px; height:100vh;
@@ -155,13 +149,15 @@
     position:fixed; left:calc(12px + env(safe-area-inset-left, 0px)); top:calc(10px + env(safe-area-inset-top, 0px));
     z-index:9; padding:10px 12px; border-radius:12px;
   }
+
+  /* чтобы контент не дёргался по ширине в grid */
+  .with-margin > * { min-width: 0; }
   </style>
 </head>
 
 <body>
-  <!-- скрытый инпут поиска для совместимости с логикой приложения -->
-  <input id="q" type="search" aria-hidden="true" tabindex="-1"
-         style="position:absolute; left:-10000px; width:1px; height:1px; opacity:0">
+  <!-- скрытый инпут поиска: на него завязано приложение -->
+  <input id="q" type="search" aria-hidden="true" tabindex="-1" style="position:absolute; left:-10000px; width:1px; height:1px; opacity:0">
 
   <!-- noscript пиксель для метрики -->
   <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
@@ -172,7 +168,7 @@
   <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
-  <!-- всегда видимая кнопка меню -->
+  <!-- плавающая кнопка меню -->
   <button id="menuFab" class="btn menu-fab" title="Меню" aria-label="Меню">☰</button>
 
   <!-- Оверлей и боковая панель -->
@@ -208,7 +204,6 @@
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
-
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
   const API_HIT = '/api/hit';
 
@@ -227,7 +222,7 @@
     }
   })();
 
-  /* ===== Я.Метрика ===== */
+  /* ===== Я.Метрика — ленивый старт ===== */
   function initYM(){
     if (window.__ymInited) return; window.__ymInited = true;
     (function(m,e,t,r,i,k,a){
@@ -246,14 +241,21 @@
     ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
   });
 
-  /* ===== MathJax ===== */
+  /* ===== MathJax (устойчиво) ===== */
   let mjPending=null;
   function ensureMathJax(){
     if (window.MathJax) return Promise.resolve();
     if (mjPending) return mjPending;
     window.MathJax = {
-      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], tags: 'ams' },
-      chtml: { linebreaks: { automatic: true, width: 'container' }, scale: 1, mtextInheritFont: true, matchFontHeight: false },
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        tags: 'ams'
+      },
+      chtml: {
+        linebreaks: { automatic: true, width: 'container' },
+        scale: 1, mtextInheritFont: true, matchFontHeight: false
+      },
       options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
     };
     mjPending = new Promise(res=>{
@@ -306,14 +308,17 @@
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
 
+  // безопасное применение темы
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
-    localStorage.setItem('theme', state.theme);
-    setUtterancesTheme(state.theme);
-    setCusdisTheme();
+    try { localStorage.setItem('theme', state.theme); } catch(_){}
+    if (typeof setUtterancesTheme === 'function') setUtterancesTheme(state.theme);
+    if (typeof setCusdisTheme === 'function') setCusdisTheme();
     const el=document.getElementById('favicon');
-    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
-    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
+    if (el){
+      const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
+      el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
+    }
   }
   function toggleTheme(){
     state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
@@ -322,7 +327,7 @@
   applyTheme();
   document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ toggleTheme(); } });
 
-  // Панель
+  // панель: открыть/закрыть
   (function(){
     const panelOverlay = document.getElementById('panelOverlay');
     const mobilePanel  = document.getElementById('mobilePanel');
@@ -340,16 +345,15 @@
     panelOverlay && (panelOverlay.onclick = ()=> setPanelOpen(false));
     document.addEventListener('keydown', e=>{ if(e.key === 'Escape') setPanelOpen(false); });
     addEventListener('hashchange', ()=> setPanelOpen(false), {passive:true});
-
     panelThemeBtn && (panelThemeBtn.onclick = ()=> toggleTheme());
 
-    // поиск в панели синхронизируем с приложением
+    // синхронизация поиска
     if (mqEl && qEl){
       mqEl.value = qEl.value || '';
       mqEl.addEventListener('input', ()=> { qEl.value = mqEl.value; qEl.dispatchEvent(new Event('input')); });
     }
 
-    // жест от левого края открывает панель; свайп влево по панели закрывает
+    // жесты
     if ('ontouchstart' in window){
       let sx=0, sy=0, st=0;
       document.addEventListener('touchstart', e=>{
@@ -379,7 +383,7 @@
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
   addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
   function ensureAdminUI(){
-    const adminBtns = document.getElementById('adminBtns');
+    const adminBtns = document.getElementById('adminBtns'); // может отсутствовать
     if (adminBtns) adminBtns.style.display = isAdmin ? 'inline-flex' : 'none';
     document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
     if(!isAdmin) adminDockHide();
@@ -747,6 +751,26 @@
   </script>
 
   <script>
+  /* ===== Пергамент: список (минимал) ===== */
+  function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
+  function renderPergList(){
+    const items = pergDocs;
+    app.innerHTML = `<section class="card"><h1>Пергамент</h1>
+      <div class="list">${items.map(d=>{
+        const e=lastEdition(d)||{};
+        return `<div class="story-item" data-arc="kainrax">
+          <a href="#/perg/${encodeURIComponent(d.id)}">
+            <div class="title">📜 ${d.title}</div>
+            <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
+          </a>
+          ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
+        </div>`;
+      }).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+  </script>
+
+  <script>
   /* ===== Загрузка markdown в объекты ===== */
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
@@ -814,7 +838,7 @@
     const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon'); let ghLoaded=false, anonLoaded=false;
     function loadGH(){ if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML=''; const s=document.createElement('script'); s.src='https://utteranc.es/client.js'; s.setAttribute('repo','sviam-byte/kainrax-site'); s.setAttribute('issue-term', term || 'home'); s.setAttribute('label','comments'); s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark'); s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s); }
     function loadAnon(){ if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
-      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML=''; const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID; t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark'; anonBox.appendChild(t);
+      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML=''; const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID; t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ру'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark'; anonBox.appendChild(t);
       if (!window.__cusdisLoaded){ const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js'; s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }; document.body.appendChild(s); } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
     }
     function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
@@ -906,9 +930,9 @@
     if(r==='/'||r===''){ renderList(); return; }
     if(r==='/arcs'){ renderArcs(); return; }
     if(r==='/articles'){ renderArticlesList(); return; } // функция ниже
-    if(r==='/notes'){ /* renderNotes(); */ renderList(); return; }
-    if(r==='/project'){ /* renderProject(); */ renderList(); return; }
-    if(r==='/perg'){ renderPergList(); return; } // список «Пергамента»
+    if(r==='/notes'){ renderList(); return; }
+    if(r==='/project'){ renderList(); return; }
+    if(r==='/perg'){ renderPergList(); return; }
 
     const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
     if(mReadId){ await renderArticleByObj(findStoryByKey(mReadId[1])); return; }
@@ -918,8 +942,7 @@
 
     const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
     const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ /* await renderNote(mNote[1]); */ renderList(); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ /* await renderPerg(mPerg[1]); */ renderPergList(); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPergList(); return; }
     const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
     renderList();
   }
@@ -1069,7 +1092,10 @@
   (function(){
     function fitLargeMath(root){
       const scope = root || document;
-      const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
+      const blocks = scope.querySelectorAll(
+        '.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]'
+      );
+
       blocks.forEach(el=>{
         let wrap = el.parentElement;
         if(!wrap || !wrap.classList.contains('kx-math-fit')){
@@ -1079,11 +1105,13 @@
           w.appendChild(el);
           wrap = w;
         }
+
         el.style.transform = '';
         wrap.style.height = '';
         const cs = getComputedStyle(wrap);
         const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
         const need  = el.scrollWidth;
+
         if(need > avail && avail > 0){
           const scale = Math.max(0.30, Math.min(1, avail / need));
           const rect  = el.getBoundingClientRect();
@@ -1092,6 +1120,7 @@
         }
       });
     }
+
     let raf = 0;
     function scheduleFit(target){
       cancelAnimationFrame(raf);
@@ -1101,7 +1130,12 @@
     addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
     addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
     window.KX_refitMath = scheduleFit;
-    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true}); } else { scheduleFit(); }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
+    } else {
+      scheduleFit();
+    }
   })();
   </script>
 </body>
