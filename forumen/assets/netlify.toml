@@ -1,7 +1,7 @@
 # === Netlify config for Kainrax forum ===
 [build]
-  base = "forumen"
-  publish = "."
+  base    = "forumen"   # перейти в папку перед билдом
+  publish = "."         # публиковать саму forumen/
   command = "npm run build"
 
   [build.environment]
@@ -10,16 +10,16 @@
 # Короткие URL на тред
 [[redirects]]
   from = "/t/:id"
-  to = "/thread.html#/:id"
+  to   = "/thread.html#/:id"
   status = 302
 
-# Кэш индексных JSON на минуту
+# Кэш JSON на минуту
 [[headers]]
   for = "/content/*.json"
   [headers.values]
   Cache-Control = "public, max-age=60, must-revalidate"
 
-# CSP и базовые заголовки
+# CSP и прочее
 [[headers]]
   for = "/*"
   [headers.values]
