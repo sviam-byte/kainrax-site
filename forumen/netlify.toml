@@ -1,7 +1,7 @@
 # === Netlify config for Kainrax forum ===
 [build]
-  base    = "forumen"   # перейти в папку перед билдом
-  publish = "."         # публиковать саму forumen/
+  base    = "forumen"
+  publish = "."
   command = "npm run build"
 
   [build.environment]
@@ -13,11 +13,23 @@
   to   = "/thread.html#/:id"
   status = 302
 
-# Кэш JSON на минуту
+# Кэш корневых JSON в /content
 [[headers]]
   for = "/content/*.json"
   [headers.values]
-  Cache-Control = "public, max-age=60, must-revalidate"
+    Cache-Control = "public, max-age=60, must-revalidate"
+
+# И на всякий: кэш всего внутри /content (включая /content/threads/*.json)
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "public, max-age=60, must-revalidate"
+
+# Не кэшировать HTML-оболочку, чтобы SPA-логика и мета были свежие
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store"
 
 # CSP и прочее
 [[headers]]
