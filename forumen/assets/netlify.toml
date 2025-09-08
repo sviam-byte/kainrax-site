@@ -1,25 +1,33 @@
+# === Netlify config for Kainrax forum (EN build) ===
+# Рабочая директория — папка forumen в репозитории
 [build]
-  # Site root — the forum folder
   base = "forumen"
   publish = "."
   command = "npm run build"
 
+  # Жёстко фиксируем Node 20 (и в UI переменную тоже не помешает)
   [build.environment]
     NODE_VERSION = "20"
 
-# Short URL for thread
+# Короткие URL на тред
 [[redirects]]
   from = "/t/:id"
   to = "/thread.html#/:id"
   status = 302
 
-# Cache the index for 1 minute
+# Кэш индекса тредов на 1 минуту
 [[headers]]
   for = "/content/threads-index.json"
   [headers.values]
   Cache-Control = "public, max-age=60, must-revalidate"
 
-# Security headers + allow Metrics
+# Можно слегка кэшировать и список авторов/комментов, если есть
+[[headers]]
+  for = "/content/*.json"
+  [headers.values]
+  Cache-Control = "public, max-age=60, must-revalidate"
+
+# CSP и базовые заголовки безопасности, + доступ для Метрики
 [[headers]]
   for = "/*"
   [headers.values]
@@ -35,3 +43,9 @@
   Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
   X-Content-Type-Options = "nosniff"
   Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Если когда-нибудь появятся serverless-функции — раскомментируй
+# [functions]
+#   node_bundler = "esbuild"
+#   included_files = ["content/**"]
+#   directory = "netlify/functions"
