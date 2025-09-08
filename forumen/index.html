@@ -1,4 +1,4 @@
-<!doctype html> 
+<!doctype html>
 <html lang="en" data-theme="subsurface">
 <head>
   <meta charset="utf-8" />
@@ -10,7 +10,9 @@
   <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/icon-64.png" />
 
+  <!-- Analytics (optional) -->
   <script src="/assets/metrika.js" defer></script>
+  <!-- Collapsible header helper -->
   <script src="/assets/hide-head.js" defer></script>
 
   <style>
@@ -19,8 +21,6 @@
       --brand:#7dd3fc; --tag:#112131; --tag-on:#183140; --ring:#7dd3fc; --link:#bfe9ff;
       --gap:12px; --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
       --border:rgba(255,255,255,.08);
-
-      /* collapsible header vars */
       --head-h: 56px;
       --safe-top: env(safe-area-inset-top, 0px);
     }
@@ -36,15 +36,22 @@
     }
 
     html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
-      padding-top: calc(var(--head-h) + var(--safe-top)); transition: padding-top .24s ease;}
+    body{
+      margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+      padding-top: calc(var(--head-h) + var(--safe-top));
+      transition: padding-top .24s ease;
+    }
     a{color:var(--link);text-decoration:none}
     a:hover{text-decoration:underline}
     :focus-visible{outline:2px solid var(--ring); outline-offset:2px}
 
     /* Header */
-    .kx-head{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--border);
-      transform:translateY(0); transition:transform .24s ease, opacity .2s ease; will-change:transform}
+    .kx-head{
+      position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0));backdrop-filter:saturate(1.1) blur(6px);
+      border-bottom:1px solid var(--border);
+      transform:translateY(0); transition:transform .24s ease, opacity .2s ease; will-change:transform;
+    }
     .kx-head.is-hidden{transform:translateY(calc(-100% - var(--safe-top))); opacity:.98}
     body.head-hidden{padding-top:0}
     html[data-theme="sepia"] .kx-head{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,255,255,0))}
@@ -55,7 +62,6 @@
     .is-active{outline:2px solid var(--ring)}
     .kx-cta{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)),var(--tag-on);border-color:var(--border);font-weight:600}
 
-    /* Respect reduced motion */
     @media (prefers-reduced-motion: reduce){
       .kx-head, body{transition:none}
     }
@@ -92,10 +98,13 @@
 
     /* Glitch link bg */
     html[data-theme="glitch"] .kx-link{position:relative;display:block;background:linear-gradient(0deg,rgba(255,255,255,.012),rgba(255,255,255,0))}
-    html[data-theme="glitch"] .kx-link::after{content:"";position:absolute;inset:0;mix-blend-mode:screen;opacity:.07;background:repeating-linear-gradient(180deg,rgba(167,139,250,.25) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(125,211,252,.15) 0 2px,transparent 2px 4px);pointer-events:none}
+    html[data-theme="glitch"] .kx-link::after{content:"";position:absolute;inset:0;mix-blend-mode:screen;opacity:.07;background:
+      repeating-linear-gradient(180deg,rgba(167,139,250,.25) 0 1px,transparent 1px 3px),
+      repeating-linear-gradient(90deg,rgba(125,211,252,.15) 0 2px,transparent 2px 4px);pointer-events:none}
 
     /* Sky line */
-    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
+    #sky-line{position:fixed;left:0;right:0;height:3px;z-index:0;pointer-events:none;opacity:.7;filter:blur(1px);background:
+      radial-gradient(ellipse 80% 150% at 50% 50%, var(--brand) 0%, transparent 40%)}
 
     /* Skeletons */
     .skeleton{border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.08), rgba(255,255,255,.04));animation:sh 1.4s infinite}
@@ -110,36 +119,19 @@
     /* ABOUT block */
     .kx-about{margin:10px 0 14px}
     .kx-about details{
-      position:relative;
-      border:1px solid var(--border);
-      border-radius:var(--r);
-      background:var(--card);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      max-width:760px;
-      margin:0 auto;
+      position:relative;border:1px solid var(--border);border-radius:var(--r);background:var(--card);box-shadow:var(--shadow);overflow:hidden;max-width:760px;margin:0 auto;
     }
     .kx-about details::before{
-      content:"";
-      position:absolute; inset:0 auto 0 0; width:4px;
-      background:linear-gradient(180deg, var(--brand), transparent);
-      opacity:.65; pointer-events:none;
+      content:"";position:absolute; inset:0 auto 0 0; width:4px;background:linear-gradient(180deg, var(--brand), transparent);opacity:.65; pointer-events:none;
     }
     .kx-about summary{
-      list-style:none; cursor:pointer; user-select:none;
-      padding:9px 12px;
-      display:flex; align-items:center; gap:8px;
-      font-weight:600; font-size:15px;
+      list-style:none; cursor:pointer; user-select:none; padding:9px 12px; display:flex; align-items:center; gap:8px; font-weight:600; font-size:15px;
     }
     .kx-about summary::-webkit-details-marker{display:none}
     .kx-about .caret{transition:transform .18s ease; font-size:12px; line-height:1; opacity:.85}
     .kx-about details[open] .caret{transform:rotate(90deg)}
     .kx-about .body{padding:0 12px 12px; color:var(--muted)}
-    .kx-badge{
-      font-size:12px; padding:4px 8px; border-radius:999px;
-      background:var(--tag); border:1px solid var(--border); color:var(--muted);
-      margin-right:6px;
-    }
+    .kx-badge{font-size:12px; padding:4px 8px; border-radius:999px; background:var(--tag); border:1px solid var(--border); color:var(--muted); margin-right:6px}
 
     @media (max-width:480px){
       .kx-head{gap:8px}
@@ -172,23 +164,19 @@
     <section class="kx-panel" aria-labelledby="h1">
       <h1 id="h1">Sector Board</h1>
 
+      <!-- ABOUT -->
       <div class="kx-about" id="about">
         <details id="aboutBox" aria-labelledby="aboutTitle">
-          <summary>
-            <span class="caret" aria-hidden="true">▸</span>
-            <span id="aboutTitle">What is this place?</span>
-          </summary>
+          <summary><span class="caret" aria-hidden="true">▸</span><span id="aboutTitle">What is this place?</span></summary>
           <div class="body">
             <p>
               <span class="kx-badge">in-world project</span>
               <span class="kx-badge">fiction</span>
               <span class="kx-badge">forum inside the world</span>
             </p>
-
             <p><strong>What it is.</strong> The “Sector Board” is an in-world project set in the Kainrax universe.
-            It collects characters’ posts and threads: notes, notices, rumors, tech messages, everyday oddities.
-            Everything is written by fictional inhabitants, not real users.</p>
-
+              It collects characters’ posts and threads: notes, notices, rumors, tech messages, everyday oddities.
+              Everything is written by fictional inhabitants, not real users.</p>
             <p><strong>How it works.</strong></p>
             <ul>
               <li><strong>Card = discussion thread.</strong> Open a card to see the original post, a timeline and character comments.</li>
@@ -196,53 +184,40 @@
               <li><strong>Time.</strong> Dates show as “Nth day of Yth year” (in-world calendar) or real time where appropriate.</li>
               <li><strong>Structure.</strong> “Sector,” “tech node,” tags, etc. are navigation keys inside Kainrax lore.</li>
             </ul>
-
             <p><strong>Canon.</strong> Nothing here is guaranteed. Threads may conflict, be biased or incomplete.
-            Canon lives in the <a href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">main stories</a>.
-            The Board expands the world but may contain rumors and in-universe mistakes.</p>
-
+              Canon lives in the <a href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">main stories</a>.
+              The Board expands the world but may contain rumors and in-universe mistakes.</p>
             <p><strong>How to read and search.</strong> Use filters, sorting and full-text search across title, body, tags and authors.
-            Click an author name to open their page; tags help collect related context.</p>
-
+              Click an author name to open their page; tags help collect related context.</p>
             <p class="kx-muted">Disclaimer: any resemblance is coincidental. Reality is messy.
               <a href="https://www.youtube.com/watch?v=HIcSWuKMwOw" target="_blank" rel="noopener">Rickroll</a>.</p>
-
             <p>Also: <a href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">main stories</a> ·
               <a href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Telegram</a></p>
           </div>
         </details>
       </div>
 
+      <!-- STORY ARCS -->
       <div class="kx-about" id="stories">
         <details id="storiesBox" aria-labelledby="storiesTitle">
-          <summary>
-            <span class="caret" aria-hidden="true">▸</span>
-            <span id="storiesTitle">Story arcs</span>
-          </summary>
+          <summary><span class="caret" aria-hidden="true">▸</span><span id="storiesTitle">Story arcs</span></summary>
           <div class="body">
             <ul>
               <li><strong>Arc: Oxygen & A-category</strong> — unfolding now under tag “A-category.” Best followed in the Telegram channel.
                 <span class="kx-muted">from <b>Day 100</b> to <b>Day —</b>, Year 430</span></li>
-
               <li><strong>Arc: Silent Rain</strong> — sensory “rain” with no instrument trace, Curator pressure, radio risk, blackout, disappearances. Uncensored version lives in Telegram.
                 <span class="kx-muted">from <b>Day 96</b> to <b>Day 99</b>, Year 430</span></li>
-
               <li><strong>Arc: “Protocol Against Humanity”</strong> — trainee’s dilemma, memes, Gideon’s suspension.
                 <span class="kx-muted">from <b>Day 72</b> to <b>Day 93</b>, Year 430</span></li>
-
               <li><strong>Arc: “The Telém Cadets’ Tragedy”</strong> — fanatic impulse, unauthorized sortie, harsh end.
                 <span class="kx-muted">from <b>Day 94</b> to <b>Day 95</b>, Year 430</span></li>
             </ul>
-
             <hr style="border:0;border-top:1px solid var(--border);opacity:.6;margin:10px 0">
-
             <ul>
-              <li><strong>Food reviews</strong> — rations, energy cans, pastes, the “silent steak.”
+              <li><strong>Food reviews</strong> — rations, energy cans, pastes, the “silent steak”.
                 <span class="kx-muted">from <b>Day 73</b> to <b>Day 95</b>, Year 430</span></li>
-
               <li><strong>Surface stories</strong> — Tianhe, Atlania, Vidyapur, pact caravans, routes and customs.
                 <span class="kx-muted">from <b>Day 70</b> to <b>Day 96</b>, Year 430</span></li>
-
               <li><strong>Study notes & manuals</strong> — lectures, outlines, reports, masters’ notes.
                 <span class="kx-muted">from <b>Day 70</b> to <b>Day 79</b>, Year 430</span></li>
             </ul>
@@ -281,6 +256,7 @@
   </main>
 
   <script type="module">
+    // ===== Sky line =====
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
       function tick(){
@@ -293,6 +269,7 @@
       requestAnimationFrame(tick);
     })();
 
+    // ===== Theme + hotkey T =====
     const THEMES=['subsurface','sepia','glitch'];
     const themeKey='kx-theme';
     function applyTheme(t){
@@ -301,7 +278,10 @@
       try{ localStorage.setItem(themeKey, t) }catch(_){ }
       document.querySelectorAll('.kx-pill').forEach(b=> b.dataset.on = (b.dataset.theme===t) ? 'true' : 'false');
       const meta=document.querySelector('meta[name="theme-color"]');
-      if(meta){ const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14'; meta.setAttribute('content', bg); }
+      if(meta){
+        const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#0b0f14';
+        meta.setAttribute('content', bg);
+      }
     }
     (function initTheme(){
       let t='subsurface';
@@ -317,6 +297,7 @@
       });
     })();
 
+    // ===== Date formatting (world-year) =====
     function fmtDayYear(s){
       if(!s) return '';
       const m = String(s).trim().match(/^(\d{3,4})[\s\-_:.\/]+(\d{1,3})(?:.*?(\d{1,2}):(\d{2}))?$/);
@@ -337,16 +318,28 @@
       return s;
     }
 
+    // ===== Utils =====
     const qs = (s,root=document)=>root.querySelector(s);
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[ch]))}
     function slugify(s){ return String(s||'anon').trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-_.]+/g,'').slice(0,64) }
-    async function loadIndex(){ try{ const r=await fetch('/content/threads-index.json',{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json() }catch(err){ console.error(err); return {error: String(err), items: []} } }
     function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms) } }
+
+    async function loadIndex(){
+      try{
+        const r=await fetch('/content/threads-index.json',{cache:'no-store'});
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return await r.json();
+      }catch(err){
+        console.error(err);
+        return {error: String(err), items: []};
+      }
+    }
 
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0 }
     function authorEmoji(name){ const i = hashStr(name||'anon') % EMO.length; return EMO[i] }
 
+    // ===== State =====
     const box=qs('#threads'), filt=qs('#filters');
     const qInp=qs('#q'), qClr=qs('#clearQ');
     const sortersBox=qs('#sorters');
@@ -358,6 +351,7 @@
     let currentSort='newest';
     try{ currentSort = localStorage.getItem(sortKey) || 'newest'; }catch(_){ }
 
+    // URL <-> state
     function readURL(){
       const u=new URL(location.href);
       currentBoard=u.searchParams.get('board')||'';
@@ -373,6 +367,7 @@
       history.replaceState(null,'',u);
     }
 
+    // Cards
     function card(t){
       const when=fmtDayYear(t.created);
       const preview=(t.body||'').replace(/\s+/g,' ').slice(0,200)+(t.body&&t.body.length>200?'…':'');
@@ -388,8 +383,13 @@
       </article>`;
     }
 
+    function isCommentsBoard(v){
+      const b = String(v||'').trim().toLowerCase();
+      return b==='комментарии' || b==='comments';
+    }
+
     function matches(t){
-      if ((t.board||'') === 'комментарии') return false;
+      if (isCommentsBoard(t.board)) return false;
       if(currentBoard && (t.board||'')!==currentBoard) return false;
       if(!query) return true;
       const hay = [t.title,t.body,(t.tags||[]).join(' '),t.author,t.sector,t.id].join(' ').toLowerCase();
@@ -408,7 +408,9 @@
     }
 
     function renderBoards(){
-      const boards = Array.from(new Set(allItems.map(x=>x.board).filter(b=>b && b!=='комментарии'))).sort();
+      const boards = Array.from(new Set(
+        allItems.map(x=>x.board).filter(b=> b && !isCommentsBoard(b))
+      )).sort();
       if(!boards.length){ filt.innerHTML=''; return; }
       const chip = b => `<span class="kx-tag${b===currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${b===currentBoard?'true':'false'}" tabindex="0" data-board="${esc(b)}">${esc(b)}</span>`;
       filt.innerHTML = `<span class="kx-tag${!currentBoard?' kx-tag--on':''}" role="tab" aria-selected="${!currentBoard?'true':'false'}" tabindex="0" data-board="">All</span>` + boards.map(chip).join('');
@@ -424,10 +426,10 @@
       });
     }
 
+    // ===== Init =====
     readURL();
     syncSortUI();
 
-    const skeleton=document.getElementById('skeleton');
     skeleton.hidden=false; box.innerHTML='';
 
     const payload = await loadIndex();
@@ -451,6 +453,7 @@
       syncSortUI(); render();
     });
 
+    // Shortcuts: / — search, Esc — clear, T — theme, ? — open “about”
     document.addEventListener('keydown', e=>{
       const key=(e.key||'').toLowerCase();
       const tag=(e.target && (e.target.tagName||'')).toLowerCase();
@@ -463,23 +466,10 @@
       }
     });
 
-    (function initAbout(){
-      const box = document.getElementById('aboutBox');
-      if(!box) return;
-      const key = 'kx-about-open';
-      try{
-        const saved = localStorage.getItem(key);
-        if(saved==='1') box.open = true;
-      }catch(_){}
-      const u = new URL(location.href);
-      if(u.hash==='#about' || u.searchParams.get('about')==='1'){ box.open = true; }
-      box.addEventListener('toggle', ()=>{
-        try{ localStorage.setItem(key, box.open ? '1':'0'); }catch(_){}
-      });
-    })();
-
+    // Legacy hash fallback: #/board
     if(location.hash && !location.search){
-      const m=location.hash.match(/^#\/(.+)$/); if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); }
+      const m=location.hash.match(/^#\/(.+)$/);
+      if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); }
     }
   </script>
 </body>
