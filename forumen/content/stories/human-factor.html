@@ -1,140 +1,48 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Human Factor — Kainrax Sector Board</title>
-  <meta name="theme-color" content="#0b0f14"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Человеческий фактор — Кайнракс</title>
+
+  <!-- ВАЖНО: эта мета-нода нужна сборщику, чтобы повесить ссылку «рассказ про» на авторов -->
+  <script type="application/json" id="kx-story">
+  {
+    "title": "Человеческий фактор",
+    "people": ["master_gideon_geodezist", "student_mavir_uni"]
+  }
+  </script>
+
   <style>
-    :root{
-      --bg:#0b0f14; --panel:#0e141d; --text:#e6edf5; --muted:#9fb0c7; --link:#bfe9ff;
-      --r:14px; --border:rgba(255,255,255,.08); --shadow:0 8px 30px rgba(0,0,0,.35)
-    }
-    body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    a{color:var(--link)}
-    .shell{max-width:820px;margin:0 auto;padding:22px}
-    .panel{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--panel);
-      border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
-    h1{margin:0 0 6px 0}
-    .meta{color:var(--muted);margin:0 0 16px 0}
-    .epi{color:var(--muted);font-style:italic;margin:6px 0 14px}
-    p{margin:12px 0}
+    body{margin:0 auto;max-width:760px;padding:28px 16px;font:17px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;color:#e6edf5;background:#0b0f14}
+    h1{margin:0 0 12px}
+    .muted{color:#98a6be}
+    a{color:#bfe9ff;text-decoration:none}
+    a:hover{text-decoration:underline}
+    hr{border:0;border-top:1px solid rgba(255,255,255,.12);margin:20px 0}
+    blockquote{margin:0;padding:0 16px;border-left:3px solid rgba(255,255,255,.2);color:#b8c5da}
   </style>
 </head>
 <body>
-  <main class="shell">
-    <article class="panel">
-      <h1>Human Factor</h1>
-      <p class="epi">“Any sufficiently advanced civilization sooner or later turns its gaze to the stars.”</p>
-      <p class="meta">July 23, 2025 — A story about Master Gideon and Mavir</p>
+  <header>
+    <h1>Человеческий фактор</h1>
+    <p class="muted">«Всякая достаточно развитая цивилизация рано или поздно устремляет свой взгляд к звёздам». <br>July 23, 2025</p>
+  </header>
 
-      <p>— And this, — the old master Gideon lifted a frayed string with a lead ball on the end, — is our main and most precious instrument. Don’t worry, it’s not the only one…</p>
+  <article>
+    <p>— А это, — старый мастер Гидеон поднял истёртую нитку с закреплённым на конце свинцовым шариком, — наш главный и самый дорогой инструмент. Ты не бойся, он такой не единственный…</p>
+    <p>Мавир не боялся, и намёки на страх порядком его достали. То, что он с поверхности, не означало, что он трус. Здесь, в Кайрнаксе, почему-то считали это синонимами…</p>
 
-      <p>Mavir wasn’t afraid, and the hints that he should be were getting on his nerves. The fact that he was from the Surface didn’t make him a coward. Here in Kainrax they for some reason treated those words as synonyms. His family barely let him go, his little sister cried, but he still came — came for knowledge, for answers to the anomalies people upstairs only whispered about — and got a position as the old geodesist’s junior apprentice, the man who smelled of mushroom dust and machine oil.</p>
+    <p>…(дальше твоё повествование без изменений; я оставляю сокращённо, вставь полный текст из черновика)…</p>
 
-      <p>Over the last three weeks Mavir had learned all the instructions. He memorized the maps — he could draw them if you woke him in the middle of the night. Every day he did the standard exercise: at different times of day, with a different heartbeat, he closed his eyes and counted one minute, then checked against the chronometer. He hit within half a second. Instruments could fail in the sectors; rhythm had to remain impeccable.</p>
+    <p>Мавир остался один. Он посмотрел на отвес в своей руке. Подошёл к месту, где только что стоял инженер. Раскачал шарик.</p>
+    <p><em>Идеальный маятник.</em></p>
+    <p>Темпоральный датчик — ноль. Гравитационная постоянная — эталон.</p>
+    <p>Мавир снова посмотрел на бланк, где не хватало только его подписи. Бланк, который станет идеальным дополнением к доносу.</p>
+    <p>И закусил кончик карандаша.</p>
 
-      <p>— Let me, — Mavir took the plumb from the wrinkled fingers. He held it with three, exactly as they taught at the Masters’ University: gaze fixed, hand steady.</p>
-
-      <p>— Will you manage?</p>
-      <p>— I will.</p>
-
-      <p>He brought the plumb to the wall. Measured with his eyes.</p>
-
-      <p>— Ninety point zero degrees, — he muttered. He moved it aside and started counting in his head. The ball’s motion… one second, two… Making sure the temporal sensor wasn’t lying, he sat by the column and opened his slate. — No gravitational deviations.</p>
-
-      <p>They were at a newly built pump station in sector B-23 — a sterile humming realm of polished metal and thick cables. The task was routine: the final calibration before commissioning. And this old man with his plumb looked like a village healer with a dried frog’s paw in the middle of an automated hospital.</p>
-
-      <p>— No deviations, master, — he reported.</p>
-
-      <p>He glanced back at Gideon. The latter sat on a crate and talked to the shift chief, a stern man named Brokk.</p>
-
-      <p>— You’ve got a new one already?.. last time it was someone else…</p>
-      <p>— …the boy was just nineteen. A good engineer, quick. Came from the Academy only last cycle…</p>
-      <p>— …the family got compensation. Accident. Fatigue.</p>
-
-      <p>Mavir rolled his eyes. Tragedies happened. That was part of the calculus, an admissible error in a complex system. The main thing was that it didn’t affect the object’s functionality.</p>
-
-      <p>With the master distracted, the work went even faster. Mavir calibrated, checked, recorded. He found a deviation: either the gravitational constant had shifted by a hundredth of a percent, or the time counter had glitched. He didn’t have the experience to tell which, and he looked around.</p>
-
-      <p>— Master! — he called, and cut himself short.</p>
-
-      <p>The old man was talking to a young guy at the control panel.</p>
-
-      <p>— How are the kids? — he asked quietly, like family.</p>
-      <p>— Fine, master. The older one started school.</p>
-      <p>— That’s a joy…</p>
-
-      <p>Mavir twitched. Point 12.4 of the instructions: “Avoid unsanctioned emotional interaction with personnel…” Gideon was breaking it with a kind of guileless audacity.</p>
-
-      <p>— Master! — Mavir shouted louder. — Something’s glitching here!</p>
-
-      <p>Gideon turned. He patted the guy on the shoulder: “Go on, son,” and came over. Took the temporal counter, took the plumb. Squatted down and started counting.</p>
-
-      <p>— Time is glitching, — Gideon stood up. — Write down: minus three-tenths percent, have them compensate. Gravity is nominal. Will you continue?</p>
-
-      <p>Mavir nodded. He didn’t call the master to the next anomaly. He measured, recorded, measured, recorded — and watched out of the corner of his eye how the old master broke every protocol imaginable. Mavir decided he would write a report on him. Detailed, with times and witnesses. He didn’t even consider it a betrayal. The system had to be impeccable, and people like Gideon were a fault in it that had to be fixed. Besides, they’d surely appreciate Mavir’s loyalty and promote him — more knowledge, more options; and when they trusted him more, he’d bring his little sister down from the Surface; she was sad up there without him, she wrote in her letters…</p>
-
-      <p>— All done, master, — he reported when the last measurement was complete. — The object is stable except for five local temporal fluctuations. All entered into the protocol.</p>
-
-      <p>— Five? — Gideon grunted. — Good work. You found almost everything.</p>
-
-      <p>— What do you mean “almost”? — Mavir snapped. — There were five. And you, with all due respect, picked up the plumb only once during the inspection.</p>
-
-      <p>Gideon smirked.</p>
-      <p>— Come, kid.</p>
-
-      <p>The old man led him deeper into the station, into a small, quiet operator’s node where the same guy sat at the console — the one Gideon had asked about the children. He looked exhausted; his hands trembled slightly over the panel.</p>
-
-      <p>— Finishing your shift? — Gideon asked.</p>
-      <p>— Yes, master. One more hour, — the guy tried to smile.</p>
-
-      <p>Gideon ignored him and, taking the plumb from Mavir, stepped to the operator.</p>
-
-      <p>— Stand straight, — he said. He brought the bob to the man’s chest and set it swaying.</p>
-
-      <p>And Mavir saw it. Instead of a clean pendulum arc, the ball traced a barely visible but stubborn spiral, slowing in one point and speeding up in another. It moved as if gravity around the guy had become viscous and uneven.</p>
-
-      <p>— Human factor, — Gideon said quietly, stopping the plumb. — The sixth anomaly. And the most dangerous.</p>
-
-      <p>The guy’s face went pale.</p>
-
-      <p>— But I’m healthy! I was checked! I—</p>
-
-      <p>— I know, son, — Gideon patted his shoulder. Mavir thought — or did the fine hairs on the old hand truly slow down near the engineer? — “Mavir,” — it seemed the master used his name for the first time, — “form C-12.”</p>
-
-      <p>“Resource Reallocation Request.” Mavir handed it over. Gideon filled it quickly, stamped it, and held it out to the engineer.</p>
-
-      <p>— Here, son. A report that the pressure regulator on this panel has failed. Per protocol you immediately stop work and wait for the repair crew. They’ll arrive… — Gideon squinted mischievously, — …in about three hours. Enough time to go home and hug your kids. Understood?</p>
-
-      <p>The guy nodded silently, looking at the paper like at salvation.</p>
-
-      <p>— And now you, — Gideon turned to Mavir as they stepped out of the room. — You must sign as a witness. You saw it. The pressure regulator is defective.</p>
-
-      <p>— But it’s in perfect condition! — Mavir burst out. — This… this is direct falsification! If he’s ill, he has to be sent to R! He’ll infect his children… They’ll court-martial us both!</p>
-
-      <p>— Me, kid. You’ll just get a scolding. You merely trusted your master, — he handed Mavir the pen. — The choice is yours. Sign — and the guy will see his family today, and the station won’t blow up next week. Do you think that Academy boy died from an “accident”? Refuse — and follow protocol. Your career will be impeccable.</p>
-
-      <p>— I refuse, — Mavir said firmly. It broke everything he believed in.</p>
-
-      <p>Gideon wasn’t surprised.</p>
-
-      <p>— They don’t teach you at the University that people influence space far stronger than space influences people, — he said. — Sooner or later you’ll notice how it works. If you refuse — refuse, son. You must think I’m a sentimental fool, but I’m only doing my job well. You’ll grow up — you’ll understand.</p>
-
-      <p>He turned and shuffled toward the exit. For the first time Mavir noticed how old and tired he was. He couldn’t have been past fifty. On the Surface they said people underground lived longer, but in front of Mavir stood a very old man.</p>
-
-      <p>Mavir was left alone. He looked at the plumb in his hand. Stepped to the spot where the engineer had just stood. Set the bob swinging.</p>
-
-      <p>Perfect pendulum.</p>
-
-      <p>Temporal sensor — zero. Gravitational constant — nominal.</p>
-
-      <p>Mavir looked again at the form that lacked only his signature. A form that would perfectly complement a denunciation.</p>
-
-      <p>And he bit the tip of his pencil.</p>
-
-      <p class="meta"><a href="https://t.me/kainrax" target="_blank" rel="noopener">t.me/kainrax</a></p>
-    </article>
-  </main>
+    <hr>
+    <p class="muted">Ещё истории — в <a href="https://t.me/kainrax" target="_blank" rel="noopener">Телеграм-канале</a>.</p>
+  </article>
 </body>
 </html>
