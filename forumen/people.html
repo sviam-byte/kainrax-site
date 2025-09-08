@@ -1,12 +1,11 @@
 <!doctype html>
-<html lang="ru" data-theme="subsurface">
+<html lang="en" data-theme="subsurface">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Все люди — Доска сектора</title>
+  <title>All people — Sector Board</title>
   <meta name="theme-color" content="#0b0f14"/>
 
-  <!-- Метрика (если есть) -->
   <script src="/assets/metrika.js" defer></script>
 
   <link rel="icon" type="image/svg+xml" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%237dd3fc'/%3E%3Cstop offset='70%25' stop-color='%230b0f14' stop-opacity='.05'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%230b0f14'/%3E%3Cpath d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='2.4' fill='%23a78bfa'/%3E%3C/svg%3E" />
@@ -56,14 +55,14 @@
   <div id="sky-line" aria-hidden="true"></div>
 
   <header class="kx-head">
-    <a class="kx-brand" href="/index.html">Доска Кайнракс</a>
+    <a class="kx-brand" href="/index.html">Kainrax Board</a>
     <nav class="kx-nav">
-      <a class="kx-btn" href="/index.html">Темы</a>
-      <a class="kx-btn is-active" href="/people.html">Все люди</a>
-      <a class="kx-btn" href="/tags.html">Теги</a>
-      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">К проекту</a>
-      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Подписаться</a>
-      <div class="kx-themes" id="themePicker" aria-label="Темы">
+      <a class="kx-btn" href="/index.html">Threads</a>
+      <a class="kx-btn is-active" href="/people.html">People</a>
+      <a class="kx-btn" href="/tags.html">Tags</a>
+      <a class="kx-btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener">to stories</a>
+      <a class="kx-btn" href="https://t.me/kainrax" target="_blank" rel="noopener nofollow">Subscribe</a>
+      <div class="kx-themes" id="themePicker" aria-label="Themes">
         <button class="kx-pill" data-theme="subsurface">Subsurface</button>
         <button class="kx-pill" data-theme="sepia">Sepia</button>
         <button class="kx-pill" data-theme="glitch">Glitch</button>
@@ -72,11 +71,11 @@
   </header>
 
   <main class="kx-shell">
-    <section class="kx-panel" id="box">Загрузка…</section>
+    <section class="kx-panel" id="box">Loading…</section>
   </main>
 
   <script type="module">
-    // Полоса неба
+    // Sky line
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
       function tick(){ const n=new Date(); const ms=n.getHours()*3600000+n.getMinutes()*60000+n.getSeconds()*1000+n.getMilliseconds(); el.style.top=(ms/86400000*100)+'vh'; if(run) requestAnimationFrame(tick); }
@@ -84,7 +83,7 @@
       requestAnimationFrame(tick);
     })();
 
-    // Темы
+    // Themes
     const THEMES=['subsurface','sepia','glitch']; const themeKey='kx-theme';
     function applyTheme(t){
       if(!THEMES.includes(t)) t='subsurface';
@@ -107,7 +106,7 @@
       });
     })();
 
-    // Утилиты
+    // Utils
     function esc(s){return (s||'').replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
     const EMO=["🛠️","🪫","🛰️","🧭","🌘","💡","⚙️","🧪","📡","🧱","🪓","⛓️","🧯","🔧","🔭","🪨","🌫️","🌊","🪙","🜂","🜁","🜄","🜃"];
     function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0}
@@ -115,22 +114,22 @@
     async function j(u){const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw 0; return r.json()}
 
     const box=document.getElementById('box');
-    const authors = await j('/content/authors-index.json'); // включает stories/story_url
+    const authors = await j('/content/authors-index.json'); // includes stories/story_url
 
     const html = `
-      <h1>Все люди</h1>
+      <h1>All people</h1>
       <div class="list">
         ${authors.map(a=>{
           const storyBlock = Array.isArray(a.stories) && a.stories.length
             ? `<div style="margin-top:6px">
                  ${a.stories.slice(0,3).map(s=>`
-                   <a class="kx-tag" href="${esc(s.url)}" target="_blank" rel="noopener">рассказ про</a>
+                   <a class="kx-tag" href="${esc(s.url)}" target="_blank" rel="noopener">story about</a>
                    <span class="muted" style="margin-left:6px">${esc(s.title)}</span>
                  `).join('<br>')}
                </div>`
             : (a.story_url ? `
                <div style="margin-top:6px">
-                 <a class="kx-tag" href="${esc(a.story_url)}" target="_blank" rel="noopener">рассказ про</a>
+                 <a class="kx-tag" href="${esc(a.story_url)}" target="_blank" rel="noopener">story about</a>
                  ${a.story_title ? `<span class="muted" style="margin-left:6px">${esc(a.story_title)}</span>` : ``}
                </div>` : ``);
 
@@ -141,7 +140,7 @@
                   <strong>${authorEmoji(a.author)} ${esc(a.author)}</strong>
                 </a>
               </div>
-              <div class="muted">ID: ${esc(a.author_id)} · постов: ${a.posts||0} · комментариев: ${a.comments||0}</div>
+              <div class="muted">ID: ${esc(a.author_id)} · posts: ${a.posts||0} · comments: ${a.comments||0}</div>
               ${storyBlock}
             </div>
           `;
