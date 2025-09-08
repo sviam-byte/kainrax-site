@@ -66,6 +66,17 @@
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
 
+  header{position:sticky;top:0;z-index:8;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
+  [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
+  [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
+  .head{max-width:var(--max);margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;position:relative}
+  .brand{font-weight:800;letter-spacing:.2px;margin-right:auto}
+  .brand a{color:var(--fg);display:inline-block;transform:translateZ(0)}
+  .brand a:hover{ animation:kx-glitch .6s steps(2,end) }
+  @keyframes kx-glitch{ 30%{ transform:translate(.4px,-.4px) skewX(.25deg) } 60%{ transform:translate(-.4px,.4px) skewY(.25deg) } }
+
+  .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
   main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
@@ -88,7 +99,7 @@
   [data-theme="light"] .tag:before{content:"#"}
   .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
 
-  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:6}
+  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:9}
 
   .anno{color:var(--muted);font-style:italic;margin-top:6px}
   .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
@@ -133,32 +144,58 @@
   .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
   .mnote .linklike{cursor:pointer; text-decoration:underline}
 
-  /* ===== Сайд-панель ===== */
-  .panel-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); backdrop-filter: blur(2px); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7; }
-  .mobile-panel{
-    position:fixed; top:0; left:0; width:86vw; max-width:360px; height:100vh;
-    background:var(--card); border-right:1px solid var(--line); box-shadow:var(--shadow);
-    transform:translateX(-102%); transition:transform .22s ease; z-index:8;
-    display:flex; flex-direction:column; padding:12px; padding-top:calc(12px + env(safe-area-inset-top, 0px));
-  }
-  body.panel-open .panel-overlay{ opacity:1; pointer-events:auto; }
-  body.panel-open .mobile-panel{ transform:translateX(0); }
-  body.panel-open{ overflow:hidden; }
+  /* ===== Панель выбора года ===== */
+  .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+  .pill.year{cursor:pointer;position:relative;user-select:none}
+  .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
+  .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
 
-  .menu-fab{
-    position:fixed; left:calc(12px + env(safe-area-inset-left, 0px)); top:calc(10px + env(safe-area-inset-top, 0px));
-    z-index:9; padding:10px 12px; border-radius:12px;
-  }
-
-  /* чтобы контент не дёргался по ширине в grid */
+  /* ===== MathJax ===== */
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .prose .mjx-container{ display:block; max-inline-size:100%; box-sizing:border-box; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; margin:12px 0; }
+  .prose .mjx-container mjx-mtext,
+  .prose .mjx-container mjx-mi,
+  .prose .mjx-container mjx-mn{ white-space:normal !important; word-break:break-word; overflow-wrap:anywhere; }
+  .kx-math-fit{ width:100%; overflow:hidden; position:relative; }
+  .kx-math-fit > .mjx-container{ will-change:transform; transform-origin:left top; }
   .with-margin > * { min-width: 0; }
+
+  /* ===========================
+     МОБИЛЬНАЯ КНОПКА И ДРАВЕР
+     =========================== */
+  .menu-btn{display:none}
+  @media (max-width:980px){
+    .search{display:none}            /* верхняя панель на телефоне прячется */
+    .brand{margin:0 auto}            /* логотип по центру */
+    .menu-btn{                       /* кнопка слева */
+      display:inline-flex;
+      position:absolute; left:12px; top:8px;
+      z-index:10; padding:8px 10px; line-height:1;
+    }
+  }
+
+  /* Drawer + scrim */
+  #scrim{
+    position:fixed; inset:0; background:rgba(0,0,0,.45);
+    opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7;
+  }
+  .drawer{
+    position:fixed; inset:0 auto 0 0; width:min(86vw,360px);
+    transform:translateX(-102%); transition:transform .22s ease;
+    background:var(--card); border-right:1px solid var(--line); z-index:8;
+    display:flex; flex-direction:column; gap:12px; padding:14px;
+  }
+  .drawer .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .drawer h3{margin:4px 0 6px}
+  .drawer a.btn, .drawer button.btn{width:auto}
+  .drawer .muted{font-size:13px}
+
+  body.drawer-open #scrim{opacity:1; pointer-events:auto}
+  body.drawer-open .drawer{transform:none}
   </style>
 </head>
 
 <body>
-  <!-- скрытый инпут поиска: на него завязано приложение -->
-  <input id="q" type="search" aria-hidden="true" tabindex="-1" style="position:absolute; left:-10000px; width:1px; height:1px; opacity:0">
-
   <!-- noscript пиксель для метрики -->
   <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
 
@@ -168,47 +205,87 @@
   <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
-  <!-- плавающая кнопка меню -->
-  <button id="menuFab" class="btn menu-fab" title="Меню" aria-label="Меню">☰</button>
+  <header>
+    <div class="head">
+      <!-- ЛЕВАЯ КНОПКА ДЛЯ ТЕЛЕФОНОВ -->
+      <button id="menuBtn" class="btn menu-btn" aria-label="Меню">☰</button>
 
-  <!-- Оверлей и боковая панель -->
-  <div id="panelOverlay" class="panel-overlay" aria-hidden="true"></div>
-  <nav id="mobilePanel" class="mobile-panel" aria-hidden="true" aria-label="Боковая панель">
-    <div class="brand" style="font-weight:800;letter-spacing:.2px;margin-bottom:6px"><a href="#/" style="color:var(--fg)">Кайнракс ✶</a></div>
+      <div class="brand"><a href="#/">Кайнракс ✶</a></div>
 
-    <input id="mq" type="search" placeholder="Поиск…" aria-label="Поиск по сайту" />
+      <!-- СТАРАЯ ПАНЕЛЬ — только для десктопа -->
+      <div class="search" style="max-width:860px">
+        <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
+        <input id="q" type="search" placeholder="Поиск по рассказам и статьям…" aria-label="Поиск" />
+        <a class="btn" href="#/arcs">Ветки</a>
+        <a class="btn" href="#/articles">Статьи</a>
+        <a class="btn" href="#/perg">Пергамент</a>
+        <a class="btn" href="#/notes">Заметки</a>
+        <a class="btn" href="#/project">О проекте | планы</a>
+        <a class="btn" href="/o2log/">Логи O₂</a>
+        <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
+        <button id="themeBtn" class="btn" title="Сменить тему (T)">🌓</button>
+        <span id="adminBtns" style="display:none">
+          <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
+          <a class="btn" id="newStoryBtn"   href="/admin/#/collections/stories/new"   target="_blank" rel="noopener">+ Рассказ</a>
+          <a class="btn" id="newArticleBtn" href="/admin/#/collections/articles/new"  target="_blank" rel="noopener">+ Статья</a>
+          <a class="btn" id="newNoteBtn"    href="/admin/#/collections/notes/new"     target="_blank" rel="noopener">+ Заметка</a>
+          <a class="btn" id="newPergBtn"    href="/admin/#/collections/pergament/new" target="_blank" rel="noopener">+ Пергамент</a>
+        </span>
+      </div>
+    </div>
+  </header>
 
-    <div class="list" style="margin:10px 0">
+  <!-- МОБИЛЬНЫЙ ДРАВЕР -->
+  <div id="scrim" aria-hidden="true"></div>
+  <aside id="mobileNav" class="drawer" aria-hidden="true" aria-label="Навигация">
+    <div class="row" style="justify-content:space-between; align-items:center">
+      <strong>Меню</strong>
+      <button id="drawerClose" class="btn" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="row">
+      <input id="qMobile" type="search" placeholder="Поиск…" aria-label="Поиск по сайту" style="flex:1" />
+      <button id="themeBtnMobile" class="btn" title="Сменить тему">🌓</button>
+    </div>
+    <div class="row">
+      <a class="btn" href="#/">Главная</a>
       <a class="btn" href="#/arcs">Ветки</a>
       <a class="btn" href="#/articles">Статьи</a>
       <a class="btn" href="#/perg">Пергамент</a>
       <a class="btn" href="#/notes">Заметки</a>
-      <a class="btn" href="#/project">О проекте | планы</a>
+      <a class="btn" href="#/project">О проекте</a>
       <a class="btn" href="/o2log/">Логи O₂</a>
+    </div>
+    <div class="row">
       <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
+      <a class="btn" href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a>
     </div>
-
-    <div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap">
-      <button id="panelThemeBtn" class="btn" type="button" title="Сменить тему">🌓 Тема</button>
-      <span id="panelAdminBtns" data-admin-only style="display:none">
+    <div id="adminMobile" data-admin-only style="display:none">
+      <h3>Администрирование</h3>
+      <div class="row">
         <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
-      </span>
+        <a class="btn" href="/admin/#/collections/stories/new"   target="_blank" rel="noopener">+ Рассказ</a>
+        <a class="btn" href="/admin/#/collections/articles/new"  target="_blank" rel="noopener">+ Статья</a>
+        <a class="btn" href="/admin/#/collections/notes/new"     target="_blank" rel="noopener">+ Заметка</a>
+        <a class="btn" href="/admin/#/collections/pergament/new" target="_blank" rel="noopener">+ Пергамент</a>
+      </div>
     </div>
-  </nav>
+    <p class="muted">Подпишись, и у алгоритмов будет меньше поводов нас прятать.</p>
+  </aside>
 
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
   <main id="app" aria-live="polite"></main>
 
   <script>
-  /* ===== Конфиг ===== */
+  /* ===== Конфиг / сервиски ===== */
   const PERG = { CODE: 'Chronicle', CODE_HASH: null };
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
-  const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  const API_HIT = '/api/hit';
 
-  // Plausible — только на проде, лениво
-  (function loadPlausibleOnProd(){
+  const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
+  const API_HIT = '/api/hit'; // UI счётчик не показываем
+
+  // Plausible лениво на проде
+  (function(){
     if (PROD_HOSTS.includes(location.hostname)) {
       window.addEventListener('load', () => {
         const loader = () => {
@@ -222,7 +299,7 @@
     }
   })();
 
-  /* ===== Я.Метрика — ленивый старт ===== */
+  // Я.Метрика — лениво
   function initYM(){
     if (window.__ymInited) return; window.__ymInited = true;
     (function(m,e,t,r,i,k,a){
@@ -241,21 +318,14 @@
     ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
   });
 
-  /* ===== MathJax (устойчиво) ===== */
+  /* ===== MathJax (лениво) ===== */
   let mjPending=null;
   function ensureMathJax(){
     if (window.MathJax) return Promise.resolve();
     if (mjPending) return mjPending;
     window.MathJax = {
-      tex: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        displayMath: [['$$','$$'], ['\\[','\\]']],
-        tags: 'ams'
-      },
-      chtml: {
-        linebreaks: { automatic: true, width: 'container' },
-        scale: 1, mtextInheritFont: true, matchFontHeight: false
-      },
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], tags: 'ams' },
+      chtml: { linebreaks: { automatic: true, width: 'container' }, scale: 1, mtextInheritFont: true, matchFontHeight: false },
       options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
     };
     mjPending = new Promise(res=>{
@@ -280,10 +350,8 @@
       }
     }catch(_){}
   }
-  </script>
 
-  <script>
-  /* ===== Хелперы ===== */
+  /* ===== Утилиты ===== */
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
   async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
   async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
@@ -302,96 +370,79 @@
   </script>
 
   <script>
-  /* ===== Состояние, тема, панель ===== */
+  /* ===== Состояние / тема ===== */
   window.CUSDIS_APP_ID = "079685b7-f335-4fbd-9217-9d857a3cc369";
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
 
-  // безопасное применение темы
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
-    try { localStorage.setItem('theme', state.theme); } catch(_){}
-    if (typeof setUtterancesTheme === 'function') setUtterancesTheme(state.theme);
-    if (typeof setCusdisTheme === 'function') setCusdisTheme();
+    localStorage.setItem('theme', state.theme);
+    setUtterancesTheme(state.theme);
+    setCusdisTheme();
     const el=document.getElementById('favicon');
-    if (el){
-      const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
-      el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
-    }
-  }
-  function toggleTheme(){
-    state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
-    applyTheme();
+    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
+    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
   }
   applyTheme();
-  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ toggleTheme(); } });
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
-  // панель: открыть/закрыть
-  (function(){
-    const panelOverlay = document.getElementById('panelOverlay');
-    const mobilePanel  = document.getElementById('mobilePanel');
-    const menuFab      = document.getElementById('menuFab');
-    const panelThemeBtn= document.getElementById('panelThemeBtn');
-    const mqEl         = document.getElementById('mq');
+  /* ===== МОБИЛЬНЫЙ ДРАВЕР ===== */
+  const body = document.body;
+  const menuBtn = document.getElementById('menuBtn');
+  const scrim = document.getElementById('scrim');
+  const drawer = document.getElementById('mobileNav');
+  const drawerClose = document.getElementById('drawerClose');
+  const qMobile = document.getElementById('qMobile');
+  const themeBtnMobile = document.getElementById('themeBtnMobile');
 
-    function setPanelOpen(v){
-      document.body.classList.toggle('panel-open', !!v);
-      mobilePanel?.setAttribute('aria-hidden', v ? 'false' : 'true');
-      panelOverlay?.setAttribute('aria-hidden', v ? 'false' : 'true');
-      if (v) setTimeout(()=> mqEl && mqEl.focus(), 40);
-    }
-    menuFab && (menuFab.onclick = ()=> setPanelOpen(!document.body.classList.contains('panel-open')));
-    panelOverlay && (panelOverlay.onclick = ()=> setPanelOpen(false));
-    document.addEventListener('keydown', e=>{ if(e.key === 'Escape') setPanelOpen(false); });
-    addEventListener('hashchange', ()=> setPanelOpen(false), {passive:true});
-    panelThemeBtn && (panelThemeBtn.onclick = ()=> toggleTheme());
+  function openDrawer(){ body.classList.add('drawer-open'); }
+  function closeDrawer(){ body.classList.remove('drawer-open'); }
+  function toggleDrawer(){ body.classList.toggle('drawer-open'); }
 
-    // синхронизация поиска
-    if (mqEl && qEl){
-      mqEl.value = qEl.value || '';
-      mqEl.addEventListener('input', ()=> { qEl.value = mqEl.value; qEl.dispatchEvent(new Event('input')); });
-    }
+  if(menuBtn) menuBtn.addEventListener('click', toggleDrawer);
+  if(drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if(scrim) scrim.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer(); }, {passive:true});
 
-    // жесты
-    if ('ontouchstart' in window){
-      let sx=0, sy=0, st=0;
-      document.addEventListener('touchstart', e=>{
-        const t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=performance.now();
-      }, {passive:true});
-      document.addEventListener('touchend', e=>{
-        const t=e.changedTouches[0];
-        const dx=t.clientX - sx, dy=Math.abs(t.clientY - sy), dt=performance.now()-st;
-        if (!document.body.classList.contains('panel-open') && sx<=16 && dt<500 && dx>28 && dy<40) setPanelOpen(true);
-      }, {passive:true});
+  if (themeBtnMobile) themeBtnMobile.onclick = ()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
 
-      let px=0, pt=0;
-      mobilePanel && mobilePanel.addEventListener('touchstart', e=>{
-        const t=e.touches[0]; px=t.clientX; pt=performance.now();
-      }, {passive:true});
-      mobilePanel && mobilePanel.addEventListener('touchend', e=>{
-        const t=e.changedTouches[0]; const dx=t.clientX - px; const dt=performance.now() - pt;
-        if (dt<500 && dx < -28) setPanelOpen(false);
-      }, {passive:true});
-    }
-  })();
-  </script>
+  // Синхронизация поиска между мобильным и десктопным
+  function syncQ(val){
+    try{
+      if (qEl && qEl.value !== val) qEl.value = val;
+      if (qMobile && qMobile.value !== val) qMobile.value = val;
+      state.q = (val||'').trim().toLowerCase();
+      renderList();
+    }catch(_){}
+  }
+  if(qEl) qEl.addEventListener('input', ()=> syncQ(qEl.value));
+  if(qMobile) qMobile.addEventListener('input', ()=> syncQ(qMobile.value));
 
-  <script>
+  // Закрывать дровер после клика по ссылке
+  drawer?.addEventListener('click', (e)=>{
+    const a = e.target.closest('a[href^="#/"]');
+    if(a){ setTimeout(closeDrawer, 0); }
+  });
+
   /* ===== Admin mode ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
   addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
   function ensureAdminUI(){
-    const adminBtns = document.getElementById('adminBtns'); // может отсутствовать
-    if (adminBtns) adminBtns.style.display = isAdmin ? 'inline-flex' : 'none';
+    document.getElementById('adminBtns').style.display = isAdmin ? 'inline-flex' : 'none';
     document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    const mob = document.getElementById('adminMobile');
+    if (mob) mob.style.display = isAdmin ? '' : 'none';
     if(!isAdmin) adminDockHide();
   }
   </script>
 
   <script>
-  /* ===== Markdown / контент ===== */
+  /* ===== Markdown / фронтматтер ===== */
   const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
 
   function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
@@ -534,7 +585,6 @@
   <script>
   /* ===== Роутер и рендер списков ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
-  qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
   const arcMeta = {
     surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
@@ -751,27 +801,7 @@
   </script>
 
   <script>
-  /* ===== Пергамент: список (минимал) ===== */
-  function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-  function renderPergList(){
-    const items = pergDocs;
-    app.innerHTML = `<section class="card"><h1>Пергамент</h1>
-      <div class="list">${items.map(d=>{
-        const e=lastEdition(d)||{};
-        return `<div class="story-item" data-arc="kainrax">
-          <a href="#/perg/${encodeURIComponent(d.id)}">
-            <div class="title">📜 ${d.title}</div>
-            <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
-          </a>
-          ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
-        </div>`;
-      }).join('')}</div></section>`;
-    adminDockHide(); ensureAdminUI();
-  }
-  </script>
-
-  <script>
-  /* ===== Загрузка markdown в объекты ===== */
+  /* ===== Статьи и истории ===== */
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -821,130 +851,6 @@
       a.text       = body || '';
     }catch(e){}
     return a;
-  }
-  </script>
-
-  <script>
-  /* ===== Комменты / служебки / прогресс ===== */
-  function mountComments(term){
-    const wrap=document.getElementById('comments'); if(!wrap) return;
-    wrap.innerHTML=`
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="btn" id="tab-gh">GitHub</button>
-        <button class="btn" id="tab-anon">Анонимно</button>
-      </div>
-      <div id="c-gh"></div>
-      <div id="c-anon" style="display:none;min-height:300px"></div>`;
-    const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon'); let ghLoaded=false, anonLoaded=false;
-    function loadGH(){ if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML=''; const s=document.createElement('script'); s.src='https://utteranc.es/client.js'; s.setAttribute('repo','sviam-byte/kainrax-site'); s.setAttribute('issue-term', term || 'home'); s.setAttribute('label','comments'); s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark'); s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s); }
-    function loadAnon(){ if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
-      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML=''; const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID; t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ру'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark'; anonBox.appendChild(t);
-      if (!window.__cusdisLoaded){ const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js'; s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }; document.body.appendChild(s); } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
-    }
-    function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
-    function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
-    wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
-    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
-  }
-  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
-  function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
-
-  const adminDock=document.getElementById('adminDock');
-  const editThisBtn=document.getElementById('editThisBtn');
-  function adminDockHide(){ adminDock.style.display='none'; }
-  function adminDockFor(kind, slug){
-    if (!isAdmin) return adminDockHide();
-    if(kind==='story')   editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
-    else if(kind==='note')   editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
-    else if(kind==='perg')   editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
-    else if(kind==='article')editThisBtn.href=`/admin/#/collections/articles/entries/${slug}`;
-    adminDock.style.display='block';
-  }
-
-  const progress=document.getElementById('progress'); let ticking=false;
-  function onScroll(){
-    if(ticking) return; ticking=true;
-    requestAnimationFrame(()=>{
-      const art=document.querySelector('article');
-      if(!art){progress.style.width='0%'; ticking=false; return;}
-      const total=art.scrollHeight - window.innerHeight + 1;
-      const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
-      progress.style.width=(isFinite(pct)?pct:0)+'%';
-      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
-      ticking=false;
-    });
-  }
-  addEventListener('scroll', onScroll, {passive:true});
-  function restoreScroll(){
-    const art=document.querySelector('article'); if(!art) return;
-    const id=art.dataset.slug||art.dataset.id;
-    const y=+localStorage.getItem('read:'+id)||0;
-    if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
-  }
-  </script>
-
-  <script>
-  /* ===== Косметика (звёзды и «небо») ===== */
-  const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
-  let W,H,starsArr=[], running=true;
-  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
-  addEventListener('resize', resize, {passive:true});
-  function makeStars(){
-    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80;
-    const k = (W*H)/60000;
-    const count = Math.floor(base + k);
-    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
-  }
-  function drawStars(ts, once=false){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
-    for(const st of starsArr){
-      const a = once ? 0.7 : 0.55 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.35;
-      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
-    }
-    if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
-  }
-  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
-
-  function initSkyLine() {
-    const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
-    function updatePosition() {
-      const now = new Date();
-      const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
-      const progress = msSinceMidnight / 86400000;
-      skyLine.style.top = `${progress * 100}vh`;
-      if (running) requestAnimationFrame(updatePosition);
-    }
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') { running = true; requestAnimationFrame(updatePosition); } else { running = false; }
-    });
-    requestAnimationFrame(updatePosition);
-  }
-  </script>
-
-  <script>
-  /* ===== Роутинг и запуск ===== */
-  async function render(){
-    const r=state.route;
-    if(r==='/'||r===''){ renderList(); return; }
-    if(r==='/arcs'){ renderArcs(); return; }
-    if(r==='/articles'){ renderArticlesList(); return; } // функция ниже
-    if(r==='/notes'){ renderList(); return; }
-    if(r==='/project'){ renderList(); return; }
-    if(r==='/perg'){ renderPergList(); return; }
-
-    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
-    if(mReadId){ await renderArticleByObj(findStoryByKey(mReadId[1])); return; }
-
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
-    if(mRead){ await renderArticleByObj(findStoryByKey(mRead[1])); return; }
-
-    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
-    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ renderPergList(); return; }
-    const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
-    renderList();
   }
 
   function renderArticlesList(){
@@ -1009,14 +915,13 @@
         <div class="prose readbox">
           ${a.cover?`<img src="${rewriteMediaUrl(a.cover)}" alt="cover" loading="lazy" decoding="async" referrerpolicy="no-referrer" style="margin-bottom:10px">`:''}
           <h1>${a.title}</h1>
-          <div class="byline">
+          <div class="byline muted">
             ${a.outlet?`<span>${a.outlet}</span>`:''}
             ${a.author?`<span class="dot">${a.author}</span>`:''}
             ${a.date?`<span class="dot">${fmtHumanDateTime(a.date)}</span>`:''}
             <span class="dot">${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин</span>
           </div>
           <div style="margin:6px 0 12px">${(a.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
-          ${a.annotation?`<div class="anno-box"><strong>Аннотация:</strong> ${a.annotation}</div>`:''}
           <div class="article-body">${mdToHtml(a.text||'')}</div>
         </div>
         <aside class="margin-notes"></aside>
@@ -1075,8 +980,298 @@
     ensureAdminUI();
     window.hit && window.hit('story:'+(s.slug||s.id)).catch(()=>{});
   }
+  </script>
 
-  (async function init(){
+  <script>
+  /* ===== Пергамент ===== */
+  function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
+  function renderPergList(){
+    const items = pergDocs;
+    app.innerHTML = `<section class="card"><h1>Пергамент</h1>
+      <div class="list">${items.map(d=>{
+        const e=lastEdition(d)||{};
+        return `<div class="story-item" data-arc="kainrax">
+          <a href="#/perg/${encodeURIComponent(d.id)}">
+            <div class="title">📜 ${d.title}</div>
+            <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
+          </a>
+          ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
+        </div>`; }).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  async function renderPerg(rawId){
+    const id = (rawId||'').split('?')[0];
+    const d = (pergDocs||[]).find(x=>x.id===id || x.slug===id);
+    if(!d){ location.hash = '#/perg'; return; }
+    const editions = (d.editions||[]);
+    if(!editions.length){ app.innerHTML = `<a class="back" href="#/perg">← К «Пергаменту»</a><section class="card">Нет редакций.</section>`; return; }
+    const q = parseHashQuery();
+    const chosenId = q.e || editions[editions.length-1].id;
+    let e = editions.find(x=>x.id===chosenId) || editions[editions.length-1];
+    const lastEd = editions[editions.length-1];
+    const isLast = (e===lastEd);
+
+    async function sha256Hex(text){ const enc=new TextEncoder().encode(text); const buf=await crypto.subtle.digest('SHA-256', enc); const arr=Array.from(new Uint8Array(buf)); return arr.map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    async function checkPergCode(input, ed){
+      const pass=(input||'').trim(); if(!pass) return false;
+      if(ed && ed.codeHash){ const [alg, hex]=String(ed.codeHash).split(':'); if((alg||'sha256').toLowerCase()==='sha256'){ const got=await sha256Hex(pass); return got.toLowerCase()===String(hex||'').toLowerCase(); } }
+      if(ed && ed.code){ return pass===String(ed.code).trim(); }
+      if(PERG.CODE_HASH){ const [alg, hex]=String(PERG.CODE_HASH).split(':'); if((alg||'sha256').toLowerCase()==='sha256'){ const got=await sha256Hex(pass); return got.toLowerCase()===String(hex||'').toLowerCase(); } }
+      if(PERG.CODE){ return pass===String(PERG.CODE).trim(); }
+      return false;
+    }
+    function showAccessModal(cfg, verify){
+      return new Promise(resolve=>{
+        const wrap=document.createElement('div'); wrap.className='modal';
+        wrap.innerHTML=`<div class="box">
+          <div style="display:flex; gap:12px; align-items:center">
+            <div class="seal" aria-hidden="true"></div>
+            <div>
+              <h3 style="margin:0 0 6px">${(cfg&&cfg.message)||'Ваш доступ?'}</h3>
+              <div class="muted" style="margin-bottom:10px">${cfg&&cfg.codeHint?('Подсказка: '+cfg.codeHint):'Введите код доступа.'}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px">
+            <input id="codeIn" type="password" placeholder="код" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)"/>
+            <button class="btn" id="okBtn">ОК</button>
+            <button class="btn" id="cancelBtn">Отмена</button>
+          </div>
+          <div class="muted" id="err" style="margin-top:8px;display:none">Неверный код</div>
+        </div>`;
+        Object.assign(wrap.style,{position:'fixed',inset:'0',display:'grid',placeItems:'center',zIndex:'99',background:'rgba(0,0,0,.4)'});
+        document.body.appendChild(wrap);
+        const codeIn=wrap.querySelector('#codeIn');
+        const ok=wrap.querySelector('#okBtn');
+        const cancel=wrap.querySelector('#cancelBtn');
+        const err=wrap.querySelector('#err');
+        function close(val){ document.body.removeChild(wrap); resolve(val); }
+        cancel.onclick=()=> close(false);
+        ok.onclick=async()=>{ const pass = await verify(codeIn.value||''); if(pass){ close(true); } else { err.style.display='block'; codeIn.select(); } };
+        codeIn.onkeydown=(e)=>{ if(e.key==='Enter') ok.click(); };
+        setTimeout(()=>codeIn.focus(),0);
+      });
+    }
+    async function ensureAccessForNonLast(ed){
+      if(isLast) return true;
+      const key = 'perg:'+d.id+':'+ed.id+':ok';
+      if(localStorage.getItem(key)==='1') return true;
+      const ok = await showAccessModal(
+        { message:'Подтвердите доступ', codeHint: ed.codeHint || (ed.access&&ed.access.hint) || 'хроникёр и год' },
+        (input)=> checkPergCode(input, ed)
+      );
+      if(ok){ localStorage.setItem(key,'1'); return true; }
+      return false;
+    }
+    const canOpen = await ensureAccessForNonLast(e);
+    if(!canOpen){ location.hash = '#/perg'; return; }
+
+    let bodyText = '';
+    try{ bodyText = await fetchText(e.file, { timeoutMs: 4000, cacheMode: isAdmin?'no-store':undefined }); }
+    catch(_){ bodyText = '(не удалось загрузить текст)'; }
+
+    const options = editions.map(x=>`<option value="${x.id}" ${x.id===e.id?'selected':''}>${x.title||x.id} · ${fmtPergDayYear(x.date||'')}</option>`).join('');
+    const idx = editions.findIndex(x=>x.id===e.id);
+    const frac = (idx+1)/editions.length*100;
+    const lastLabel = fmtPergDayYear(lastEd.date||'');
+    const currLabel = fmtPergDayYear(e.date||'');
+
+    let prevBlock = '';
+    let prevObj = null;
+    if (isLast && editions.length > 1){
+      prevObj = editions[editions.length-2];
+      prevBlock = `<div class="anno-box" id="prevBox" style="margin-top:10px;cursor:pointer">
+        <strong>Предыдущая редакция:</strong> ${fmtPergDayYear(prevObj.date||'')} — <u>доступ по коду</u>
+      </div>`;
+    }
+
+    app.innerHTML = `
+      <a class="back" href="#/perg">← К «Пергаменту»</a>
+      <article class="with-margin" data-id="${d.id}">
+        <div class="prose parchment readbox">
+          <h1>📜 ${d.title}</h1>
+          <div class="muted">Редакции:
+            <select id="edSel" class="btn" style="padding:6px 10px">${options}</select>
+          </div>
+          <div class="edhint">${currLabel} → последняя: ${lastLabel}</div>
+          <div class="edbar"><div class="fill" id="edProgress" style="height:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:${frac.toFixed(1)}%;border-radius:6px"></div></div>
+          ${d.annotation?`<div class="anno">${d.annotation}</div>`:''}
+          ${prevBlock}
+          <div class="scroll-body">${(bodyText||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>
+        </div>
+        <aside class="margin-notes">
+          ${(Array.isArray(d.margin)?d.margin:[]).map(m=>`<div class="mnote">${m}</div>`).join('')}
+          ${!isLast ? `<div class="mnote">Эта версия защищена: подтверждение кода обязательно.</div>`:''}
+          ${isLast && prevObj ? `<div class="mnote"><span class="linklike" id="mPrevLink">Предыдущая редакция: ${fmtPergDayYear(prevObj.date||'')} (клик — ввести код)</span></div>`:''}
+        </aside>
+      </article>
+      <section class="card" style="margin-top:16px"><h3>Комментарии</h3><section id="comments"></section></section>`;
+
+    const sel=document.getElementById('edSel');
+    const edProgress=document.getElementById('edProgress');
+    const edHint=document.querySelector('.edhint');
+    function updateEdUI(nv){
+      const ix = editions.findIndex(x=>x.id===nv);
+      const e2 = editions[ix];
+      const f = (ix+1)/editions.length*100;
+      if(edProgress) edProgress.style.width = f.toFixed(1)+'%';
+      if(edHint) edHint.textContent = `${fmtPergDayYear(e2.date||'')} → последняя: ${lastLabel}`;
+    }
+    if(sel){ sel.onchange=()=>{ const nv=sel.value; updateEdUI(nv); const base = '#/perg/'+encodeURIComponent(d.id); location.hash = base + '?e='+encodeURIComponent(nv); }; }
+
+    const prevBox=document.getElementById('prevBox');
+    const mPrevLink=document.getElementById('mPrevLink');
+    async function openPrev(){
+      if(!prevObj) return;
+      const ok = await showAccessModal(
+        { message:'Подтвердите доступ к предыдущей редакции', codeHint: prevObj.codeHint || (prevObj.access&&prevObj.access.hint) || 'хроникёр и год' },
+        (input)=> checkPergCode(input, prevObj)
+      );
+      if(ok){
+        const base = '#/perg/'+encodeURIComponent(d.id);
+        location.hash = base + '?e='+encodeURIComponent(prevObj.id);
+      }
+    }
+    if(prevBox) prevBox.addEventListener('click', openPrev);
+    if(mPrevLink) mPrevLink.addEventListener('click', openPrev);
+
+    mountComments('perg:'+(d.slug||d.id)+':'+(e.id||''));
+    setTimeout(restoreScroll,0);
+    adminDockFor('perg', d.slug||d.id);
+    ensureAdminUI();
+    window.hit && window.hit('perg:'+(d.slug||d.id)+':'+(e.id||'')).catch(()=>{});
+  }
+  </script>
+
+  <script>
+  /* ===== Комменты / служебки / прогресс ===== */
+  function mountComments(term){
+    const wrap=document.getElementById('comments'); if(!wrap) return;
+    wrap.innerHTML=`
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn" id="tab-gh">GitHub</button>
+        <button class="btn" id="tab-anon">Анонимно</button>
+      </div>
+      <div id="c-gh"></div>
+      <div id="c-anon" style="display:none;min-height:300px"></div>`;
+    const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon'); let ghLoaded=false, anonLoaded=false;
+    function loadGH(){ if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML=''; const s=document.createElement('script'); s.src='https://utteranc.es/client.js'; s.setAttribute('repo','sviam-byte/kainrax-site'); s.setAttribute('issue-term', term || 'home'); s.setAttribute('label','comments'); s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark'); s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s); }
+    function loadAnon(){ if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML=''; const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID; t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark'; anonBox.appendChild(t);
+      if (!window.__cusdisLoaded){ const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js'; s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }; document.body.appendChild(s); } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
+    }
+    function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
+    function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
+    wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
+    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
+  }
+  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
+  function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){} }
+
+  const adminDock=document.getElementById('adminDock');
+  const editThisBtn=document.getElementById('editThisBtn');
+  function adminDockHide(){ adminDock.style.display='none'; }
+  function adminDockFor(kind, slug){
+    if (!isAdmin) return adminDockHide();
+    if(kind==='story')   editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
+    else if(kind==='note')   editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
+    else if(kind==='perg')   editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
+    else if(kind==='article')editThisBtn.href=`/admin/#/collections/articles/entries/${slug}`;
+    adminDock.style.display='block';
+  }
+
+  const progress=document.getElementById('progress'); let ticking=false;
+  function onScroll(){
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{
+      const art=document.querySelector('article');
+      if(!art){progress.style.width='0%'; ticking=false; return;}
+      const total=art.scrollHeight - window.innerHeight + 1;
+      const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
+      progress.style.width=(isFinite(pct)?pct:0)+'%';
+      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      ticking=false;
+    });
+  }
+  addEventListener('scroll', onScroll, {passive:true});
+  function restoreScroll(){
+    const art=document.querySelector('article'); if(!art) return;
+    const id=art.dataset.slug||art.dataset.id;
+    const y=+localStorage.getItem('read:'+id)||0;
+    if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
+  }
+  </script>
+
+  <script>
+  /* ===== Косметика (звёзды и линия неба) ===== */
+  const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
+  let W,H,starsArr=[], running=true;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
+  addEventListener('resize', resize, {passive:true});
+  function makeStars(){
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80;
+    const k = (W*H)/60000;
+    const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
+  }
+  function drawStars(ts, once=false){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
+    for(const st of starsArr){
+      const a = once ? 0.7 : 0.55 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.35;
+      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
+    }
+    if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
+  }
+  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
+
+  function initSkyLine() {
+    const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
+    function updatePosition() {
+      const now = new Date();
+      const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
+      const progress = msSinceMidnight / 86400000;
+      skyLine.style.top = `${progress * 100}vh`;
+      if (running) requestAnimationFrame(updatePosition);
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') { running = true; requestAnimationFrame(updatePosition); } else { running = false; }
+    });
+    requestAnimationFrame(updatePosition);
+  }
+  </script>
+
+  <script>
+  /* ===== Роутинг ===== */
+  async function render(){
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/articles'){ renderArticlesList(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
+    if(r==='/project'){ renderProject(); return; }
+    if(r==='/perg'){ renderPergList(); return; }
+
+    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
+    if(mReadId){ await renderArticleByObj(findStoryByKey(mReadId[1])); return; }
+
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
+    if(mRead){ await renderArticleByObj(findStoryByKey(mRead[1])); return; }
+
+    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
+    const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
+    renderList();
+  }
+
+  // Заглушки для редких страниц (чтобы не падать, если их нет)
+  function renderNotes(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`; }
+  function renderProject(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>О проекте</h1><div class="muted">Кайнракс — тёмная НФ. Обновления по пятницам и субботам.</div></section>`; }
+
+  async function renderInit(){
     app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
     try { await loadContent(); } catch(_) {}
     applyTheme();
@@ -1084,7 +1279,8 @@
     ensureAdminUI();
     (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!prefersReduced) requestAnimationFrame(drawStars); })();
     initSkyLine();
-  })();
+  }
+  renderInit();
   </script>
 
   <script>
@@ -1092,10 +1288,7 @@
   (function(){
     function fitLargeMath(root){
       const scope = root || document;
-      const blocks = scope.querySelectorAll(
-        '.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]'
-      );
-
+      const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
       blocks.forEach(el=>{
         let wrap = el.parentElement;
         if(!wrap || !wrap.classList.contains('kx-math-fit')){
@@ -1105,13 +1298,11 @@
           w.appendChild(el);
           wrap = w;
         }
-
         el.style.transform = '';
         wrap.style.height = '';
         const cs = getComputedStyle(wrap);
         const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
         const need  = el.scrollWidth;
-
         if(need > avail && avail > 0){
           const scale = Math.max(0.30, Math.min(1, avail / need));
           const rect  = el.getBoundingClientRect();
@@ -1120,7 +1311,6 @@
         }
       });
     }
-
     let raf = 0;
     function scheduleFit(target){
       cancelAnimationFrame(raf);
@@ -1130,7 +1320,6 @@
     addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
     addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
     window.KX_refitMath = scheduleFit;
-
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
     } else {
