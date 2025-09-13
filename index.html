@@ -69,7 +69,7 @@
   header{position:sticky;top:0;z-index:8;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
   [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
   [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
-  .head{max-width:var(--max);margin:0 auto;padding:10px 16px;display:flex;gap:10px;align-items:center;position:relative}
+  .head{max-width:var(--max);margin:0 авто;padding:10px 16px;display:flex;gap:10px;align-items:center;position:relative}
   .brand{font-weight:800;letter-spacing:.2px;margin-right:auto}
   .brand a{color:var(--fg);display:inline-block;transform:translateZ(0)}
   .brand a:hover{ animation:kx-glitch .6s steps(2,end) }
@@ -166,12 +166,12 @@
   /* ===== Мобилка: только логотип + кнопка меню ===== */
   .menu-btn{display:none}
   @media (max-width:980px){
-    .search{display:none}            /* верхняя панель на телефоне прячется */
-    .brand{margin:0 auto}            /* логотип по центру */
-    .menu-btn{                       /* кнопка слева */
+    .search{display:none}
+    .brand{margin:0 auto}
+    .menu-btn{
       display:inline-flex;
       position:absolute; left:12px; top:8px;
-      z-index:1000;                   /* важно! поверх всего */
+      z-index:1000;
       padding:8px 10px; line-height:1;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
@@ -197,7 +197,7 @@
 
   body.drawer-open #scrim{opacity:1; pointer-events:auto}
   body.drawer-open .drawer{transform:none}
-  body.drawer-open{ overflow:hidden } /* запрет скролла фона */
+  body.drawer-open{ overflow:hidden }
   </style>
 </head>
 
@@ -212,7 +212,6 @@
 
   <header>
     <div class="head">
-      <!-- ЛЕВАЯ КНОПКА ДЛЯ ТЕЛЕФОНОВ -->
       <button id="menuBtn"
               class="btn menu-btn"
               aria-label="Меню"
@@ -221,7 +220,6 @@
 
       <div class="brand"><a href="#/">Кайнракс ✶</a></div>
 
-      <!-- СТАРАЯ ПАНЕЛЬ — только для десктопа -->
       <div class="search" style="max-width:860px">
         <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
         <input id="q" type="search" placeholder="Поиск по рассказам и статьям…" aria-label="Поиск" />
@@ -265,7 +263,6 @@
       <a class="btn" href="#/project">О проекте</a>
       <a class="btn" href="/o2log/">Логи O₂</a>
       <a href="kids.html">Детская энциклопедия</a>
-
     </div>
     <div class="row">
       <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
@@ -285,7 +282,7 @@
   </aside>
 
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
-  <main id="app" aria-live="polite"></main>
+  <main id="app" aria-live="полite"></main>
 
   <!-- ===== JS: конфиг/утилиты ===== -->
   <script>
@@ -293,6 +290,8 @@
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
+  // НОВОЕ: кандидаты источников «Пергамента»
+  const PERG_API_CANDIDATES = ['/api/pergament-index','/.netlify/functions/pergament-index','content/pergament/index.json'];
 
   // Plausible (лениво)
   (function(){
@@ -346,7 +345,7 @@
   }
   </script>
 
-  <!-- ===== Тема и ДРОВЕР: переписано для надёжной мобилки ===== -->
+  <!-- ===== Тема и ДРОВЕР ===== -->
   <script>
   const app=document.getElementById('app');
   const qEl=document.getElementById('q');
@@ -389,7 +388,6 @@
     function close(){ setOpen(false); }
     function toggle(){ setOpen(!isOpen()); }
 
-    // На мобильных «click» бывает капризным — ловим триггеры надёжно
     ['click','pointerup','touchend'].forEach(function(evt){
       btn.addEventListener(evt, function(e){
         e.preventDefault(); e.stopPropagation();
@@ -397,7 +395,6 @@
       }, {passive:false});
     });
 
-    // Закрытие по крестику и по затемнению
     [scrim, xBtn].forEach(function(el){
       if(!el) return;
       ['click','pointerup','touchend'].forEach(function(evt){
@@ -405,10 +402,8 @@
       });
     });
 
-    // Esc закрывает
     d.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
 
-    // Переключение темы в дровере
     if (themeBtnMobile){
       themeBtnMobile.addEventListener('click', function(){
         state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
@@ -416,7 +411,6 @@
       });
     }
 
-    // Синхронизация поиска между полями
     function syncQ(val){
       try{
         if (qEl && qEl.value !== val) qEl.value = val;
@@ -428,13 +422,11 @@
     if(qEl) qEl.addEventListener('input', function(){ syncQ(qEl.value); }, {passive:true});
     if(qMobile) qMobile.addEventListener('input', function(){ syncQ(qMobile.value); }, {passive:true});
 
-    // Закрывать после клика по любой внутренней ссылке SPA
     drawer.addEventListener('click', function(e){
       var a = e.target.closest && e.target.closest('a[href^="#/"]');
       if(a){ setTimeout(close, 0); }
     });
 
-    // Предотвращаем «прокрутку подложки» и липкое трение на iOS
     var lastY = 0;
     drawer.addEventListener('touchstart', function(e){ if(e.touches && e.touches[0]) lastY = e.touches[0].clientY; }, {passive:true});
     drawer.addEventListener('touchmove', function(e){
@@ -442,15 +434,14 @@
       var curY = e.touches && e.touches[0] ? e.touches[0].clientY : lastY;
       var atTop = drawer.scrollTop <= 0 && curY > lastY;
       var atBot = (drawer.scrollHeight - drawer.clientHeight - drawer.scrollTop) <= 0 && curY < lastY;
-      if (atTop || atBot){ e.preventDefault(); }   // не даём событию «пробиться» к body
+      if (atTop || atBot){ e.preventDefault(); }
       lastY = curY;
     }, {passive:false});
   })();
   </script>
 
-  <!-- ===== Далее: ваш контент/роутер (оставлено как было) ===== -->
+  <!-- ===== Markdown / парсинг ===== -->
   <script>
-  /* ===== Markdown / парсинг ===== */
   const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
 
   function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
@@ -512,8 +503,8 @@
   }
   </script>
 
+  <!-- ===== Данные ===== -->
   <script>
-  /* ===== Данные ===== */
   let stories=[], notes=[], pergDocs=[], articles=[];
 
   async function firstJson(urls,{timeouts=[8000,8000,5000]}={}) {
@@ -541,8 +532,17 @@
       } catch(_) {}
     }
 
-    try{ pergDocs = await fetchJson('content/pergament/index.json',{timeoutMs:5000, headers:{'Accept':'application/json'}}); }
-    catch{ pergDocs = []; }
+    // НОВОЕ: грузим «Пергамент» с нескольких источников
+    try{
+      let pj = null;
+      for (const u of PERG_API_CANDIDATES){
+        try{
+          const v = await fetchJson(u,{timeoutMs:7000, headers:{'Accept':'application/json'}});
+          if(Array.isArray(v)){ pj=v; break; }
+        }catch(_){}
+      }
+      pergDocs = Array.isArray(pj) ? pj : [];
+    }catch(_){ pergDocs = []; }
 
     const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
 
@@ -575,6 +575,7 @@
     notes.sort   ((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
     articles.sort((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
 
+    // сортировка и внутри документов, и между ними
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
       const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
@@ -590,8 +591,8 @@
   }
   </script>
 
+  <!-- ===== Роутер и рендер списков ===== -->
   <script>
-  /* ===== Роутер и рендер списков ===== */
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
   qEl && qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
@@ -754,8 +755,8 @@
   }
   </script>
 
+  <!-- ===== Ветки/теги/страницы ===== -->
   <script>
-  /* ===== Ветки/теги/страницы (как было) ===== */
   function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
@@ -807,8 +808,8 @@
   }
   </script>
 
+  <!-- ===== Загрузка статей/историй ===== -->
   <script>
-  /* ===== Загрузка статей/историй ===== */
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -989,17 +990,26 @@
   }
   </script>
 
+  <!-- ===== Пергамент / комменты / прогресс / админ док ===== -->
   <script>
-  /* ===== Пергамент / комменты / прогресс / админ док ===== */
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
+
   function renderPergList(){
-    const items = pergDocs;
+    const items = Array.isArray(pergDocs) ? pergDocs : [];
+    if(!items.length){
+      app.innerHTML = `<section class="card">
+        <h1>Пергамент</h1>
+        <div class="muted">Пока пусто. Проверь, что <code>content/pergament/**</code> попал в билд, а <code>/api/pergament-index</code> отдаёт JSON.</div>
+      </section>`;
+      adminDockHide(); ensureAdminUI(); return;
+    }
+
     app.innerHTML = `<section class="card"><h1>Пергамент</h1>
       <div class="list">${items.map(d=>{
         const e=lastEdition(d)||{};
         return `<div class="story-item" data-arc="kainrax">
           <a href="#/perg/${encodeURIComponent(d.id)}">
-            <div class="title">📜 ${d.title}</div>
+            <div class="title">📜 ${d.title||d.id}</div>
             <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
           </a>
           ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
@@ -1007,11 +1017,73 @@
     adminDockHide(); ensureAdminUI();
   }
 
-  /* ... Весь блок renderPerg(...) оставлен без изменений ради краткости ... */
+  async function renderPerg(id){
+    const doc = (pergDocs||[]).find(d => String(d.id) === String(id));
+    if(!doc){ location.hash = '#/perg'; return; }
+
+    const hq = parseHashQuery();
+    const idx = Number.isFinite(+hq.ed) ? Math.max(0, Math.min(+hq.ed, (doc.editions||[]).length-1))
+                                        : (doc.editions||[]).length-1;
+    const ed  = (doc.editions||[])[idx] || {};
+
+    // Загружаем конкретную редакцию
+    let body = '';
+    const filePath = ed.file || doc.file || '';
+    const isMd = (filePath||'').toLowerCase().endsWith('.md');
+    try{
+      const raw = await fetchText(filePath, { timeoutMs: 8000 });
+      if (isMd){
+        const { body: b } = parseFrontMatter(raw);
+        body = b || raw || '';
+      } else {
+        body = raw || '';
+      }
+    }catch(_){ body=''; }
+
+    const title = doc.title || 'Пергамент';
+    const anno  = (doc.annotation || doc.anno || '').trim();
+
+    const edList = (doc.editions||[]).map((e,i)=>{
+      const href = `#/perg/${encodeURIComponent(doc.id)}?ed=${i}`;
+      const date = fmtPergDayYear(e.date||'');
+      return `<li style="margin:4px 0">${i===idx?'▸':''} <a class="btn" href="${href}">${date||('Редакция '+(i+1))}</a>${e.note?` <span class="muted">${e.note}</span>`:''}</li>`;
+    }).join('');
+
+    function asHtml(txt){
+      const esc = (s)=> s.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+      return txt.split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('\n');
+    }
+
+    const htmlBody = isMd ? mdToHtml(body) : asHtml(body);
+
+    app.innerHTML = `
+      <a class="back" href="#/perg">← Ко всем хроникам</a>
+      <article class="with-margin" data-id="${doc.id}">
+        <div class="prose readbox parchment">
+          <h1>📜 ${title}</h1>
+          <div class="muted">редакция: ${fmtPergDayYear(ed.date || doc.date || '')}${doc.source?` · ${doc.source}`:''}</div>
+          ${anno ? `<div class="anno-box">${anno}</div>` : ''}
+          <div class="article-body">${htmlBody}</div>
+        </div>
+        <aside class="margin-notes">
+          <div class="mnote"><strong>Редакции</strong></div>
+          <ol style="padding-left:16px">${edList || '<li class="muted">Пока одна версия.</li>'}</ol>
+        </aside>
+      </article>
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3><section id="comments"></section>
+      </section>`;
+
+    if (isMd){ await typesetMath(document.querySelector('.article-body')); KX_refitMath(document); }
+    mountComments('perg:'+String(doc.id));
+    adminDockFor('perg', String(doc.id));
+    ensureAdminUI();
+    setTimeout(restoreScroll,0);
+  }
   </script>
 
+  <!-- ===== Комменты / служебки / прогресс ===== -->
   <script>
-  /* ===== Комменты / служебки / прогресс ===== */
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -1069,8 +1141,8 @@
   }
   </script>
 
+  <!-- ===== Косметика ===== -->
   <script>
-  /* ===== Косметика: звёзды/ски-лайн ===== */
   const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
   let W,H,starsArr=[], running=true;
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1109,8 +1181,8 @@
   }
   </script>
 
+  <!-- ===== Роутинг и запуск ===== -->
   <script>
-  /* ===== Роутинг и запуск ===== */
   let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
   if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
   addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
@@ -1160,7 +1232,6 @@
   }
   init();
 
-  /* Надёжный автоскейл блочных формул */
   (function(){
     function fitLargeMath(root){
       const scope = root || document;
