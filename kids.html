@@ -22,24 +22,27 @@
     nav.top{position:sticky;top:0;background:rgba(12,18,32,.85);backdrop-filter:blur(8px);z-index:10;border-bottom:1px solid rgba(255,255,255,.08)}
     nav.top .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between}
     .brand{font-weight:700;letter-spacing:.3px;color:var(--brand)}
-    .menu a{padding:12px 10px;border-radius:10px;color:var(--ink);opacity:.9}
+    .menu a{padding:12px 10px;border-radius:10px;color:var(--ink);opacity:.9;font-size:14px;}
     .menu a:hover{background:rgba(255,255,255,.06)}
     section{scroll-margin-top:80px;padding:48px 0;background:radial-gradient(600px 200px at 10% 0%, rgba(125,224,255,.06), transparent 60%),radial-gradient(600px 200px at 90% 100%, rgba(163,255,207,.06), transparent 60%)}
     .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
     .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .card.pad{padding:22px}
+    .card.pad{padding:24px}
     figure{margin:0} figure img{display:block;width:100%;height:auto}
     figure figcaption{font-size:14px;color:var(--muted);padding:10px 14px 16px}
     h2{font-size:clamp(22px,3.6vw,34px);margin:0 0 12px} h3{margin:14px 0 8px}
     .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.12);color:var(--muted);margin-right:8px}
-    ul{margin:10px 0 0 20px}
+    ul{margin:10px 0 0; padding-left: 20px;}
     .kicker{color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.2em}
+    .note{font-size:14px;color:var(--muted);border-left:3px solid var(--accent);padding-left:14px;margin-top:16px;}
     .cta{display:inline-block;margin-top:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14)}
     .footer{color:var(--muted);font-size:14px;text-align:center;padding:28px 0 60px}
-    .col-7{grid-column:span 7} .col-5{grid-column:span 5} .col-6{grid-column:span 6} .col-12{grid-column:span 12}
-    @media (max-width:980px){.grid{grid-template-columns:repeat(6,1fr)} .col-7,.col-5,.col-6{grid-column:span 6}}
+    .col-8{grid-column:span 8} .col-7{grid-column:span 7} .col-5{grid-column:span 5} .col-6{grid-column:span 6} .col-4{grid-column:span 4} .col-12{grid-column:span 12}
+    @media (max-width:980px){.grid{grid-template-columns:repeat(6,1fr)} .col-8,.col-7,.col-5,.col-6{grid-column:span 6}}
+    @media (max-width:720px){.grid{grid-template-columns:repeat(4,1fr)} .col-8,.col-7,.col-5,.col-6,.col-4{grid-column:span 4}}
     .quiz{display:grid;gap:16px} .quiz .q{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px}
-    .quiz button{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.18);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .quiz .options{display:flex;flex-wrap:wrap;gap:8px;}
+    .quiz button{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.18);padding:10px 14px;border-radius:10px;cursor:pointer;flex-grow:1;}
     .quiz button:hover{border-color:var(--accent)} .good{color:var(--accent2)} .bad{color:#ff8c8c} .hide{display:none}
   </style>
 </head>
@@ -49,22 +52,23 @@
       <div class="brand">Кайнракс — наш дом</div>
       <div class="menu">
         <a href="#home">Наш дом</a>
-        <a href="#city">Город</a>
-        <a href="#founders">Воздвиженцы</a>
-        <a href="#sigils">Сигиллы</a>
+        <a href="#founders">Основатели</a>
+        <a href="#hexagon">Порядок</a>
         <a href="#hresh">Хриш</a>
+        <a href="#rules">Правила</a>
         <a href="#quiz">Викторина</a>
       </div>
     </div>
   </nav>
 
   <header class="hero">
+    <!-- Укажите правильный путь к вашему изображению -->
     <img class="bg" src="images/skyline.png" alt="Панорама города Кайнракс под сияющим куполом">
     <div class="wrap">
       <div class="title">
-        <div class="kicker">Энциклопедия для любознательных</div>
+        <div class="kicker">Энциклопедия юного гражданина</div>
         <h1>Кайнракс — наш дом</h1>
-        <p>Мы живём глубоко под землёй, где над городами светят купола, а люди берегут друг друга и знания.</p>
+        <p>Мы живём глубоко под землёй, где Порядок защищает нас, а Знание освещает нам путь.</p>
       </div>
     </div>
   </header>
@@ -73,170 +77,179 @@
     <!-- 1. Наш дом -->
     <section id="home">
       <div class="grid">
-        <div class="col-12 card pad">
+        <div class="col-7 card">
+           <!-- Укажите правильный путь к вашему изображению -->
+          <figure>
+            <img src="images/plaza.png" alt="Площадь с террасами и каналами, люди гуляют под куполом">
+            <figcaption>Вечный Город — сердце Кайнракс. Здесь безопасно благодаря Порядку.</figcaption>
+          </figure>
+        </div>
+        <div class="col-5 card pad">
           <span class="pill">Глава 1</span>
-          <h2>Как устроена жизнь под куполом</h2>
-          <h3>Пять опор города</h3>
+          <h2>Наш безопасный мир</h2>
+          <p>Кайнракс — это система городов-крепостей, построенных в глубине земли для защиты нашего народа. Наш мир держится на пяти основах:</p>
           <ul>
-            <li><b>Свет</b> — купол-солнце даёт тёплое освещение и режим «утро–день–вечер».</li>
-            <li><b>Вода</b> — чистые каналы, насосные станции и сады на террасах.</li>
-            <li><b>Воздух</b> — мониторинг кислорода, правила проветривания, учёт расхода.</li>
-            <li><b>Знание</b> — библиотеки и Древо-Код, где хранят проверенные записи.</li>
-            <li><b>Порядок</b> — Стражи и городские службы, чтобы всем было безопасно.</li>
+            <li><b>Искусственное Небо</b> — даёт нам свет и смену дня и ночи.</li>
+            <li><b>Системы Жизнеобеспечения</b> — очищают воздух и воду.</li>
+            <li><b>Древо-Код</b> — наша великая библиотека, хранящая истинные знания.</li>
+            <li><b>Единство</b> — каждый из нас важен для общего дела.</li>
+            <li><b>Порядок</b> — мудрое правление, которое защищает нас от хаоса.</li>
           </ul>
-          <p class="note">Мы называем себя кайрнцами. Наш девиз простой: учиться, трудиться, помогать.</p>
         </div>
       </div>
     </section>
-
-    <!-- 2. Город -->
-    <section id="city">
+    
+    <!-- 2. Воздвиженцы -->
+    <section id="founders">
       <div class="grid">
         <div class="col-5 card pad">
           <span class="pill">Глава 2</span>
-          <h2>Город террас и мостов</h2>
-          <p>Кайнракс растёт ярусами. Между жилыми кварталами — сады, мастерские и галереи, по которым удобно ходить и обмениваться новостями.</p>
-          <h3>Что увидишь вокруг</h3>
+          <h2>Герои-Воздвиженцы</h2>
+          <p><b>Воздвиженцы</b> — наши великие предки. Когда мир на Поверхности поразила болезнь — <b>Великий Разлом</b>, — они не испугались. Они повели наш народ в безопасные глубины и основали Кайнракс.</p>
+          <h3>Три столпа основания</h3>
           <ul>
-            <li>Библиотеки и мастерские — место знаний и изобретений.</li>
-            <li>Сады и галереи — для прогулок, встреч и маленьких концертов.</li>
-            <li>Мосты и лестницы — быстрые пути между ярусами.</li>
+            <li><b>Нин, Первая Королева</b> — мудрая правительница, объединившая всех.</li>
+            <li><b>Лугаль, Первый Строитель</b> — гений, что вырезал в скалах наши города.</li>
+            <li><b>Пишти, Первый Защитник</b> — храбрый воин, установивший первые рубежи обороны.</li>
           </ul>
+          <p class="note">Мы чтим их память, следуя трём принципам: Учиться, Трудиться, Защищать.</p>
         </div>
         <div class="col-7 card">
-          <figure>
-            <img src="images/plaza.png" alt="Площадь с террасами и каналами, люди гуляют под куполом">
-            <figcaption>Площадь террас. Здесь проходят Парады Идей — праздник изобретателей.</figcaption>
-          </figure>
-        </div>
-        <div class="col-6 card">
-          <figure>
-            <img src="images/window.png" alt="Уютное окно с видом на подвесные сады и галерею">
-            <figcaption>Домашний очаг: у каждого окна — полка с книгами и растение-спутник.</figcaption>
-          </figure>
-        </div>
-        <div class="col-6 card pad">
-          <h3>Учёба и игры</h3>
-          <p>Мы учимся в Домах Знаний: один день — науки и игры, другой — ремёсла и спорт. Полезно вести «дневник открытий» и делиться идеями с друзьями.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. Воздвиженцы -->
-    <section id="founders">
-      <div class="grid">
-        <div class="col-7 card">
+          <!-- Укажите правильный путь к вашему изображению -->
           <figure>
             <img src="images/hero.png" alt="Официальная статуя Воздвиженцев: учёный, страж и мастер">
-            <figcaption>Официальная статуя Воздвиженцев в Главном зале. Девиз: <b>«Знание. Труд. Защита.»</b></figcaption>
+            <figcaption>Монумент Основателям. Он напоминает нам о долге перед Кайнракс.</figcaption>
           </figure>
         </div>
-        <div class="col-5 card pad">
-          <span class="pill">Глава 3</span>
-          <h2>Кто такие Воздвиженцы</h2>
-          <p><b>Воздвиженцы</b> — основатели наших подземных городов. Они увели народ с опасной Поверхности и построили безопасный дом.</p>
-          <h3>Их имена и дела</h3>
-          <ul>
-            <li><b>Нин, Первая среди равных</b> — направляла учёных и хранителей знаний.</li>
-            <li><b>Лугаль, Первый Молот</b> — руководил строительством, настраивал каналы и опоры.</li>
-            <li><b>Пишти, Первый Меч</b> — отвечал за защиту города и порядок.</li>
-          </ul>
-          <p class="note">Мы чтим их поступки простыми правилами: учиться, работать на общее и помогать слабым.</p>
-        </div>
       </div>
     </section>
 
-    <!-- 4. Сигиллы -->
-    <section id="sigils">
+    <!-- 3. Королева и Гексагон -->
+    <section id="hexagon">
       <div class="grid">
         <div class="col-12 card pad">
-          <span class="pill">Глава 4</span>
-          <h2>Сигиллы — долг и талант</h2>
-          <p><b>Сигилла</b> — это официально признанная обязанность и редкая компетенция. Сигилла не делает человека «главнее», она даёт <i>долг</i> помогать там, где нужна точность и ответственность.</p>
-          <h3>Примеры сигилл</h3>
-          <ul>
-            <li><b>Воды</b> — чистота и давление в каналах.</li>
-            <li><b>Счёта</b> — справедливое распределение ресурсов.</li>
-            <li><b>Памяти</b> — хранение записей Древа-Кода.</li>
-          </ul>
-          <p class="note">Детям сигиллы не присваивают. Мы тренируем внимание и дисциплину, чтобы в будущем быть полезными городу.</p>
+            <span class="pill">Глава 3</span>
+            <h2>Сердце Порядка: Королева и Гексагон</h2>
+            <p>Наш дом защищает мудрая и сильная <b>Королева Маэра Альб</b>. Она — сердце Кайнракс. Но даже у сердца есть верные помощники. Королеве служат шесть вечных должностей-инструментов — <b>сигилл</b>. Вместе они образуют <b>Гексагон</b>, несокрушимый щит нашего государства.</p>
+            <p>Сигилла — это не человек, а великая <b>функция</b>, долг. Тот, кто несёт сигиллу, лишь временно служит ей.</p>
+        </div>
+        <div class="col-4 card pad">
+            <h3>Меч</h3>
+            <p><b>Функция: Исправление.</b> Меч — это скальпель хирурга. Он находит "ошибки" в ткани нашего мира и аккуратно вырезает их, восстанавливая порядок.</p>
+        </div>
+        <div class="col-4 card pad">
+            <h3>Молот</h3>
+            <p><b>Функция: Стабильность.</b> Молот — это щит реальности. Он делает наши стены крепкими, а пол — твёрдым, защищая мир от искажений.</p>
+        </div>
+        <div class="col-4 card pad">
+            <h3>Узел</h3>
+            <p><b>Функция: Изучение.</b> Узел — это разум учёного. Он исследует аномалии, чтобы мы могли создавать "лекарства" для починки нашего мира.</p>
+        </div>
+        <div class="col-4 card pad">
+            <h3>Хроникёр</h3>
+            <p><b>Функция: Память.</b> Хроникёр — это живая библиотека нации. Он хранит всю нашу историю, чтобы мы учились на прошлом и не повторяли ошибок.</p>
+        </div>
+        <div class="col-4 card pad">
+            <h3>Ректор</h3>
+            <p><b>Функция: Единство.</b> Ректор — это дирижёр общества. Он помогает всем нам — от инженера до солдата — работать как единый слаженный механизм.</p>
+        </div>
+        <div class="col-4 card pad">
+            <h3>Эмиссар</h3>
+            <p><b>Функция: Навигация.</b> Эмиссар — это компас государства. Он находит безопасные пути в запутанном мире, позволяя нам двигаться вперёд.</p>
         </div>
       </div>
     </section>
 
-    <!-- 5. Хриш -->
+    <!-- 4. Хриш -->
     <section id="hresh">
       <div class="grid">
         <div class="col-5 card pad">
-          <span class="pill">Важно</span>
+          <span class="pill">Глава 4</span>
           <h2>Хриш и безопасность</h2>
-          <p><b>Хриш</b> — редкая аномалия. Она выглядит как переливчатое пятно и может «ломать» пространство. Очаги сразу ограждают и изучают взрослые.</p>
-          <h3>Три правила</h3>
-          <ul>
-            <li>Увидел хриш — <b>отойди</b> на безопасное расстояние.</li>
-            <li>Позови взрослых или Стража. Опиши место: сектор, указатели, время.</li>
-            <li>Не трогай и не бросай внутрь предметы.</li>
-          </ul>
-          <p class="note">На тренировках учат, как помогать друг другу и не мешать работе специалистов.</p>
+          <p><b>Хриш</b> — это редкая аномалия, "помеха" из больного мира Поверхности. Она похожа на переливающееся масляное пятно и может временно "ломать" пространство вокруг.</p>
+          <p>Хриш не злой, он просто неправильный. С ним работают только взрослые специалисты. Наш долг — не мешать им.</p>
         </div>
         <div class="col-7 card">
+          <!-- Укажите правильный путь к вашему изображению -->
           <figure>
             <img src="images/hresh.png" alt="Переливчатая аномалия с дымками и следами часов вокруг">
-            <figcaption>Аномалия хриш. Учёные изучают её, чтобы город оставался безопасным.</figcaption>
+            <figcaption>Очаг Хриша под наблюдением. Не приближайся — доверься специалистам.</figcaption>
           </figure>
         </div>
       </div>
     </section>
+
+    <!-- 5. Правила -->
+    <section id="rules">
+        <div class="grid">
+          <div class="col-12 card pad">
+            <span class="pill">Глава 5</span>
+            <h2>Пять правил юного гражданина</h2>
+            <ol>
+              <li><b>Знай свой сектор и путь к убежищу.</b> Порядок начинается с тебя.</li>
+              <li><b>Увидел аномалию — отойди и сообщи.</b> Чётко назови место Стражу. Не будь героем, будь полезным.</li>
+              <li><b>Учись с усердием.</b> Знания — это тоже оружие для защиты нашего дома.</li>
+              <li><b>Доверяй Королеве и Гексагону.</b> Их решения направлены на всеобщее благо.</li>
+              <li><b>Помни: Порядок — наша главная стена.</b> Хаос снаружи, единство внутри.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
 
     <!-- 6. Викторина -->
     <section id="quiz">
       <div class="grid">
         <div class="col-12 card pad">
           <span class="pill">Проверка знаний</span>
-          <h2>Мини-викторина</h2>
+          <h2>Викторина Порядка</h2>
           <div class="quiz" id="quizBox"></div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="grid">
-        <div class="col-12 card pad">
-          <h2>Для наставников</h2>
-          <p>Материал подан просто и последовательно: сначала «наш дом», затем устройство города, основатели, сигиллы и безопасность. Текст подходит для чтения вслух.</p>
-          <a class="cta" href="#home">Вернуться к началу</a>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">Сделано для маленьких граждан Кайнракс. ©</footer>
+  <footer class="footer">Издано Ректоратом для будущих строителей Кайнракс. ©</footer>
 
   <script>
     const data = [
       {
-        q: "Кто такие кайрнцы?",
-        options: ["Жители подземных городов Кайнракс.", "Путешественники по пустыне.", "Лётчики с Поверхности."],
-        ok: 0
-      },
-      {
-        q: "Назови опоры города:",
-        options: ["Свет, вода, воздух, знание, порядок.", "Только еда и игры.", "Туманы и шёпоты."],
-        ok: 0
-      },
-      {
-        q: "Кто из Воздвиженцев руководил строительством?",
-        options: ["Нин, Первая среди равных", "Лугаль, Первый Молот", "Пишти, Первый Меч"],
+        q: "Кто правит Кайнракс и является сердцем Порядка?",
+        options: ["Совет Основателей", "Королева Маэра Альб", "Главный Инженер"],
         ok: 1
       },
       {
-        q: "Что делать, если увидел хриш?",
-        options: ["Подойти ближе и потрогать.", "Отойти, позвать взрослых/Стража и описать место.", "Бросить внутрь камень."],
+        q: "Как мы называем 'болезнь' на Поверхности, от которой нас спасли Воздвиженцы?",
+        options: ["Великий Шторм", "Великий Разлом", "Великая Тишина"],
         ok: 1
       },
       {
-        q: "Сигилла — это…",
-        options: ["Красивый значок.", "Официальный долг и редкая компетенция на пользу города.", "Название игры."],
+        q: "Какая сигилла отвечает за хранение всей нашей истории?",
+        options: ["Ректор", "Хроникёр", "Узел"],
+        ok: 1
+      },
+      {
+        q: "Что из этого НЕ является основой нашего мира?",
+        options: ["Древо-Код", "Искусственное Небо", "Свободные путешествия на Поверхность"],
+        ok: 2
+      },
+      {
+        q: "Твоё первое действие, если ты увидел Хриш?",
+        options: ["Позвать друзей посмотреть.", "Отойти на безопасное расстояние и сообщить Стражу.", "Попробовать изучить его самому."],
+        ok: 1
+      },
+      {
+        q: "Какая сигилла-функция отвечает за стабильность стен и полов?",
+        options: ["Молот", "Меч", "Эмиссар"],
+        ok: 0
+      },
+      {
+        q: "Где хранятся все истинные знания нашего народа?",
+        options: ["В личных дневниках", "В устных рассказах", "В Древе-Коде"],
+        ok: 2
+      },
+      {
+        q: "Какой главный девиз мы помним, чтобы защитить наш дом?",
+        options: ["Каждый сам за себя", "Порядок — наша главная стена", "Веселье важнее всего"],
         ok: 1
       }
     ];
@@ -245,7 +258,7 @@
       const wrap = document.createElement('div');
       wrap.className = 'q';
       wrap.innerHTML = `
-        <div class="kicker">Вопрос ${idx+1}</div>
+        <div class="kicker">Вопрос ${idx+1} из ${data.length}</div>
         <div style="font-size:18px; margin:6px 0 12px">${item.q}</div>
         <div class="options"></div>
         <div class="res hide" aria-live="polite"></div>
@@ -257,8 +270,12 @@
         btn.addEventListener('click', () => {
           const res = wrap.querySelector('.res');
           res.classList.remove('hide');
-          if (i === item.ok) { res.innerHTML = '<span class="good">Верно!</span>'; }
-          else { res.innerHTML = '<span class="bad">Не совсем.</span> Подсказка на странице выше.'; }
+          if (i === item.ok) { res.innerHTML = '<span class="good">Верно! Порядок в твоих знаниях.</span>'; }
+          else { res.innerHTML = '<span class="bad">Неверно.</span> Перечитай нужную главу, чтобы укрепить свои знания.'; }
+          
+          // Блокируем кнопки после ответа
+          opts.querySelectorAll('button').forEach(b => b.disabled = true);
+          btn.style.borderColor = (i === item.ok) ? 'var(--accent2)' : '#ff8c8c';
         });
         opts.appendChild(btn);
       });
