@@ -94,6 +94,11 @@
       padding:10px 14px;min-height:var(--tap);border-radius:10px;cursor:pointer;flex-grow:1}
     .quiz button:hover,.quiz button:focus-visible{border-color:var(--accent);outline:none}
     .good{color:var(--accent2)} .bad{color:#ff8c8c} .hide{display:none}
+    .quiz-summary{
+      margin-top:16px;padding:12px 14px;border:1px solid var(--border);
+      border-radius:12px;background:rgba(255,255,255,.04);font-size:15px
+    }
+    .quiz-summary b{color:var(--brand)}
 
     /* Footer */
     .footer{color:var(--muted);font-size:14px;text-align:center;padding:28px 0 60px}
@@ -335,6 +340,7 @@
           <span class="pill">Проверка знаний</span>
           <h2>Викторина юного гражданина</h2>
           <div class="quiz" id="quizBox" aria-live="polite"></div>
+          <div id="quizSummary" class="quiz-summary hide" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -342,8 +348,17 @@
 
   <footer class="footer">Издано Ректоратом для будущих строителей Кайнракс. ©</footer>
 
+  <!-- Noscript-фолбэк (пиксель-счётчик) -->
+  <noscript>
+    <div>
+      <img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt="">
+    </div>
+  </noscript>
+
   <script>
+    // ---------------------------
     // Навигация: гамбургер
+    // ---------------------------
     (function(){
       const toggle = document.querySelector('.nav-toggle');
       const menu = document.getElementById('menu');
@@ -356,7 +371,9 @@
       });
     })();
 
-    // Викторина
+    // ---------------------------
+    // Викторина с кратким итогом
+    // ---------------------------
     const data = [
       { q: "Почему наши предки Воздвиженцы ушли с Поверхности?", options: ["Они испугались темноты.", "Они отказались поклоняться богам и решили построить свой мир.", "Начался ледниковый период."], ok: 1 },
       { q: "Кто из Воздвиженцев был Первой Короной?", options: ["Лугаль", "Пишти", "Нин"], ok: 2 },
@@ -367,38 +384,113 @@
       { q: "Кем является Корона в нашей системе управления?", options: ["Верховным Администратором, Первой среди равных.", "Самым богатым жителем.", "Пожизненным диктатором."], ok: 0 },
       { q: "Какой главный принцип делает нашу нацию сильной?", options: ["Слепая вера в чудеса.", "Наш разум — наша крепость.", "Надеяться на удачу."], ok: 1 }
     ];
+
     const box = document.getElementById('quizBox');
+    const summary = document.getElementById('quizSummary');
+    let answeredCount = 0, correctCount = 0;
+    const total = data.length;
+
+    function showSummary(){
+      const score = Math.round((correctCount/total)*100);
+      let msg = '';
+      if (correctCount === total) msg = 'Идеально. Ты уже можешь читать «Пергамент» без подсказок.';
+      else if (score >= 80) msg = 'Отлично! Пара правок — и ты в строю.';
+      else if (score >= 60) msg = 'Хорошо. Перечитай главы про Основателей и Управление.';
+      else msg = 'Есть над чем поработать. Начни с Главы 1 и 5.';
+      summary.innerHTML = `<b>Итог:</b> ${correctCount} из ${total}. ${msg}`;
+      summary.classList.remove('hide');
+      summary.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
     if (box){
       data.forEach((item, idx) => {
-        const wrap = document.createElement('div'); wrap.className = 'q';
+        const wrap = document.createElement('div'); 
+        wrap.className = 'q';
         wrap.setAttribute('role','group');
         wrap.setAttribute('aria-labelledby', `q${idx}-label`);
+        wrap.dataset.done = '';
+
         wrap.innerHTML =
           `<div id="q${idx}-label" class="kicker">Вопрос ${idx+1} из ${data.length}</div>
            <div style="font-size:18px; margin:6px 0 12px">${item.q}</div>
            <div class="options"></div>
            <div class="res hide" aria-live="polite"></div>`;
+
         const opts = wrap.querySelector('.options');
+        const res = wrap.querySelector('.res');
+
         item.options.forEach((opt, i) => {
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.textContent = opt;
+
           btn.addEventListener('click', () => {
-            const res = wrap.querySelector('.res'); res.classList.remove('hide');
-            if (i === item.ok) {
-              res.innerHTML = '<span class="good">Верно! Твои знания — опора для Кайнракс.</span>';
-            } else {
-              res.innerHTML = '<span class="bad">Неверно.</span> Перечитай нужную главу, чтобы укрепить свои знания.';
-            }
-            // Блокируем только остальные варианты, текущую кнопку оставляем фокусируемой
-            opts.querySelectorAll('button').forEach(b => { if (b!==btn) b.disabled = true; });
-            btn.style.borderColor = (i === item.ok) ? 'var(--accent2)' : '#ff8c8c';
+            if (wrap.dataset.done === '1') return;
+            res.classList.remove('hide');
+            const correct = (i === item.ok);
+            res.innerHTML = correct 
+              ? '<span class="good">Верно! Твои знания — опора для Кайнракс.</span>'
+              : '<span class="bad">Неверно.</span> Перечитай нужную главу.';
+
+            opts.querySelectorAll('button').forEach(b => { if (b !== btn) b.disabled = true; });
+            btn.style.borderColor = correct ? 'var(--accent2)' : '#ff8c8c';
+
+            wrap.dataset.done = '1';
+            answeredCount += 1;
+            if (correct) correctCount += 1;
+            if (answeredCount === total) showSummary();
           });
+
           opts.appendChild(btn);
         });
+
         box.appendChild(wrap);
       });
     }
+
+    // ---------------------------
+    // Яндекс.Метрика (лениво)
+    // ---------------------------
+    // Работает только на прод-хостах, локально молчит
+    const PROD_HOSTS = ["kainrax.site","www.kainrax.site","kainrax.netlify.app"];
+    window.dataLayer = window.dataLayer || [];
+
+    function initYM(){
+      if (window.__ymInited || !PROD_HOSTS.includes(location.hostname)) return;
+      window.__ymInited = true;
+      (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,
+        k.src=r,a.parentNode.insertBefore(k,a);
+      })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
+
+      try{
+        ym(103716449,'init',{
+          webvisor:true,
+          clickmap:true,
+          trackLinks:true,
+          accurateTrackBounce:true,
+          ecommerce:'dataLayer'
+        });
+        // Первичный хит
+        ym(103716449,'hit', location.href);
+        // Трекинг переходов по якорям
+        window.addEventListener('hashchange', function(){
+          if (window.__ymInited) ym(103716449,'hit', location.href);
+        });
+      }catch(_){}
+    }
+
+    // Ленивый запуск: когда браузеру нечего делать или спустя 1.5с
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(initYM, {timeout:3000});
+    } else {
+      setTimeout(initYM, 1500);
+    }
+    // На всякий случай — при первом взаимодействии
+    window.addEventListener('pointerdown', initYM, {once:true});
+    window.addEventListener('keydown', initYM, {once:true});
   </script>
 </body>
 </html>
