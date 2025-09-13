@@ -3,259 +3,1311 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Кайнракс — наш дом</title>
-  <meta name="description" content="Детская энциклопедия Кайнракс: наш дом, построенный разумом, Воздвиженцы, сигиллы и безопасность.">
+  <title>Кайнракс — рассказы и статьи</title>
+  <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
-  <meta name="color-scheme" content="dark">
+
+  <!-- OG/Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Кайнракс — рассказы и статьи">
+  <meta property="og:title" content="Кайнракс — рассказы и статьи">
+  <meta property="og:description" content="Тёмная НФ о подземной цивилизации, где магия — это сбой в физике. Обновления — пт/сб.">
+  <meta property="og:image" content="https://kainrax.site/og/kainrax-og.jpg">
+  <meta property="og:locale" content="ru_RU">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Кайнракс — рассказы и статьи">
+  <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
+  <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
+
+  <!-- perf hints -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://plausible.io">
+
+  <!-- Favicon -->
+  <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
+
   <style>
-    /* ====== Базовые переменные ====== */
-    :root{
-      --bg:#0c1220; --panel:#0f1730; --ink:#e8f0ff; --muted:#c4cdea;
-      --accent:#7de0ff; --accent2:#a3ffcf; --brand:#ffd86b; --card:#121a33;
-      --border:rgba(255,255,255,.10); --shadow:0 8px 30px rgba(0,0,0,.35);
-      --radius:20px; --wrap:1200px; --gap:24px; --tap:44px;
+  :root{
+    --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
+    --card:rgba(16,21,32,.92); --line:#223042;
+    --accent:#7dd3fc; --accent2:#a78bfa; --link:#93c5fd;
+    --max:1024px; --r:14px; --shadow:0 12px 36px rgba(0,0,0,.45);
+    --code:#0a0e16; --mountain:#121723; --star:rgba(255,255,255,.9);
+    --surface:#10b981; --kainrax:#7dd3fc; --ibut:#f59e0b; --article:#c084fc;
+  }
+  [data-theme="light"]{
+    --bg:#f7fbff; --fg:#0b0f14; --muted:#5a6774;
+    --card:rgba(255,255,255,.97); --line:#e6ecf2;
+    --accent:#0ea5e9; --accent2:#7c3aed; --link:#1d4ed8;
+    --shadow:0 8px 24px rgba(0,0,0,.08); --code:#f6f8fb; --mountain:#dfe7f3; --star:rgba(10,20,40,.85);
+  }
+  [data-theme="cringe"]{
+    --bg:linear-gradient(135deg,#ffb6f3,#ffd699 50%,#b3f1ff);
+    --fg:#111; --muted:#333; --card:rgba(255,255,255,.9); --line:#ffd1f4;
+    --accent:#ff3ea5; --accent2:#07f49e; --link:#7c00ff;
+    --shadow:0 14px 40px rgba(0,0,0,.25); --code:#fff5ff; --mountain:#ffc6fb; --star:rgba(0,0,0,.75);
+  }
+
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
+  a{color:var(--link); text-decoration:none; position:relative}
+  a:hover{ text-shadow:0 0 .15px currentColor, 0 0 .25px currentColor; }
+
+  h1{margin:6px 0 10px;font-size:28px}
+  .muted{color:var(--muted)}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
+  .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
+  .card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.28;
+    background-image: radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%);
+  }
+
+  .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
+  input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+
+  header{position:sticky;top:0;z-index:8;background:linear-gradient(to bottom, rgba(15,21,32,.92), rgba(15,21,32,.7));backdrop-filter: blur(10px) saturate(1.1);border-bottom:1px solid var(--line)}
+  [data-theme="light"] header{background:linear-gradient(to bottom, rgba(255,255,255,.95), rgba(255,255,255,.75))}
+  [data-theme="cringe"] header{background:linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,.6))}
+  .head{max-width:var(--max);margin:0 авто;padding:10px 16px;display:flex;gap:10px;align-items:center;position:relative}
+  .brand{font-weight:800;letter-spacing:.2px;margin-right:auto}
+  .brand a{color:var(--fg);display:inline-block;transform:translateZ(0)}
+  .brand a:hover{ animation:kx-glitch .6s steps(2,end) }
+  @keyframes kx-glitch{ 30%{ transform:translate(.4px,-.4px) skewX(.25deg) } 60%{ transform:translate(-.4px,.4px) skewY(.25deg) } }
+
+  .search{flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  main{max-width:var(--max);margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media (min-width:980px){ .grid{grid-template-columns:1.15fr .85fr;gap:22px} }
+
+  .list{display:flex;flex-direction:column;gap:12px}
+  .story-item{position:relative;padding:14px 14px 14px 16px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
+  .story-item a{color:var(--fg);text-decoration:none}
+  .title{font-weight:700}
+  .story-item::before{
+    content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
+    background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);
+  }
+  .story-item[data-arc="surface"]::before{ background:linear-gradient(12deg, var(--surface), transparent 60%) }
+  .story-item[data-arc="kainrax"]::before{ background:linear-gradient(12deg, var(--kainrax), transparent 60%) }
+  .story-item[data-arc="ibut"]::before{    background:linear-gradient(12deg, var(--ibut),    transparent 60%) }
+  .story-item[data-kind="article"]::before{ background:linear-gradient(12deg, var(--article), transparent 60%) }
+
+  .tag{display:inline-flex;gap:6px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;margin-right:6px}
+  .tag:before{content:"✶";color:var(--muted)}
+  [data-theme="light"] .tag:before{content:"#"}
+  .back{display:inline-flex;align-items:center;gap:8px;margin:6px 0 12px}
+
+  .progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg, var(--accent), var(--accent2));width:0;z-index:9}
+
+  .anno{color:var(--muted);font-style:italic;margin-top:6px}
+  .anno-box{border:1px dashed var(--line);background:rgba(125,211,252,.06);padding:12px;border-radius:10px;margin:10px 0 14px}
+  [data-theme="light"] .anno-box{background:rgba(14,165,233,.08)}
+  [data-theme="cringe"] .anno-box{background:rgba(255,62,165,.08)}
+  details.anno-dtl summary{cursor:pointer;user-select:none}
+
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+  #ceiling,#mountains{display:none}
+  [data-theme="cringe"] #ceiling,[data-theme="cringe"] #mountains{display:block}
+  #ceiling{position:fixed;left:0;right:0;top:0;height:18vh;z-index:0;pointer-events:none;opacity:.95}
+  #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)}
+  #ceiling path{fill:var(--mountain)}
+  #mountains{position:fixed;left:0;right:0;bottom:0;height:28vh;z-index:0;pointer-events:none;opacity:.92}
+  #mountains svg{width:100%;height:100%;display:block}
+  #mountains path{fill:var(--mountain)}
+
+  #sky-line { position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: .7; filter: blur(1px);
+    background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%); }
+  [data-theme="light"] #sky-line { background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 40%); opacity: .6; }
+  [data-theme="cringe"] #sky-line { height: 4px; background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+    background-size: 200% 200%; animation: cringe-line-anim 3s linear infinite; filter: blur(2px); opacity: .8; }
+  @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+
+  .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
+  [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
+  [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
+
+  .parchment{
+    position:relative;
+    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
+    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply;
+  }
+  .parchment::before{
+    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>");
+  }
+
+  .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
+  @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
+  .margin-notes{position:sticky;top:76px;align-self:start}
+  .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
+  .mnote .linklike{cursor:pointer; text-decoration:underline}
+
+  /* ===== Панель выбора года ===== */
+  .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+  .pill.year{cursor:pointer;position:relative;user-select:none}
+  .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
+  .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
+
+  /* ===== MathJax: устойчивость ===== */
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .prose .mjx-container{
+    display:block; max-inline-size:100%; box-sizing:border-box;
+    overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; margin:12px 0;
+  }
+  .prose .mjx-container mjx-mtext,
+  .prose .mjx-container mjx-mi,
+  .prose .mjx-container mjx-mn{ white-space:normal !important; word-break:break-word; overflow-wrap:anywhere; }
+  .kx-math-fit{ width:100%; overflow:hidden; position:relative; }
+  .kx-math-fit > .mjx-container{ will-change:transform; transform-origin:left top; }
+  .with-margin > * { min-width: 0; }
+
+  /* ===== Мобилка: только логотип + кнопка меню ===== */
+  .menu-btn{display:none}
+  @media (max-width:980px){
+    .search{display:none}
+    .brand{margin:0 auto}
+    .menu-btn{
+      display:inline-flex;
+      position:absolute; left:12px; top:8px;
+      z-index:1000;
+      padding:8px 10px; line-height:1;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
-    html{color-scheme:dark; scroll-padding-top:84px}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Inter,Arial,sans-serif; line-height:1.6}
-    a{color:var(--accent);text-decoration:none}
-    b,strong{font-weight:600}
-    .wrap{max-width:var(--wrap); margin:0 auto; padding:24px}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .skip{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-    .skip:focus{left:16px;top:8px;width:auto;height:auto;background:#111a33;color:#fff;padding:8px 12px;border-radius:8px;z-index:1000}
+  }
 
-    /* ====== Навбар ====== */
-    nav.top{position:sticky;top:0;background:rgba(12,18,32,.86);backdrop-filter:blur(8px);
-      border-bottom:1px solid var(--border); z-index:50}
-    nav.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{font-weight:700;letter-spacing:.3px;color:var(--brand)}
-    .menu{display:flex;flex-wrap:wrap;gap:4px}
-    .menu a{padding:12px 12px;min-height:var(--tap);display:flex;align-items:center;border-radius:10px;color:var(--ink);opacity:.95;font-size:14px}
-    .menu a:hover,.menu a:focus-visible{background:rgba(255,255,255,.06);outline:none}
-    .nav-toggle{display:none;background:transparent;border:1px solid var(--border);color:var(--ink);
-      border-radius:10px;padding:8px;cursor:pointer}
-    .nav-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* Drawer + scrim */
+  #scrim{
+    position:fixed; inset:0; background:rgba(0,0,0,.45);
+    opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7;
+  }
+  .drawer{
+    position:fixed; inset:0 auto 0 0; width:min(86vw,360px);
+    transform:translateX(-102%); transition:transform .22s ease;
+    background:var(--card); border-right:1px solid var(--line); z-index:8;
+    display:flex; flex-direction:column; gap:12px; padding:14px;
+    overflow:auto; -webkit-overflow-scrolling:touch;
+  }
+  .drawer .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .drawer h3{margin:4px 0 6px}
+  .drawer a.btn, .drawer button.btn{width:auto}
+  .drawer .muted{font-size:13px}
 
-    /* ====== Hero ====== */
-    header.hero{position:relative;isolation:isolate;overflow:hidden;min-height:68vh;
-      display:grid;place-items:center;background:linear-gradient(180deg,#0a1123,#0c1220)}
-    header.hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.25;filter:contrast(110%) saturate(110%);z-index:-1}
-    .title{text-align:center;background:rgba(16,24,48,.55);border:1px solid var(--border);
-      padding:24px 28px;border-radius:var(--radius);box-shadow:var(--shadow)}
-    .title h1{margin:0 0 6px;font-size:clamp(28px,5vw,48px)}
-    .title p{margin:0;color:var(--muted)}
-    .kicker{color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.2em}
-
-    /* ====== Layout ====== */
-    section{scroll-margin-top:84px; padding:48px 0; content-visibility:auto; contain-intrinsic-size:1px 1000px}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap);align-items:start}
-    .col-12{grid-column:span 12} .col-8{grid-column:span 8} .col-7{grid-column:span 7}
-    .col-6{grid-column:span 6} .col-5{grid-column:span 5} .col-4{grid-column:span 4}
-    @media (max-width:980px){.grid{grid-template-columns:repeat(6,1fr)} .col-8,.col-7,.col-6,.col-5{grid-column:span 6}}
-    @media (max-width:720px){
-      .grid{grid-template-columns:repeat(4,1fr); gap:16px}
-      .col-8,.col-7,.col-6,.col-5,.col-4{grid-column:span 4}
-      header.hero{min-height:60vh}
-      .title{backdrop-filter:none;box-shadow:none}
-      .wrap{padding:20px}
-      .nav-toggle{display:block}
-      .menu{position:fixed; inset:56px 0 0 0; display:none; flex-direction:column; gap:4px; padding:12px 16px;
-        background:rgba(12,18,32,.98); backdrop-filter:blur(4px)}
-      .menu.open{display:flex}
-      body.no-scroll{overflow:hidden}
-    }
-
-    /* ====== Cards, Figures ====== */
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .card.pad{padding:24px}
-    h2{font-size:clamp(22px,3.6vw,34px);margin:0 0 12px}
-    h3{margin:14px 0 8px}
-    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid var(--border);color:var(--muted);margin-right:8px}
-    .note{font-size:14px;color:var(--muted);border-left:3px solid var(--accent);padding-left:14px;margin-top:16px}
-    .fact-card{background:color-mix(in oklab, var(--brand) 6%, transparent);border:1px solid color-mix(in oklab, var(--brand) 15%, transparent)}
-    figure{margin:0}
-    figure img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
-    figure figcaption{font-size:14px;color:var(--muted);padding:10px 14px 16px}
-
-    ul,ol{margin:10px 0 0; padding-left:20px}
-    ul.icon-list{list-style:none;padding-left:0}
-    ul.icon-list li{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}
-    ul.icon-list .icon{flex-shrink:0;width:20px;height:20px;margin-top:2px;color:var(--accent)}
-
-    /* ====== Quiz ====== */
-    .quiz{display:grid;gap:16px}
-    .quiz .q{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
-    .quiz .options{display:flex;flex-wrap:wrap;gap:8px}
-    .quiz button{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.18);
-      padding:10px 14px;min-height:var(--tap);border-radius:10px;cursor:pointer;flex-grow:1}
-    .quiz button:hover,.quiz button:focus-visible{border-color:var(--accent);outline:none}
-    .good{color:var(--accent2)} .bad{color:#ff8c8c} .hide{display:none}
-    .quiz-summary{margin-top:16px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);font-size:15px}
-    .quiz-summary b{color:var(--brand)}
-
-    /* ====== Footer ====== */
-    .footer{color:var(--muted);font-size:14px;text-align:center;padding:28px 0 60px}
-    :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-    @media (prefers-reduced-motion: reduce){
-      *{animation:none!important; transition:none!important}
-    }
+  body.drawer-open #scrim{opacity:1; pointer-events:auto}
+  body.drawer-open .drawer{transform:none}
+  body.drawer-open{ overflow:hidden }
   </style>
 </head>
+
 <body>
-  <a class="skip" href="#home">Перейти к содержанию</a>
+  <noscript><div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div></noscript>
 
-  <nav class="top" role="navigation" aria-label="Основное меню">
-    <div class="wrap">
-      <div class="brand">Кайнракс — наш дом</div>
-      <button class="nav-toggle" aria-expanded="false" aria-controls="menu">
-        <span class="sr-only">Открыть меню</span>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      </button>
-      <div id="menu" class="menu">
-        <a href="#home">Наш мир</a>
-        <a href="#cities">Города</a>
-        <a href="#path">Твой путь</a>
-        <a href="#founders">Основатели</a>
-        <a href="#hexagon">Управление</a>
-        <a href="#choice">Наш выбор</a>
-        <a href="#hresh">Хриш</a>
-        <a href="#quiz">Викторина</a>
-      </div>
-    </div>
-  </nav>
+  <div id="sky-line" aria-hidden="true"></div>
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
+  <div class="progress" id="progress"></div>
 
-  <header class="hero">
-    <img class="bg" src="images/skyline.png" alt="" width="1600" height="900" fetchpriority="high" decoding="async">
-    <div class="wrap">
-      <div class="title">
-        <div class="kicker">Энциклопедия юного гражданина</div>
-        <h1>Кайнракс — наш дом</h1>
-        <p>Мы живём глубоко под землёй, где наш разум и труд создали безопасный мир для людей.</p>
+  <header>
+    <div class="head">
+      <button id="menuBtn"
+              class="btn menu-btn"
+              aria-label="Меню"
+              aria-controls="mobileNav"
+              aria-expanded="false">☰</button>
+
+      <div class="brand"><a href="#/">Кайнракс ✶</a></div>
+
+      <div class="search" style="max-width:860px">
+        <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
+        <input id="q" type="search" placeholder="Поиск по рассказам и статьям…" aria-label="Поиск" />
+        <a class="btn" href="#/arcs">Ветки</a>
+        <a class="btn" href="#/articles">Статьи</a>
+        <a class="btn" href="#/perg">Пергамент</a>
+        <a class="btn" href="#/notes">Заметки</a>
+        <a class="btn" href="#/project">О проекте | планы</a>
+        <a class="btn" href="/o2log/">Логи O₂</a>
+        <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
+        <a class="btn" href="kids.html">Детская энциклопедия</a>
+        <button id="themeBtn" class="btn" title="Сменить тему (T)">🌓</button>
+        <span id="adminBtns" style="display:none">
+          <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
+          <a class="btn" id="newStoryBtn"   href="/admin/#/collections/stories/new"   target="_blank" rel="noopener">+ Рассказ</a>
+          <a class="btn" id="newArticleBtn" href="/admin/#/collections/articles/new"  target="_blank" rel="noopener">+ Статья</a>
+          <a class="btn" id="newNoteBtn"    href="/admin/#/collections/notes/new"     target="_blank" rel="noopener">+ Заметка</a>
+          <a class="btn" id="newPergBtn"    href="/admin/#/collections/pergament/new" target="_blank" rel="noopener">+ Пергамент</a>
+        </span>
       </div>
     </div>
   </header>
 
-  <main class="wrap">
-    <!-- ... секции (сократила для читаемости, у тебя они все есть) ... -->
-
-    <!-- 8. Викторина -->
-    <section id="quiz" aria-labelledby="quiz-h">
-      <h2 id="quiz-h" class="sr-only">Викторина юного гражданина</h2>
-      <div class="grid">
-        <div class="col-12 card pad">
-          <span class="pill">Проверка знаний</span>
-          <h2>Викторина юного гражданина</h2>
-          <div class="quiz" id="quizBox" aria-live="polite"></div>
-          <div id="quizSummary" class="quiz-summary hide" aria-live="polite"></div>
-        </div>
+  <!-- МОБИЛЬНЫЙ ДРОВЕР -->
+  <div id="scrim" aria-hidden="true"></div>
+  <aside id="mobileNav" class="drawer" aria-hidden="true" aria-label="Навигация" tabindex="-1">
+    <div class="row" style="justify-content:space-between; align-items:center">
+      <strong>Меню</strong>
+      <button id="drawerClose" class="btn" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="row">
+      <input id="qMobile" type="search" placeholder="Поиск…" aria-label="Поиск по сайту" style="flex:1" />
+      <button id="themeBtnMobile" class="btn" title="Сменить тему">🌓</button>
+    </div>
+    <div class="row">
+      <a class="btn" href="#/">Главная</a>
+      <a class="btn" href="#/arcs">Ветки</a>
+      <a class="btn" href="#/articles">Статьи</a>
+      <a class="btn" href="#/perg">Пергамент</a>
+      <a class="btn" href="#/notes">Заметки</a>
+      <a class="btn" href="#/project">О проекте</a>
+      <a class="btn" href="/o2log/">Логи O₂</a>
+      <a href="kids.html">Детская энциклопедия</a>
+    </div>
+    <div class="row">
+      <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
+      <a class="btn" href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a>
+    </div>
+    <div id="adminMobile" data-admin-only style="display:none">
+      <h3>Администрирование</h3>
+      <div class="row">
+        <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
+        <a class="btn" href="/admin/#/collections/stories/new"   target="_blank" rel="noopener">+ Рассказ</a>
+        <a class="btn" href="/admin/#/collections/articles/new"  target="_blank" rel="noopener">+ Статья</a>
+        <a class="btn" href="/admin/#/collections/notes/new"     target="_blank" rel="noopener">+ Заметка</a>
+        <a class="btn" href="/admin/#/collections/pergament/new" target="_blank" rel="noopener">+ Пергамент</a>
       </div>
-    </section>
-  </main>
+    </div>
+    <p class="muted">Подпишись, и у алгоритмов будет меньше поводов нас прятать.</p>
+  </aside>
 
-  <footer class="footer">Издано Ректоратом для будущих строителей Кайнракс. ©</footer>
+  <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
+  <main id="app" aria-live="полite"></main>
 
+  <!-- ===== JS: конфиг/утилиты ===== -->
   <script>
-    // ====== Навигация ======
-    (function(){
-      const toggle = document.querySelector('.nav-toggle');
-      const menu = document.getElementById('menu');
-      if(!toggle || !menu) return;
-      toggle.addEventListener('click', () => {
-        const open = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!open));
-        menu.classList.toggle('open', !open);
-        document.body.classList.toggle('no-scroll', !open);
-      });
-    })();
+  const PERG = { CODE: 'Chronicle', CODE_HASH: null };
+  const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
+  const MEDIA_PROXY = '/api/media';
+  const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
+  // НОВОЕ: кандидаты источников «Пергамента»
+  const PERG_API_CANDIDATES = ['/api/pergament-index','/.netlify/functions/pergament-index','content/pergament/index.json'];
 
-    // ====== Викторина ======
-    const data = [
-      { q: "Почему наши предки Воздвиженцы ушли с Поверхности?", options: ["Они испугались темноты.", "Они отказались поклоняться богам и решили построить свой мир.", "Начался ледниковый период."], ok: 1 },
-      { q: "Кто из Воздвиженцев был Первой Короной?", options: ["Лугаль", "Пишти", "Нин"], ok: 2 },
-      { q: "Что такое «Пергамент»?", options: ["Древняя карта.", "Сборник наставлений, как быть сильным и умным человеком.", "Список запретов."], ok: 1 },
-      { q: "Что такое «Профессиональное Направление»?", options: ["Тайный клуб.", "Путь мастерства, который ты выберешь, когда вырастешь.", "Название спортивной команды."], ok: 1 },
-      { q: "Что важнее всего для того, чтобы быть гражданином Кайнракс?", options: ["Место рождения.", "Твой собственный выбор следовать нашему пути.", "Богатство семьи."], ok: 1 },
-      { q: "Почему жизнь в Кайнракс стабильнее, чем на Поверхности?", options: ["У нас лучше погода.", "Потому что она основана на разуме, а не на капризах богов.", "Там нет наших городов."], ok: 1 },
-      { q: "Кем является Корона в нашей системе управления?", options: ["Верховным Администратором, Первой среди равных.", "Самым богатым жителем.", "Пожизненным диктатором."], ok: 0 },
-      { q: "Какой главный принцип делает нашу нацию сильной?", options: ["Слепая вера в чудеса.", "Наш разум — наша крепость.", "Надеяться на удачу."], ok: 1 }
-    ];
-
-    const box = document.getElementById('quizBox');
-    const summary = document.getElementById('quizSummary');
-    let answeredCount = 0, correctCount = 0;
-    const total = data.length;
-
-    function showSummary(){
-      const score = Math.round((correctCount/total)*100);
-      let msg = '';
-      if (correctCount === total) msg = 'Идеально. Ты уже можешь читать «Пергамент» без подсказок.';
-      else if (score >= 80) msg = 'Отлично! Пара правок — и ты в строю.';
-      else if (score >= 60) msg = 'Хорошо. Перечитай главы про Основателей и Управление.';
-      else msg = 'Есть над чем поработать. Начни с Главы 1 и 5.';
-      summary.innerHTML = `<b>Итог:</b> ${correctCount} из ${total}. ${msg}`;
-      summary.classList.remove('hide');
-      summary.scrollIntoView({behavior:'smooth', block:'center'});
-    }
-
-    if (box){
-      data.forEach((item, idx) => {
-        const wrap = document.createElement('div'); 
-        wrap.className = 'q';
-        wrap.dataset.done = '';
-        wrap.innerHTML =
-          `<div class="kicker">Вопрос ${idx+1} из ${data.length}</div>
-           <div style="font-size:18px; margin:6px 0 12px">${item.q}</div>
-           <div class="options"></div>
-           <div class="res hide" aria-live="polite"></div>`;
-        const opts = wrap.querySelector('.options');
-        const res = wrap.querySelector('.res');
-        item.options.forEach((opt, i) => {
-          const btn = document.createElement('button'); btn.type = 'button'; btn.textContent = opt;
-          btn.addEventListener('click', () => {
-            if (wrap.dataset.done === '1') return;
-            res.classList.remove('hide');
-            const correct = (i === item.ok);
-            res.innerHTML = correct 
-              ? '<span class="good">Верно! Твои знания — опора для Кайнракс.</span>'
-              : '<span class="bad">Неверно.</span> Перечитай нужную главу.';
-            opts.querySelectorAll('button').forEach(b => { if (b!==btn) b.disabled = true; });
-            btn.style.borderColor = correct ? 'var(--accent2)' : '#ff8c8c';
-            wrap.dataset.done = '1';
-            answeredCount += 1; if (correct) correctCount += 1;
-            if (answeredCount === total) showSummary();
-          });
-          opts.appendChild(btn);
-        });
-        box.appendChild(wrap);
+  // Plausible (лениво)
+  (function(){
+    if (PROD_HOSTS.includes(location.hostname)) {
+      window.addEventListener('load', () => {
+        const loader = () => {
+          const s=document.createElement('script'); s.defer=true;
+          s.setAttribute('data-domain', location.hostname);
+          s.src='https://plausible.io/js/script.js';
+          document.head.appendChild(s);
+        };
+        ('requestIdleCallback' in window) ? requestIdleCallback(loader) : setTimeout(loader, 1200);
       });
     }
+  })();
 
-    // ====== Метрика (лениво) ======
-    function initYM(){
-      if (window.__ymInited) return; window.__ymInited = true;
-      (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,
-        k.src=r,a.parentNode.insertBefore(k,a);
-      })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
-      try{
-        ym(103716449,'init',{
-          webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, ecommerce:'dataLayer'
-        });
-      }catch(_){}
-    }
-    if (window.requestIdleCallback) requestIdleCallback(initYM);
-    else setTimeout(initYM,1500);
-    window.addEventListener('hashchange', () => {
-      if (typeof ym==='function') ym(103716449,'hit',location.pathname+location.hash);
-    });
+  // Метрика (лениво)
+  function initYM(){
+    if (window.__ymInited) return; window.__ymInited = true;
+    (function(m,e,t,r,i,k,a){
+      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)}; m[i].l=1*new Date();
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
+    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
+    try{
+      ym(103716449,'init',{webvisor:true,clickmap:true,trackLinks:true,accurateTrackBounce:true,ecommerce:'dataLayer'});
+      let last=location.href;
+      const hit=()=>{ try{ ym(103716449,'hit',location.href,{referer:last,title:document.title}); last=location.href; }catch(e){} };
+      if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
+      addEventListener('hashchange', hit);
+    }catch(_){}
+  }
+  window.addEventListener('load', () => {
+    ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
+  });
+
+  // Утилиты
+  const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
+  async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
+  async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
+
+  const CACHE = {
+    get(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(_){ return null; } },
+    set(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(_){ } }
+  };
+
+  function rewriteMediaUrl(src){
+    if(!src) return src;
+    if(/^https?:\/\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
+    if(/^hub:\//i.test(src) || /^asset:\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
+    return src;
+  }
   </script>
 
-  <!-- Noscript-фолбэк -->
-  <noscript>
-    <div><img src="https://mc.yandex.ru/watch/103716449" style="position:absolute; left:-9999px;" alt=""></div>
-  </noscript>
+  <!-- ===== Тема и ДРОВЕР ===== -->
+  <script>
+  const app=document.getElementById('app');
+  const qEl=document.getElementById('q');
+  const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
+
+  function applyTheme(){
+    document.documentElement.setAttribute('data-theme', state.theme);
+    localStorage.setItem('theme', state.theme);
+    setUtterancesTheme(state.theme);
+    setCusdisTheme();
+    const el=document.getElementById('favicon');
+    const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
+    el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
+  }
+  applyTheme();
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
+  document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
+
+  /* ===== Мобильный дровер: устойчиво для iOS/Android ===== */
+  (function(){
+    var d = document, body = d.body;
+    var btn    = d.getElementById('menuBtn');
+    var drawer = d.getElementById('mobileNav');
+    var scrim  = d.getElementById('scrim');
+    var xBtn   = d.getElementById('drawerClose');
+    var qMobile= d.getElementById('qMobile');
+    var themeBtnMobile = d.getElementById('themeBtnMobile');
+
+    if(!btn || !drawer){ return; }
+
+    function setOpen(v){
+      body.classList.toggle('drawer-open', v);
+      drawer.setAttribute('aria-hidden', v ? 'false' : 'true');
+      btn.setAttribute('aria-expanded', v ? 'true' : 'false');
+      if (v) { try{ drawer.focus(); }catch(_){ } }
+    }
+    function isOpen(){ return body.classList.contains('drawer-open'); }
+    function open(){ setOpen(true); }
+    function close(){ setOpen(false); }
+    function toggle(){ setOpen(!isOpen()); }
+
+    ['click','pointerup','touchend'].forEach(function(evt){
+      btn.addEventListener(evt, function(e){
+        e.preventDefault(); e.stopPropagation();
+        toggle();
+      }, {passive:false});
+    });
+
+    [scrim, xBtn].forEach(function(el){
+      if(!el) return;
+      ['click','pointerup','touchend'].forEach(function(evt){
+        el.addEventListener(evt, function(e){ e.preventDefault(); close(); }, {passive:false});
+      });
+    });
+
+    d.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+
+    if (themeBtnMobile){
+      themeBtnMobile.addEventListener('click', function(){
+        state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark');
+        applyTheme();
+      });
+    }
+
+    function syncQ(val){
+      try{
+        if (qEl && qEl.value !== val) qEl.value = val;
+        if (qMobile && qMobile.value !== val) qMobile.value = val;
+        state.q = (val||'').trim().toLowerCase();
+        renderList && renderList();
+      }catch(_){}
+    }
+    if(qEl) qEl.addEventListener('input', function(){ syncQ(qEl.value); }, {passive:true});
+    if(qMobile) qMobile.addEventListener('input', function(){ syncQ(qMobile.value); }, {passive:true});
+
+    drawer.addEventListener('click', function(e){
+      var a = e.target.closest && e.target.closest('a[href^="#/"]');
+      if(a){ setTimeout(close, 0); }
+    });
+
+    var lastY = 0;
+    drawer.addEventListener('touchstart', function(e){ if(e.touches && e.touches[0]) lastY = e.touches[0].clientY; }, {passive:true});
+    drawer.addEventListener('touchmove', function(e){
+      if(!isOpen()) return;
+      var curY = e.touches && e.touches[0] ? e.touches[0].clientY : lastY;
+      var atTop = drawer.scrollTop <= 0 && curY > lastY;
+      var atBot = (drawer.scrollHeight - drawer.clientHeight - drawer.scrollTop) <= 0 && curY < lastY;
+      if (atTop || atBot){ e.preventDefault(); }
+      lastY = curY;
+    }, {passive:false});
+  })();
+  </script>
+
+  <!-- ===== Markdown / парсинг ===== -->
+  <script>
+  const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
+
+  function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
+    if(typeof val==='number') return new Date(val);
+    if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; }
+    return null;
+  }
+  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
+  function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
+  function fmtHumanDateTime(v){ const d=toDate(v); return d ? d.toLocaleString('ru-RU',{year:'numeric',month:'long',day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''; }
+  function fmtPergDayYear(s){ if(typeof s!=='string') return String(s||''); const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s); const year=+m[1], day=+m[2]; return `${day}-й день ${year}-го года.`; }
+  const getAnno = (s) => { const a=(s.annotation||s.anno||s.summary||'').trim(); if(a) return a; const txt=(s.text||'').replace(/\s+/g,' ').trim(); if(!txt) return ''; const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt; };
+
+  function normalizeTags(val){
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      const s = val.trim();
+      if (!s) return [];
+      if (/^\[.*\]$/.test(s)) { try { return JSON.parse(s.replace(/'/g,'"')); } catch(_){} }
+      return s.split(',').map(x=>x.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  function parseFrontMatter(md){
+    const m = md.match(/^---\s*([\s\S]*?)\s*---\s*\n?([\s\S]*)$/);
+    if (!m) return { attributes:{}, body: md.trim() };
+    const yaml = m[1], body = m[2].trim();
+    const attrs = {};
+    yaml.split('\n').forEach(line=>{
+      const i=line.indexOf(':'); if(i<0) return;
+      const k=line.slice(0,i).trim(); let v=line.slice(i+1).trim();
+      if (/^\[.*\]$/.test(v)) { try { v = JSON.parse(v.replace(/'/g,'"')); } catch {} }
+      attrs[k]=String(v).replace(/^['"]|['"]$/g,'');
+    });
+    return { attributes: attrs, body };
+  }
+
+  function mdToHtml(md) {
+    let html = md
+      .replace(/```([\s\S]*?)```/g, (m,code)=> `<pre><code>${code.replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</code></pre>`)
+      .replace(/^> (.*)$/gim, '<blockquote>$1</blockquote>')
+      .replace(/^### (.*)$/gim, '<h3>$1</h3>')
+      .replace(/^## (.*)$/gim,  '<h2>$1</h2>')
+      .replace(/^# (.*)$/gim,   '<h1>$1</h1>')
+      .replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)(?!\s*<li>)/gims, '<ul>$1</ul>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)/g, (m,alt,src,cap)=> {
+        const finalSrc = rewriteMediaUrl(src);
+        const capHtml = cap ? `<figcaption>${cap}</figcaption>` : '';
+        return `<figure><img src="${finalSrc}" alt="${alt||''}" loading="lazy" decoding="async" referrerpolicy="no-referrer">${capHtml}</figure>`;
+      })
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/^\s*---\s*$/gim,'<hr>');
+    html = html.split(/\n{2,}/).map(b => /<(h\d|ul|ol|pre|blockquote|figure|hr)/i.test(b) ? b : `<p>${b.replace(/\n/g,'<br>')}</p>`).join('\n');
+    return html;
+  }
+  </script>
+
+  <!-- ===== Данные ===== -->
+  <script>
+  let stories=[], notes=[], pergDocs=[], articles=[];
+
+  async function firstJson(urls,{timeouts=[8000,8000,5000]}={}) {
+    for (let i=0;i<urls.length;i++){
+      const url=urls[i];
+      try{
+        const j=await fetchJson(url,{timeoutMs:timeouts[i] ?? 6000, headers:{'Accept':'application/json'}});
+        if (j && (Array.isArray(j.stories) || Array.isArray(j.notes) || Array.isArray(j.articles))) return j;
+        if (Array.isArray(j)) return { stories:[], notes:[], articles:j };
+      }catch(e){}
+    }
+    return null;
+  }
+
+  async function loadContent(){
+    let j = CACHE.get('__contentIndex');
+    if (!j) j = await firstJson(API_INDEX_CANDIDATES);
+    if (!j) j = { stories:[], notes:[], articles:[] };
+    else CACHE.set('__contentIndex', j);
+
+    if (!Array.isArray(j.articles) || !j.articles.length) {
+      try {
+        const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
+        j.articles = Array.isArray(aj) ? aj : (aj.articles||[]);
+      } catch(_) {}
+    }
+
+    // НОВОЕ: грузим «Пергамент» с нескольких источников
+    try{
+      let pj = null;
+      for (const u of PERG_API_CANDIDATES){
+        try{
+          const v = await fetchJson(u,{timeoutMs:7000, headers:{'Accept':'application/json'}});
+          if(Array.isArray(v)){ pj=v; break; }
+        }catch(_){}
+      }
+      pergDocs = Array.isArray(pj) ? pj : [];
+    }catch(_){ pergDocs = []; }
+
+    const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
+
+    stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
+      ...s,
+      id:   s.id   || s.slug || '',
+      slug: s.slug || s.id   || '',
+      year: safeYear(s.year ?? s.worldYear),
+      file: s.file || (s.slug||s.id ? `content/stories/${(s.slug||s.id)}.md` : undefined),
+      tags: Array.isArray(s.tags) ? s.tags : (typeof s.tags==='string' ? s.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+    }));
+    notes    = (Array.isArray(j.notes)?j.notes:[]).map(n=>({
+      ...n,
+      id:   n.id   || n.slug || '',
+      slug: n.slug || n.id   || '',
+      file: n.file || (n.slug||n.id ? `content/notes/${(n.slug||n.id)}.md` : undefined),
+      tags: Array.isArray(n.tags) ? n.tags : (typeof n.tags==='string' ? n.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+    }));
+    articles = (Array.isArray(j.articles)?j.articles:[]).map(a=>({
+      ...a,
+      id:   a.id   || a.slug || '',
+      slug: a.slug || a.id   || '',
+      year: safeYear(a.year),
+      file: a.file || (a.slug||a.id ? `content/articles/${(a.slug||a.id)}.md` : undefined),
+      tags: Array.isArray(a.tags) ? a.tags : (typeof a.tags==='string' ? a.tags.split(',').map(x=>x.trim()).filter(Boolean) : [])
+    }));
+
+    const ts2 = (v)=> { const d = (v?new Date(v):null); return d && !isNaN(+d) ? +d : 0; };
+    stories.sort ((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
+    notes.sort   ((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
+    articles.sort((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
+
+    // сортировка и внутри документов, и между ними
+    pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
+    pergDocs.sort((a,b)=> {
+      const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
+      return String(bl).localeCompare(String(al));
+    });
+
+    (async ()=> {
+      try{
+        const fresh = await firstJson(API_INDEX_CANDIDATES);
+        if (fresh) { CACHE.set('__contentIndex', fresh); }
+      }catch(_){}
+    })();
+  }
+  </script>
+
+  <!-- ===== Роутер и рендер списков ===== -->
+  <script>
+  addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
+  qEl && qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
+
+  const arcMeta = {
+    surface: {id:'surface', title:'Поверхность', desc:'Рассказы и повести не о Кайнракс.'},
+    kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
+    ibut:    {id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.'},
+  };
+
+  function buildArcs(){
+    const map = {};
+    for(const s of stories){
+      const id=s.arc||'kainrax';
+      if(!map[id]) map[id]={...(arcMeta[id]||{id,title:id,desc:''}), items:[]};
+      map[id].items.push(s);
+    }
+    for(const k in map){
+      map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
+    }
+    return Object.values(map);
+  }
+
+  function findStoryByKey(key){
+    if(!key) return null;
+    let s = stories.find(x=> (x.id||'') === key);
+    if(s) return s;
+    const bySlug = stories.filter(x=> (x.slug||'') === key);
+    bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
+    return bySlug[0] || null;
+  }
+  function findArticleByKey(key){
+    if(!key) return null;
+    let a = articles.find(x=> (x.id||'') === key);
+    if(a) return a;
+    const bySlug = articles.filter(x=> (x.slug||'') === key);
+    bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
+    return bySlug[0] || null;
+  }
+
+  function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
+  function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null; state.year = ySel; return ySel; }
+
+  function collectYearCounts(list,{excludeArc}={}) {
+    return list.reduce((acc, it)=>{
+      if (excludeArc && it.arc === excludeArc) return acc;
+      const y = safeYear(it.year);
+      if (y != null) acc[y] = (acc[y]||0)+1;
+      return acc;
+    }, {});
+  }
+  function yearBarHtml(years, counts, ySel){
+    return `
+      <div class="yearbar" id="yearbar">
+        <span class="muted">Год:</span>
+        <span class="pill year" data-year="" data-active="${ySel==null}">Все</span>
+        ${years.map(y=>`
+          <span class="pill year" data-year="${y}" data-active="${ySel===y}">${y}<span class="badge">${counts[y]}</span></span>`).join('')}
+      </div>`;
+  }
+
+  function renderList(){
+    const q = state.q;
+    const ySel = currentYearSelection();
+
+    const baseStories = stories.filter(s=>{
+      if (!q) return true;
+      const hay=[s.title||'', (s.text||''), (s.tags||[]).join(' ')].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+    const baseArticles = articles.filter(a=>{
+      if (!q) return true;
+      const hay=[a.title||'', a.author||'', a.outlet||'', (a.text||''), (a.tags||[]).join(' ')].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+
+    const unionForYears = baseStories.concat(baseArticles);
+    const counts = collectYearCounts(unionForYears, {excludeArc:'ibut'});
+    const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
+
+    const itemsStories = baseStories.filter(s=> ySel==null ? true : safeYear(s.year)===ySel);
+    const itemsArticles = baseArticles.filter(a=> ySel==null ? true : safeYear(a.year)===ySel);
+
+    const yearBar = yearBarHtml(years, counts, ySel);
+
+    app.innerHTML=`
+      <div class="grid">
+        <section class="card">
+          <h1>Рассказы</h1>
+          <div class="muted">Короткая НФ без лорового барьера. Выходы: пятница/суббота.</div>
+          ${yearBar}
+          <div class="list">
+            ${itemsStories.length?itemsStories.map(s=>`
+              <div class="story-item" data-arc="${s.arc||'kainrax'}">
+                <a href="#/read-id/${s.id}">
+                  <div class="title">✶ ${s.title||'Без названия'}</div>
+                  <div class="muted">
+                    ${fmtHumanDate(s.date)}
+                    · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения
+                    · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}
+                    ${(s.arc!=='ibut' && safeYear(s.year)!=null)?` · год: ${safeYear(s.year)}`:''}
+                  </div>
+                </a>
+                ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пусто.</div>'}
+          </div>
+
+          <h1 style="margin-top:22px">Статьи</h1>
+          <div class="muted">Мини-архив статей. Формулы, картинки, ссылки, подписи.</div>
+          <div class="list" style="margin-top:10px">
+            ${itemsArticles.length?itemsArticles.map(a=>`
+              <div class="story-item" data-kind="article">
+                <a href="#/read-article/${a.id}">
+                  <div class="title">📰 ${a.title||'Без названия'}</div>
+                  <div class="muted">
+                    ${fmtHumanDateTime(a.date)}
+                    ${safeYear(a.year)!=null?` · год: ${safeYear(a.year)}`:''}
+                    ${a.outlet?` · ${a.outlet}`:''}
+                    ${a.author?` · ${a.author}`:''}
+                    · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
+                  </div>
+                </a>
+                ${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}
+              </div>`).join(''):'<div class="muted" style="margin-top:10px">Пока статей нет.</div>'}
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Ветки</h2>
+          <div class="list">
+            ${buildArcs().map(a=>`
+              <div class="story-item" data-arc="${a.id}">
+                <a href="#/arc/${a.id}">
+                  <div class="title">✶ ${a.title}</div>
+                  <div class="muted">${a.items.length} текст(а)</div>
+                  <div>${a.desc||''}</div>
+                </a>
+              </div>`).join('')}
+          </div>
+          <h3 style="margin-top:14px">Подписка</h3>
+          <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
+        </aside>
+      </div>`;
+
+    const ybar = document.getElementById('yearbar');
+    if (ybar){
+      ybar.addEventListener('click', (e)=>{
+        const pill = e.target.closest('.pill.year'); if(!pill) return;
+        const v = pill.dataset.year || '';
+        const newHash = v ? `#/?year=${encodeURIComponent(v)}` : '#/';
+        if (location.hash !== newHash) location.hash = newHash; else renderList();
+      });
+    }
+
+    adminDockHide(); ensureAdminUI();
+
+    const needS = itemsStories.filter(s=>!s.title || !s.date).slice(0,8);
+    if(needS.length){ Promise.all(needS.map(s=>loadMdIntoStory(s,isAdmin))).then(()=>{ renderList(); }); }
+    const needA = itemsArticles.filter(a=>!a.title || !a.date).slice(0,8);
+    if(needA.length){ Promise.all(needA.map(a=>loadMdIntoArticle(a,isAdmin))).then(()=>{ renderList(); }); }
+  }
+  </script>
+
+  <!-- ===== Ветки/теги/страницы ===== -->
+  <script>
+  function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
+    <div class="list">${arcs.map(a=>`
+      <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
+        <div class="title">✶ ${a.title}</div>
+        <div class="muted">${a.items.length} текст(а)</div>
+        <div>${a.desc||''}</div>
+      </a></div>`).join('')}</div></section>`; adminDockHide(); ensureAdminUI(); }
+
+  function renderArc(id){
+    const arcs=buildArcs();
+    const a=arcs.find(x=>x.id===id)||{id,title:'Ветка',items:[],desc:''};
+    app.innerHTML=`<section class="card">
+      <a class="back" href="#/arcs">← Ко всем веткам</a>
+      <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
+      <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
+        <li class="story-item" data-arc="${s.arc||'kainrax'}">
+          <a href="#/read-id/${s.id}">
+            <div class="title">✶ ${i+1}. ${s.title}</div>
+            <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
+          </a>
+          ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
+        </li>`).join('')}
+      </ol></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  function renderTag(tag){
+    const st=stories.filter(s=> (s.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
+    const ar=articles.filter(a=> (a.tags||[]).map(t=>t.toLowerCase()).includes(tag.toLowerCase()));
+    app.innerHTML=`<section class="card">
+      <a class="back" href="#/">← На главную</a>
+      <h1>#${tag}</h1>
+
+      <h3>В рассказах</h3>
+      <div class="list">${st.length?st.map(s=>`
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
+          <div class="title">✶ ${s.title}</div>
+          <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
+        </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
+
+      <h3 style="margin-top:14px">В статьях</h3>
+      <div class="list">${ar.length?ar.map(a=>`
+        <div class="story-item" data-kind="article"><a href="#/read-article/${a.id}">
+          <div class="title">📰 ${a.title}</div>
+          <div class="muted">${fmtHumanDateTime(a.date)} ${a.outlet?` · ${a.outlet}`:''} ${a.author?` · ${a.author}`:''}</div>
+        </a>${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
+    </section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+  </script>
+
+  <!-- ===== Загрузка статей/историй ===== -->
+  <script>
+  async function loadMdIntoStory(s, isAdmin){
+    if (!s) return s;
+    let file = s.file;
+    if(!file){
+      const name=(s.slug||s.id||'').trim();
+      if(name) file = `content/stories/${name}.md`;
+    }
+    if(!file || s.text) return s;
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 6000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      s.file       = file;
+      s.title      = s.title      || attributes.title || s.id;
+      s.date       = s.date       || attributes.date  || '';
+      s.minutes    = s.minutes    || Number(attributes.minutes)|| Math.max(5, Math.round((body||'').length/1100));
+      s.arc        = s.arc        || attributes.arc   || 'kainrax';
+      s.tags       = s.tags       || normalizeTags(attributes.tags);
+      s.annotation = s.annotation || attributes.annotation || '';
+      const yRaw   = (attributes.year ?? attributes.worldYear ?? attributes.pergYear);
+      s.year       = s.year ?? safeYear(yRaw);
+      s.text       = body || '';
+    }catch(e){}
+    return s;
+  }
+
+  async function loadMdIntoArticle(a, isAdmin){
+    if (!a) return a;
+    let file = a.file;
+    if(!file){
+      const name=(a.slug||a.id||'').trim();
+      if(name) file = `content/articles/${name}.md`;
+    }
+    if(!file || a.text) return a;
+    try{
+      const raw = await fetchText(file,{ timeoutMs: 7000, cacheMode: isAdmin?'no-store':undefined });
+      const { attributes, body } = parseFrontMatter(raw);
+      a.file       = file;
+      a.title      = a.title      || attributes.title || a.id;
+      a.date       = a.date       || attributes.date  || '';
+      a.minutes    = a.minutes    || Number(attributes.minutes)|| Math.max(6, Math.round((body||'').length/1000));
+      a.tags       = a.tags       || normalizeTags(attributes.tags);
+      a.annotation = a.annotation || attributes.annotation || '';
+      a.year       = a.year ?? safeYear(attributes.year);
+      a.author     = a.author     || attributes.author || '';
+      a.outlet     = a.outlet     || attributes.outlet || attributes.journal || '';
+      a.cover      = a.cover      || attributes.cover  || '';
+      a.text       = body || '';
+    }catch(e){}
+    return a;
+  }
+
+  function renderArticlesList(){
+    const q = state.q;
+    const ySel = currentYearSelection();
+    const base = articles.filter(a=>{
+      if (!q) return true;
+      const hay=[a.title||'', a.author||'', a.outlet||'', (a.text||''), (a.tags||[]).join(' ')].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+    const counts = collectYearCounts(base);
+    const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
+    const items = base.filter(a=> ySel==null ? true : safeYear(a.year)===ySel);
+    const yearBar = yearBarHtml(years, counts, ySel);
+
+    app.innerHTML = `
+      <section class="card">
+        <a class="back" href="#/">← На главную</a>
+        <h1>Статьи</h1>
+        <div class="muted">Архив: формулы, иллюстрации, источники, подписи.</div>
+        ${yearBar}
+        <div class="list" style="margin-top:8px">
+          ${
+            items.length
+              ? items.map(a => `
+                <div class="story-item" data-kind="article">
+                  <a href="#/read-article/${a.id}">
+                    <div class="title">📰 ${a.title || 'Без названия'}</div>
+                    <div class="muted">
+                      ${fmtHumanDateTime(a.date)}
+                      ${safeYear(a.year)!=null?` · год: ${safeYear(a.year)}`:''}
+                      ${a.outlet?` · ${a.outlet}`:''}
+                      ${a.author?` · ${a.author}`:''}
+                      · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
+                    </div>
+                  </a>
+                  ${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}
+                </div>`).join('')
+              : '<div class="muted">Пока пусто. Смотри <code>content/articles</code>.</div>'
+          }
+        </div>
+      </section>`;
+    const ybar = document.getElementById('yearbar');
+    if (ybar){
+      ybar.addEventListener('click', (e)=>{
+        const pill = e.target.closest('.pill.year'); if(!pill) return;
+        const v = pill.dataset.year || '';
+        const newHash = v ? `#/articles?year=${encodeURIComponent(v)}` : '#/articles';
+        if (location.hash !== newHash) location.hash = newHash; else renderArticlesList();
+      });
+    }
+    adminDockHide(); ensureAdminUI();
+  }
+
+  async function renderArticleRead(id){
+    const a=findArticleByKey(id); if(!a){ location.hash='#/articles'; return; }
+    try{ await loadMdIntoArticle(a, isAdmin); }catch(e){}
+
+    app.innerHTML = `
+      <a class="back" href="#/articles">← К статьям</a>
+      <article class="with-margin" data-id="${a.id}" data-slug="${a.slug||a.id}">
+        <div class="prose readbox">
+          ${a.cover?`<img src="${rewriteMediaUrl(a.cover)}" alt="cover" loading="lazy" decoding="async" referrerpolicy="no-referrer" style="margin-bottom:10px">`:''}
+          <h1>${a.title}</h1>
+          <div class="byline muted">
+            ${a.outlet?`<span>${a.outlet}</span>`:''}
+            ${a.author?`<span class="dot">${a.author}</span>`:''}
+            ${a.date?`<span class="dot">${fmtHumanDateTime(a.date)}</span>`:''}
+            <span class="dot">${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин</span>
+          </div>
+          <div style="margin:6px 0 12px">${(a.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+          <div class="article-body">${mdToHtml(a.text||'')}</div>
+        </div>
+        <aside class="margin-notes"></aside>
+      </article>
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3><section id="comments"></section>
+      </section>`;
+
+    await typesetMath(document.querySelector('.article-body'));
+    KX_refitMath(document);
+    mountComments('article:'+(a.slug||a.id));
+    setTimeout(restoreScroll,0);
+    adminDockFor('article', a.slug||a.id);
+    ensureAdminUI();
+    window.hit && window.hit('article:'+(a.slug||a.id)).catch(()=>{});
+  }
+
+  async function renderArticleByObj(s){
+    if(!s){ location.hash='#/'; return; }
+    try{ await loadMdIntoStory(s, isAdmin); }catch(e){}
+
+    const arcs=buildArcs();
+    const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
+    const order=a.items; const pos=Math.max(0, order.findIndex(v=> v.id===s.id ));
+    const prev=order[pos-1], next=order[pos+1];
+
+    app.innerHTML=`
+      <a class="back" href="#/">← К списку</a>
+      <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
+        <div class="prose readbox">
+          <h1>${s.title}</h1>
+          <div class="muted">
+            ${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин
+            · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
+            (${pos+1}/${order.length})
+          </div>
+          <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+          ${(s.text||'').split(/\n\n+/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}
+          <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+          <div style="display:flex;justify-content:space-between;gap:10px">
+            ${prev?`<a class="btn" href="#/read-id/${prev.id}">← ${prev.title}</a>`:'<span></span>'}
+            ${next?`<a class="btn" href="#/read-id/${next.id}">${next.title} →</a>`:'<span></span>'}
+          </div>
+        </div>
+        <aside class="margin-notes"></aside>
+      </article>
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3><section id="comments"></section>
+      </section>`;
+
+    await typesetMath(document.querySelector('.prose.readbox'));
+    KX_refitMath(document);
+    mountComments('story:'+(s.slug||s.id));
+    setTimeout(restoreScroll,0);
+    adminDockFor('story', s.slug||s.id);
+    ensureAdminUI();
+    window.hit && window.hit('story:'+(s.slug||s.id)).catch(()=>{});
+  }
+  </script>
+
+  <!-- ===== Пергамент / комменты / прогресс / админ док ===== -->
+  <script>
+  function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
+
+  function renderPergList(){
+    const items = Array.isArray(pergDocs) ? pergDocs : [];
+    if(!items.length){
+      app.innerHTML = `<section class="card">
+        <h1>Пергамент</h1>
+        <div class="muted">Пока пусто. Проверь, что <code>content/pergament/**</code> попал в билд, а <code>/api/pergament-index</code> отдаёт JSON.</div>
+      </section>`;
+      adminDockHide(); ensureAdminUI(); return;
+    }
+
+    app.innerHTML = `<section class="card"><h1>Пергамент</h1>
+      <div class="list">${items.map(d=>{
+        const e=lastEdition(d)||{};
+        return `<div class="story-item" data-arc="kainrax">
+          <a href="#/perg/${encodeURIComponent(d.id)}">
+            <div class="title">📜 ${d.title||d.id}</div>
+            <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
+          </a>
+          ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
+        </div>`; }).join('')}</div></section>`;
+    adminDockHide(); ensureAdminUI();
+  }
+
+  async function renderPerg(id){
+    const doc = (pergDocs||[]).find(d => String(d.id) === String(id));
+    if(!doc){ location.hash = '#/perg'; return; }
+
+    const hq = parseHashQuery();
+    const idx = Number.isFinite(+hq.ed) ? Math.max(0, Math.min(+hq.ed, (doc.editions||[]).length-1))
+                                        : (doc.editions||[]).length-1;
+    const ed  = (doc.editions||[])[idx] || {};
+
+    // Загружаем конкретную редакцию
+    let body = '';
+    const filePath = ed.file || doc.file || '';
+    const isMd = (filePath||'').toLowerCase().endsWith('.md');
+    try{
+      const raw = await fetchText(filePath, { timeoutMs: 8000 });
+      if (isMd){
+        const { body: b } = parseFrontMatter(raw);
+        body = b || raw || '';
+      } else {
+        body = raw || '';
+      }
+    }catch(_){ body=''; }
+
+    const title = doc.title || 'Пергамент';
+    const anno  = (doc.annotation || doc.anno || '').trim();
+
+    const edList = (doc.editions||[]).map((e,i)=>{
+      const href = `#/perg/${encodeURIComponent(doc.id)}?ed=${i}`;
+      const date = fmtPergDayYear(e.date||'');
+      return `<li style="margin:4px 0">${i===idx?'▸':''} <a class="btn" href="${href}">${date||('Редакция '+(i+1))}</a>${e.note?` <span class="muted">${e.note}</span>`:''}</li>`;
+    }).join('');
+
+    function asHtml(txt){
+      const esc = (s)=> s.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
+      return txt.split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('\n');
+    }
+
+    const htmlBody = isMd ? mdToHtml(body) : asHtml(body);
+
+    app.innerHTML = `
+      <a class="back" href="#/perg">← Ко всем хроникам</a>
+      <article class="with-margin" data-id="${doc.id}">
+        <div class="prose readbox parchment">
+          <h1>📜 ${title}</h1>
+          <div class="muted">редакция: ${fmtPergDayYear(ed.date || doc.date || '')}${doc.source?` · ${doc.source}`:''}</div>
+          ${anno ? `<div class="anno-box">${anno}</div>` : ''}
+          <div class="article-body">${htmlBody}</div>
+        </div>
+        <aside class="margin-notes">
+          <div class="mnote"><strong>Редакции</strong></div>
+          <ol style="padding-left:16px">${edList || '<li class="muted">Пока одна версия.</li>'}</ol>
+        </aside>
+      </article>
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3><section id="comments"></section>
+      </section>`;
+
+    if (isMd){ await typesetMath(document.querySelector('.article-body')); KX_refitMath(document); }
+    mountComments('perg:'+String(doc.id));
+    adminDockFor('perg', String(doc.id));
+    ensureAdminUI();
+    setTimeout(restoreScroll,0);
+  }
+  </script>
+
+  <!-- ===== Комменты / служебки / прогресс ===== -->
+  <script>
+  function mountComments(term){
+    const wrap=document.getElementById('comments'); if(!wrap) return;
+    wrap.innerHTML=`
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn" id="tab-gh">GitHub</button>
+        <button class="btn" id="tab-anon">Анонимно</button>
+      </div>
+      <div id="c-gh"></div>
+      <div id="c-anon" style="display:none;min-height:300px"></div>`;
+    const ghBox=wrap.querySelector('#c-gh'), anonBox=wrap.querySelector('#c-anon'); let ghLoaded=false, anonLoaded=false;
+    function loadGH(){ if (ghLoaded) return; ghLoaded=true; ghBox.innerHTML=''; const s=document.createElement('script'); s.src='https://utteranc.es/client.js'; s.setAttribute('repo','sviam-byte/kainrax-site'); s.setAttribute('issue-term', term || 'home'); s.setAttribute('label','comments'); s.setAttribute('theme', document.documentElement.getAttribute('data-theme')==='light'?'github-light':'github-dark'); s.setAttribute('crossorigin','anonymous'); s.async=true; ghBox.appendChild(s); }
+    function loadAnon(){ if (!window.CUSDIS_APP_ID){ anonBox.innerHTML='<div class="muted">Анонимные комментарии отключены.</div>'; return; }
+      if (anonLoaded) return; anonLoaded=true; anonBox.innerHTML=''; const t=document.createElement('div'); t.id='cusdis_thread'; t.dataset.host='https://cusdis.com'; t.dataset.appId=window.CUSDIS_APP_ID; t.dataset.pageId=term || (location.pathname+location.hash); t.dataset.pageUrl=location.href; t.dataset.pageTitle=document.title; t.dataset.lang='ru'; t.dataset.theme=(document.documentElement.getAttribute('data-theme')==='light')?'light':'dark'; anonBox.appendChild(t);
+      if (!window.__cusdisLoaded){ const s=document.createElement('script'); s.defer=true; s.src='https://cusdis.com/js/cusdis.es.js'; s.onload=()=>{ window.__cusdisLoaded=true; try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }; document.body.appendChild(s); } else { try{ window.CUSDIS?.renderTo?.('#cusdis_thread'); setCusdisTheme(); }catch(_){} }
+    }
+    function showGH(){ ghBox.style.display='block'; anonBox.style.display='none'; loadGH(); }
+    function showAnon(){ ghBox.style.display='none'; anonBox.style.display='block'; loadAnon(); }
+    wrap.querySelector('#tab-gh').onclick=showGH; wrap.querySelector('#tab-anon').onclick=showAnon;
+    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ showGH(); io.disconnect(); } },{rootMargin:'200px'}); io.observe(wrap);
+  }
+  function setUtterancesTheme(theme){ const iframe=document.querySelector('iframe.utterances-frame'); if(iframe) iframe.contentWindow.postMessage({type:'set-theme', theme:theme==='light'?'github-light':'github-dark'}, 'https://utteranc.es'); }
+  function setCusdisTheme(){ try{ window.CUSDIS?.setTheme?.(document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'); }catch(_){ } }
+
+  const adminDock=document.getElementById('adminDock');
+  const editThisBtn=document.getElementById('editThisBtn');
+  function adminDockHide(){ adminDock.style.display='none'; }
+  function adminDockFor(kind, slug){
+    if (!isAdmin) return adminDockHide();
+    if(kind==='story')   editThisBtn.href=`/admin/#/collections/stories/entries/${slug}`;
+    else if(kind==='note')   editThisBtn.href=`/admin/#/collections/notes/entries/${slug}`;
+    else if(kind==='perg')   editThisBtn.href=`/admin/#/collections/pergament/entries/${slug}`;
+    else if(kind==='article')editThisBtn.href=`/admin/#/collections/articles/entries/${slug}`;
+    adminDock.style.display='block';
+  }
+
+  const progress=document.getElementById('progress'); let ticking=false;
+  function onScroll(){
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{
+      const art=document.querySelector('article');
+      if(!art){progress.style.width='0%'; ticking=false; return;}
+      const total=art.scrollHeight - window.innerHeight + 1;
+      const pct=Math.min(100, Math.max(0, ((window.scrollY - art.offsetTop) / total)*100));
+      progress.style.width=(isFinite(pct)?pct:0)+'%';
+      const id=art.dataset.slug||art.dataset.id; if(id){ localStorage.setItem('read:'+id, window.scrollY); }
+      ticking=false;
+    });
+  }
+  addEventListener('scroll', onScroll, {passive:true});
+  function restoreScroll(){
+    const art=document.querySelector('article'); if(!art) return;
+    const id=art.dataset.slug||art.dataset.id;
+    const y=+localStorage.getItem('read:'+id)||0;
+    if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
+  }
+  </script>
+
+  <!-- ===== Косметика ===== -->
+  <script>
+  const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
+  let W,H,starsArr=[], running=true;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
+  addEventListener('resize', resize, {passive:true});
+  function makeStars(){
+    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80;
+    const k = (W*H)/60000;
+    const count = Math.floor(base + k);
+    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
+  }
+  function drawStars(ts, once=false){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
+    for(const st of starsArr){
+      const a = once ? 0.7 : 0.55 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.35;
+      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
+    }
+    if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
+  }
+  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
+
+  function initSkyLine() {
+    const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
+    function updatePosition() {
+      const now = new Date();
+      const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
+      const progress = msSinceMidnight / 86400000;
+      skyLine.style.top = `${progress * 100}vh`;
+      if (running) requestAnimationFrame(updatePosition);
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') { running = true; requestAnimationFrame(updatePosition); } else { running = false; }
+    });
+    requestAnimationFrame(updatePosition);
+  }
+  </script>
+
+  <!-- ===== Роутинг и запуск ===== -->
+  <script>
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
+  function ensureAdminUI(){
+    const adminBtns = document.getElementById('adminBtns');
+    if (adminBtns) adminBtns.style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    const mob = document.getElementById('adminMobile');
+    if (mob) mob.style.display = isAdmin ? '' : 'none';
+    if(!isAdmin) adminDockHide();
+  }
+
+  function renderNotes(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`; }
+  function renderProject(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>О проекте</h1><div class="muted">Кайнракс — тёмная НФ. Обновления по пятницам и субботам.</div></section>`; }
+
+  async function render(){
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/articles'){ renderArticlesList(); return; }
+    if(r==='/notes'){ renderNotes(); return; }
+    if(r==='/project'){ renderProject(); return; }
+    if(r==='/perg'){ renderPergList(); return; }
+
+    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
+    if(mReadId){ await renderArticleByObj(findStoryByKey(mReadId[1])); return; }
+
+    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
+    if(mRead){ await renderArticleByObj(findStoryByKey(mRead[1])); return; }
+
+    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
+    const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
+    renderList();
+  }
+
+  async function init(){
+    app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
+    try { await loadContent(); } catch(_) {}
+    applyTheme();
+    render();
+    ensureAdminUI();
+    (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!prefersReduced) requestAnimationFrame(drawStars); })();
+    initSkyLine();
+  }
+  init();
+
+  (function(){
+    function fitLargeMath(root){
+      const scope = root || document;
+      const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
+      blocks.forEach(el=>{
+        let wrap = el.parentElement;
+        if(!wrap || !wrap.classList.contains('kx-math-fit')){
+          const w = document.createElement('div');
+          w.className = 'kx-math-fit';
+          (wrap || el.parentNode).insertBefore(w, el);
+          w.appendChild(el);
+          wrap = w;
+        }
+        el.style.transform = '';
+        wrap.style.height = '';
+        const cs = getComputedStyle(wrap);
+        const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
+        const need  = el.scrollWidth;
+        if(need > avail && avail > 0){
+          const scale = Math.max(0.30, Math.min(1, avail / need));
+          const rect  = el.getBoundingClientRect();
+          el.style.transform = `scale(${scale})`;
+          wrap.style.height = (rect.height * scale + 2) + 'px';
+        }
+      });
+    }
+    let raf = 0;
+    function scheduleFit(target){
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=> fitLargeMath(target || document));
+    }
+    addEventListener('resize', ()=> scheduleFit(), {passive:true});
+    addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
+    addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
+    window.KX_refitMath = scheduleFit;
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
+    } else {
+      scheduleFit();
+    }
+  })();
+  </script>
+
+  <!-- MathJax loader (лениво) -->
+  <script>
+  let mjPending=null;
+  function ensureMathJax(){
+    if (window.MathJax) return Promise.resolve();
+    if (mjPending) return mjPending;
+    window.MathJax = {
+      tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']], tags: 'ams' },
+      chtml: { linebreaks: { automatic: true, width: 'container' }, scale: 1, mtextInheritFont: true, matchFontHeight: false },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+    };
+    mjPending = new Promise(res=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js';
+      s.async=true; s.onload=()=>res(); s.onerror=()=>res();
+      document.head.appendChild(s);
+    });
+    return mjPending;
+  }
+  async function typesetMath(scope){
+    try{
+      if(!scope) return;
+      const html = scope.innerHTML || '';
+      const hasMath = /\$\$[\s\S]*?\$\$|\\\[|\\\(|(^|[^\\])\$(?=\S)[\s\S]*?\$(?!\w)/.test(html);
+      if(!hasMath) return;
+      await ensureMathJax();
+      if(window.MathJax){
+        if (MathJax.typesetClear) MathJax.typesetClear([scope]);
+        await MathJax.typesetPromise([scope]);
+        KX_refitMath(scope);
+      }
+    }catch(_){ }
+  }
+  </script>
 </body>
 </html>
