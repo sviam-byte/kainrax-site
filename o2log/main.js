@@ -1,10 +1,47 @@
-// o2log/main.js
-import React from 'https://esm.sh/react@18.2.0?dev';
-import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client?dev';
-// ВАЖНО: у Recharts добавляем ?bundle, чтобы подтянулись все d3-зависимости.
-import * as Recharts from 'https://esm.sh/recharts@2.10.4?bundle&target=es2018&dev';
+import { O2LogApp } from './O2LogApp.js';
 
-import O2LogApp from './O2LogApp.js';
+const $ = sel => document.querySelector(sel);
+const els = {
+  canvas:   $('#map'),
+  tooltip:  $('#tooltip'),
+  rangeSel: $('#rangeSel'),
+  liveChk:  $('#liveChk'),
+  crit:     $('#critSlider'),
+  warn:     $('#warnSlider'),
+  top:      $('#topSlider'),
+  thVals:   $('#thVals'),
 
-const el = document.getElementById('root');
-createRoot(el).render(React.createElement(O2LogApp, { React, Recharts }));
+  kLast: $('#k-last'), kMin: $('#k-min'), kMax: $('#k-max'), kBrk: $('#k-brk'),
+  chartLine: $('#chartLine'), chartPie: $('#chartPie'),
+  logTable: $('#logTable tbody'),
+  btnExport: $('#btnExport'),
+};
+
+const app = new O2LogApp({
+  canvas: els.canvas,
+  tooltip: els.tooltip,
+  kpis: { last: els.kLast, min: els.kMin, max: els.kMax, brk: els.kBrk },
+  charts: { line: els.chartLine, pie: els.chartPie },
+  logsTbody: els.logTable,
+  thresholds: { critical: Number(els.crit.value), warning: Number(els.warn.value), upper: Number(els.top.value) },
+  range: els.rangeSel.value
+});
+
+// controls
+function renderThVals() {
+  els.thVals.textContent =
+    `(${app.thresholds.critical.toFixed(2)} / ${app.thresholds.warning.toFixed(2)} / ${app.thresholds.upper.toFixed(2)} %)`;
+}
+renderThVals();
+
+els.rangeSel.addEventListener('change', e => app.setRange(e.target.value));
+els.liveChk.addEventListener('change', e => app.setLive(e.target.checked));
+
+els.crit.addEventListener('input', () => { app.thresholds.critical = Math.min(Number(els.crit.value), app.thresholds.warning - 0.05); renderThVals(); app.redraw(); app.updateCharts(); });
+els.warn.addEventListener('input', () => { app.thresholds.warning = Math.max(Number(els.warn.value), app.thresholds.critical + 0.05); renderThVals(); app.redraw(); app.updateCharts(); });
+els.top .addEventListener('input', () => { app.thresholds.upper    = Number(els.top.value); renderThVals(); app.redraw(); app.updateCharts(); });
+
+els.btnExport.addEventListener('click', () => app.exportLogsCsv());
+
+// kick off
+app.start();
