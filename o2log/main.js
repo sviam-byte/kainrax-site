@@ -6,6 +6,8 @@ const els = {
   tooltip:  $('#tooltip'),
   rangeSel: $('#rangeSel'),
   modeSel:  $('#modeSel'),
+  filterSel:$('#filterSel'),
+  logScopeSel:$('#logScopeSel'),
   liveChk:  $('#liveChk'),
   crit:     $('#critSlider'),
   warn:     $('#warnSlider'),
@@ -28,18 +30,21 @@ const app = new O2LogApp({
   thresholds: { critical: Number(els.crit.value), warning: Number(els.warn.value), upper: Number(els.top.value) },
   range: els.rangeSel.value,
   mode:  els.modeSel.value,
+  filter: els.filterSel.value,
+  logScope: els.logScopeSel.value,
   explainNode: els.explain,
 });
 
 // controls
 function renderThVals() {
-  els.thVals.textContent =
-    `(${app.thresholds.critical.toFixed(2)} / ${app.thresholds.warning.toFixed(2)} / ${app.thresholds.upper.toFixed(2)} %)`;
+  els.thVals.textContent = `(${app.thresholds.critical.toFixed(2)} / ${app.thresholds.warning.toFixed(2)} / ${app.thresholds.upper.toFixed(2)} %)`;
 }
 renderThVals();
 
 els.rangeSel.addEventListener('change', e => app.setRange(e.target.value));
 els.modeSel .addEventListener('change', e => app.setMode(e.target.value));
+els.filterSel.addEventListener('change', e => app.setFilter(e.target.value));
+els.logScopeSel.addEventListener('change', e => app.setLogScope(e.target.value));
 els.liveChk.addEventListener('change', e => app.setLive(e.target.checked));
 
 els.crit.addEventListener('input', () => { app.thresholds.critical = Math.min(Number(els.crit.value), app.thresholds.warning - 0.05); renderThVals(); app.redraw(); app.updateCharts(); });
