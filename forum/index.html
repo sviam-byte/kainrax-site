@@ -20,6 +20,9 @@
       --gap:12px; --r:14px; --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 30px rgba(0,0,0,.35);
       --border:rgba(255,255,255,.08);
     }
+    /* Отключаем плавные скроллы: восстановление должно быть мгновенным */
+    html{scroll-behavior:auto !important}
+
     /* Светлая тема */
     html[data-theme="sepia"]{
       --bg:#f8f4ec; --bg-soft:#f2eadf; --panel:#ffffff; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
@@ -202,7 +205,8 @@
           </div>
         </details>
       </div>
-            <!-- КНОПКА/РАСКРЫВАЛКА: СЮЖЕТЫ (АРКИ) — кратко -->
+
+      <!-- КНОПКА/РАСКРЫВАЛКА: СЮЖЕТЫ (АРКИ) — кратко -->
       <div class="kx-about" id="stories">
         <details id="storiesBox" aria-labelledby="storiesTitle">
           <summary>
@@ -211,34 +215,29 @@
           </summary>
           <div class="body">
             <ul>
-                <li><strong>Арка: кислород и А-категория</strong> — разворачивается прямо сейчас по тегу А-категория. Следить за историей в нужном порядке легче в телеграм-канале.
-                <span class="kx-muted">с <b>100-го</b> по <b>-й</b> день 430-го года</span></li>
-              <li><strong>Арка: Тихий Дождь</strong> — сенсорный «дождь» без приборной фиксации, давление Куратора, риск связиста, блэкаут, исчезновения. Без цензуры Контроля - в телеграме.
-                <span class="kx-muted">с <b>96-го</b> по <b>99-й</b> день 430-го года</span></li>
-      
+              <li><strong>Арка: кислород и А-категория</strong> — разворачивается прямо сейчас по тегу А-категория. Следить за историей в нужном порядке легче в телеграм-канале.
+                <span class="kx-muted">с 100-го по -й день 430-го года</span></li>
+              <li><strong>Арка: Тихий Дождь</strong> — сенсорный «дождь» без приборной фиксации, давление Куратора, риск связиста, блэкаут, исчезновения. Без цензуры Контроля — в телеграме.
+                <span class="kx-muted">с 96-го по 99-й день 430-го года</span></li>
               <li><strong>Арка: «Протокол против Человечности»</strong> — стажёрная дилемма, мемы, отстранение Гидеона.
-                <span class="kx-muted">с <b>72-го</b> по <b>93-й</b> день 430-го года</span></li>
-      
+                <span class="kx-muted">с 72-го по 93-й день 430-го года</span></li>
               <li><strong>Арка: «Трагедия кадетов из Телема»</strong> — фанатичный порыв, самовольная вылазка, больной финал.
-                <span class="kx-muted">с <b>94-го</b> по <b>95-й</b> день 430-го года</span></li>
+                <span class="kx-muted">с 94-го по 95-й день 430-го года</span></li>
             </ul>
-      
+
             <hr style="border:0;border-top:1px solid var(--border);opacity:.6;margin:10px 0">
-      
+
             <ul>
               <li><strong>Обзоры еды</strong> — пайки, энергетики, пасты, «тихий бифштекс».
-                <span class="kx-muted">с <b>73-го</b> по <b>95-й</b> день 430-го года</span></li>
-      
+                <span class="kx-muted">с 73-го по 95-й день 430-го года</span></li>
               <li><strong>Истории с Поверхности</strong> — Тяньхэ, Атлания, Видьяпур, пакт-караваны, рейсы и таможни.
-                <span class="kx-muted">с <b>70-го</b> по <b>96-й</b> день 430-го года</span></li>
-      
+                <span class="kx-muted">с 70-го по 96-й день 430-го года</span></li>
               <li><strong>Учебные записи и методички</strong> — лекции, конспекты, отчёты, заметки мастеров.
-                <span class="kx-muted">с <b>70-го</b> по <b>79-й</b> день 430-го года</span></li>
+                <span class="kx-muted">с 70-го по 79-й день 430-го года</span></li>
             </ul>
           </div>
         </details>
       </div>
-
 
       <p class="kx-muted">Быт, странности, техузлы. Каждая карточка — ветка. Используй фильтры, поиск и сортировку.</p>
 
@@ -271,6 +270,55 @@
   </main>
 
   <script type="module">
+    // ===== Управление восстановлением скролла при "Назад" =====
+    const SCROLL_KEY = 'kx-scroll:' + location.pathname;
+
+    if ('scrollRestoration' in history) {
+      // Берем управление на себя, иначе браузер постарается восстановить до рендера
+      history.scrollRestoration = 'manual';
+    }
+
+    function storeScroll(){
+      try {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        sessionStorage.setItem(SCROLL_KEY, String(y));
+      } catch(_){}
+    }
+
+    function restoreScroll(){
+      let target = 0;
+      try { target = parseInt(sessionStorage.getItem(SCROLL_KEY) || '0', 10) || 0; } catch(_){}
+      if (!target) return;
+
+      let tries = 0;
+      const maxTries = 60; // ~1 сек при 60fps
+
+      function step(){
+        tries++;
+        const se = document.scrollingElement || document.documentElement;
+        const maxPossible = se.scrollHeight - window.innerHeight;
+        // Ждем, пока контент «доростет» до нужной высоты
+        if (maxPossible < target && tries < maxTries) {
+          requestAnimationFrame(step);
+          return;
+        }
+        window.scrollTo(0, target);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Сохраняем скролл на уход со страницы
+    window.addEventListener('pagehide', storeScroll, {capture:true});
+    window.addEventListener('beforeunload', storeScroll);
+
+    // При клике на карточку-тред сохраняем позицию заранее
+    document.addEventListener('click', (e)=>{
+      const a = e.target.closest('a');
+      if (!a) return;
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('/thread.html')) storeScroll();
+    });
+
     // ===== Полоса неба =====
     (function initSkyLine(){
       const el=document.getElementById('sky-line'); let run=true;
@@ -426,7 +474,9 @@
     syncSortUI();
 
     // Скелетон вкл
-    skeleton.hidden=false; box.innerHTML='';
+    const skeleton = document.getElementById('skeleton');
+    skeleton.hidden=false;
+    box.innerHTML='';
 
     const payload = await loadIndex();
     if(payload && payload.error){
@@ -435,19 +485,23 @@
     }
     allItems = Array.isArray(payload) ? payload : Array.isArray(payload.items) ? payload.items : [];
 
-    renderBoards(); render();
+    renderBoards();
+    render();
     skeleton.hidden=true;
 
+    // Восстанавливаем скролл после того, как всё отрисовали
+    restoreScroll();
+
     // ===== События =====
-    const applySearch = debounce(()=>{ query=qInp.value.trim().toLowerCase(); render(); }, 120);
+    const applySearch = debounce(()=>{ query=qInp.value.trim().toLowerCase(); render(); storeScroll(); }, 120);
     qInp.addEventListener('input', applySearch);
-    qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); qInp.focus(); });
+    qClr.addEventListener('click', ()=>{ qInp.value=''; query=''; render(); storeScroll(); qInp.focus(); });
 
     sortersBox.addEventListener('click', e=>{
       const btn=e.target.closest('button[data-sort]'); if(!btn) return;
       currentSort = btn.dataset.sort;
       try{ localStorage.setItem(sortKey, currentSort) }catch(_){ }
-      syncSortUI(); render();
+      syncSortUI(); render(); storeScroll();
     });
 
     // Хоткеи: / — поиск, Esc — очистить, T — тема, ? — открыть «о проекте»
@@ -456,7 +510,7 @@
       const tag=(e.target && (e.target.tagName||'')).toLowerCase();
       const typing = tag==='input' || tag==='textarea' || (e.target && e.target.isContentEditable);
       if(key==='/' && !typing){ qInp.focus(); qInp.select(); e.preventDefault(); }
-      else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); } }
+      else if(key==='escape'){ if(qInp.value){ qInp.value=''; query=''; render(); storeScroll(); } }
       else if(key==='?' && !typing){
         const box = document.getElementById('aboutBox');
         if(box && !box.open){ box.open = true; document.getElementById('aboutTitle')?.focus?.(); }
@@ -484,7 +538,7 @@
 
     // Фикс: если hash был, переведём в параметры (для старых ссылок вида #/board)
     if(location.hash && !location.search){
-      const m=location.hash.match(/^#\/(.+)$/); if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); }
+      const m=location.hash.match(/^#\/(.+)$/); if(m){ currentBoard=decodeURIComponent(m[1]); renderBoards(); render(); storeScroll(); }
     }
   </script>
 </body>
