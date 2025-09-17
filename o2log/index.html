@@ -1,24 +1,610 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>O₂ Logs</title>
-  <style>
-    :root{color-scheme:dark light}
-    body{margin:0;background:#0b0f14;color:#e6e6e6;
-         font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    #root{min-height:100vh;display:flex;align-items:stretch}
-    .card{background:rgba(16,21,32,.92);border:1px solid #223042;border-radius:14px;
-          box-shadow:0 12px 36px rgba(0,0,0,.45);}
-  </style>
-  <!-- Tailwind для быстрых классов внутри лаборатории -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script> tailwind.config = { theme:{ extend:{} }, darkMode:'media' } </script>
-  <!-- Точка входа -->
-  <script type="module" src="./main.js?v=2"></script>
-</head>
-<body>
-  <div id="root" class="p-3 md:p-5 w-full"></div>
-</body>
-</html>
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Tooltip as ShadTooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Download, Play, Pause, AlertTriangle, Map as MapIcon, Activity } from "lucide-react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Legend,
+  ReferenceLine,
+  Cell,
+} from "recharts";
+
+// =============================
+// Helpers: date/time & data
+// =============================
+const MINUTES = 60 * 1000;
+const HOURS = 60 * MINUTES;
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+
+function randn(mean = 0, stdev = 1) {
+  // Box–Muller
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return mean + stdev * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+// Oxygen is typically around ~20.9% in air. We'll simulate around that with occasional dips/spikes.
+function generateSeries(startTs, endTs, stepMs, base = 20.9, volatility = 0.08) {
+  const data = [];
+  for (let t = startTs; t <= endTs; t += stepMs) {
+    const dayPhase = Math.sin((t / (24 * HOURS)) * Math.PI * 2);
+    const value = base + randn(0, volatility) + dayPhase * 0.06;
+    data.push({ t, value: Number(value.toFixed(3)) });
+  }
+  return data;
+}
+
+function injectEvents(series, severityChance = 0.015) {
+  // randomly add transient dips/spikes to simulate incidents
+  const incidents = [];
+  const arr = [...series];
+  for (let i = 0; i < arr.length; i++) {
+    if (Math.random() < severityChance) {
+      const severity = Math.random() < 0.5 ? "warning" : "critical";
+      const duration = Math.floor(3 + Math.random() * 10);
+      const magnitude = severity === "critical" ? -1.6 - Math.random() * 0.6 : -0.8 - Math.random() * 0.4;
+      for (let k = 0; k < duration && i + k < arr.length; k++) {
+        arr[i + k] = { ...arr[i + k], value: Math.max(16, arr[i + k].value + magnitude + randn(0, 0.05)) };
+      }
+      incidents.push({ ts: arr[i].t, severity, message: severity === "critical" ? "Падение О₂ ниже порога" : "Снижение О₂" });
+      i += duration;
+    }
+  }
+  return { series: arr, incidents };
+}
+
+function downloadCSV(filename, rows) {
+  const process = (v) => (typeof v === "string" && v.includes(",") ? `"${v.replace(/"/g, '""')}"` : v);
+  const csv = rows.map((r) => r.map(process).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// =============================
+// Mock topology for one sector
+// =============================
+const SECTOR = {
+  id: "S-7A",
+  name: "Сектор 7А",
+  width: 12,
+  height: 8,
+  // grid units. houses define x,y,w,h in those units
+  houses: Array.from({ length: 12 }).map((_, i) => {
+    const col = i % 4; // 4 across
+    const row = Math.floor(i / 4); // 3 rows
+    return {
+      id: `H-${101 + i}`,
+      name: `Дом ${101 + i}`,
+      x: 1 + col * 3,
+      y: 1 + row * 2.2,
+      w: 2,
+      h: 1.5,
+      base: 20.7 + (i % 3) * 0.15 + (Math.random() - 0.5) * 0.1,
+    };
+  }),
+};
+
+// precompute initial data window (last 24h)
+const NOW = Date.now();
+const DEFAULT_RANGE = "24h"; // 1h | 24h | 7d
+
+function rangeToMs(range) {
+  if (range === "1h") return 1 * HOURS;
+  if (range === "7d") return 7 * 24 * HOURS;
+  return 24 * HOURS;
+}
+
+function stepForRange(range) {
+  if (range === "1h") return 2 * MINUTES;
+  if (range === "7d") return 30 * MINUTES;
+  return 5 * MINUTES;
+}
+
+// =============================
+// Components
+// =============================
+function Kpi({ label, value, unit, trend }) {
+  return (
+    <Card className="rounded-2xl shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm text-muted-foreground font-medium">{label}</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="text-2xl font-semibold tracking-tight">
+          {value}
+          {unit && <span className="ml-1 text-muted-foreground text-base">{unit}</span>}
+        </div>
+        {trend != null && (
+          <div className={`text-xs mt-1 ${trend >= 0 ? "text-green-600" : "text-red-600"}`}>
+            {trend >= 0 ? "+" : ""}
+            {trend.toFixed(3)} {unit}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function useO2Data(house, range) {
+  return useMemo(() => {
+    if (!house) return { series: [], incidents: [], stats: null };
+    const now = Date.now();
+    const span = rangeToMs(range);
+    const start = now - span;
+    const step = stepForRange(range);
+    const base = house.base;
+    const raw = generateSeries(start, now, step, base, 0.09);
+    const { series, incidents } = injectEvents(raw, 0.008);
+    const values = series.map((d) => d.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const last = values[values.length - 1];
+    const prev = values[Math.max(0, values.length - 6)];
+    const trend = last - prev;
+    const below195 = values.filter((v) => v < 19.5).length;
+    const warnings = incidents.filter((i) => i.severity === "warning").length;
+    const critical = incidents.filter((i) => i.severity === "critical").length;
+    const stats = { min, max, last, trend, below195, warnings, critical };
+    return { series, incidents, stats };
+  }, [house?.id, range]);
+}
+
+function SeverityBadge({ severity }) {
+  const map = {
+    info: "bg-sky-100 text-sky-800",
+    warning: "bg-amber-100 text-amber-800",
+    critical: "bg-red-100 text-red-800",
+  };
+  return <span className={`px-2 py-0.5 text-xs rounded ${map[severity] || map.info}`}>{severity}</span>;
+}
+
+function SectorMap({ sector, selectedId, onSelect, threshold }) {
+  const W = 720;
+  const H = 420;
+  const pad = 24;
+  const scaleX = (x) => pad + (x / sector.width) * (W - 2 * pad);
+  const scaleY = (y) => pad + (y / sector.height) * (H - 2 * pad);
+  const houseRect = (h) => ({
+    x: scaleX(h.x),
+    y: scaleY(h.y),
+    w: ((W - 2 * pad) * h.w) / sector.width,
+    h: ((H - 2 * pad) * h.h) / sector.height,
+  });
+
+  // color by current value relative to threshold bands
+  function colorFor(val) {
+    if (val == null) return "#e5e7eb"; // gray-200
+    if (val < threshold.critical) return "#ef4444"; // red-500
+    if (val < threshold.warning) return "#f59e0b"; // amber-500
+    if (val <= threshold.upper) return "#10b981"; // emerald-500
+    return "#3b82f6"; // blue-500
+  }
+
+  // mock current values per house to color the map
+  const now = Date.now();
+  const currentById = useMemo(() => {
+    const obj = {};
+    sector.houses.forEach((h) => {
+      const val = 20.6 + (Math.sin((now / (HOURS)) + Number(h.id.split("-")[1])) * 0.15) + randn(0, 0.06);
+      obj[h.id] = Number(val.toFixed(2));
+    });
+    return obj;
+  }, [sector.houses]);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-[420px] rounded-2xl border bg-white">
+      {/* grid */}
+      <defs>
+        <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#f1f5f9" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width={W} height={H} fill="url(#grid)" />
+
+      {/* Title */}
+      <text x={pad} y={pad - 6} className="fill-slate-500 text-xs">
+        {sector.name} • кликабельные дома • цвет = состояние О₂
+      </text>
+
+      {sector.houses.map((h) => {
+        const r = houseRect(h);
+        const val = currentById[h.id];
+        const isSel = selectedId === h.id;
+        return (
+          <g key={h.id} className="cursor-pointer" onClick={() => onSelect?.(h.id)}>
+            <rect
+              x={r.x}
+              y={r.y}
+              width={r.w}
+              height={r.h}
+              rx={10}
+              className="transition-all"
+              fill={colorFor(val)}
+              opacity={isSel ? 0.95 : 0.85}
+              stroke={isSel ? "#0f172a" : "#94a3b8"}
+              strokeWidth={isSel ? 2 : 1}
+            />
+            <text x={r.x + 8} y={r.y + 16} className="fill-white text-[10px] font-semibold drop-shadow">
+              {h.name}
+            </text>
+            <text x={r.x + 8} y={r.y + 30} className="fill-white text-[10px] opacity-90">
+              {val.toFixed(2)}%
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Legend */}
+      <g transform={`translate(${W - pad - 140}, ${pad})`}>
+        <rect width="140" height="78" rx="10" fill="#ffffff" stroke="#e5e7eb" />
+        {[
+          { c: "#ef4444", t: "критично" },
+          { c: "#f59e0b", t: "ниже нормы" },
+          { c: "#10b981", t: "норма" },
+          { c: "#3b82f6", t: "выше нормы" },
+        ].map((l, i) => (
+          <g key={l.t} transform={`translate(8, ${8 + i * 17})`}>
+            <rect width="12" height="12" rx="2" fill={l.c} />
+            <text x="18" y="10" className="fill-slate-600 text-[10px]">{l.t}</text>
+          </g>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+export default function O2SectorDashboard() {
+  const [range, setRange] = useState(DEFAULT_RANGE);
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState(SECTOR.houses[0].id);
+  const [live, setLive] = useState(true);
+  const [threshold, setThreshold] = useState({ critical: 19.0, warning: 19.5, upper: 21.4 });
+
+  const housesFiltered = useMemo(() => {
+    return SECTOR.houses.filter((h) => h.name.toLowerCase().includes(query.toLowerCase()));
+  }, [query]);
+
+  const selectedHouse = useMemo(() => SECTOR.houses.find((h) => h.id === selectedId), [selectedId]);
+
+  const { series, incidents, stats } = useO2Data(selectedHouse, range);
+
+  // Live re-render tick
+  useEffect(() => {
+    if (!live) return;
+    const t = setInterval(() => {
+      // trigger re-render by toggling a dummy state if needed
+      setQuery((q) => q);
+    }, 4000);
+    return () => clearInterval(t);
+  }, [live]);
+
+  // Logs derived from incidents + random info lines
+  const logs = useMemo(() => {
+    const base = incidents.map((ev, idx) => ({
+      id: `E${idx}`,
+      ts: ev.ts,
+      house: selectedHouse?.name,
+      severity: ev.severity,
+      message: ev.message,
+    }));
+    // plus info pings
+    const infos = series.filter((_, i) => i % 40 === 0).map((d, i) => ({
+      id: `I${i}`,
+      ts: d.t,
+      house: selectedHouse?.name,
+      severity: "info",
+      message: `Датчик О₂ сообщил значение ${d.value.toFixed(2)}%`,
+    }));
+    return [...base, ...infos].sort((a, b) => b.ts - a.ts);
+  }, [incidents, series, selectedHouse?.name]);
+
+  const pieData = useMemo(() => {
+    const v = stats?.last ?? 0;
+    const normal = Math.min(Math.max((v - threshold.critical) / (threshold.upper - threshold.critical), 0), 1);
+    return [
+      { name: "О₂", value: Math.round(normal * 100) },
+      { name: "Дефицит/избыток", value: 100 - Math.round(normal * 100) },
+    ];
+  }, [stats?.last, threshold]);
+
+  const exportLogs = () => {
+    const rows = [["timestamp", "house", "severity", "message"], ...logs.map((l) => [new Date(l.ts).toISOString(), l.house, l.severity, l.message])];
+    downloadCSV(`o2-logs-${selectedHouse?.id}.csv`, rows);
+  };
+
+  return (
+    <TooltipProvider>
+      <div className="p-6 space-y-4">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <MapIcon className="size-5" />
+            <h1 className="text-xl font-semibold">Мониторинг О₂ • {SECTOR.name}</h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Live</span>
+              <Switch checked={live} onCheckedChange={setLive} />
+            </div>
+
+            <Select value={range} onValueChange={setRange}>
+              <SelectTrigger className="w-[140px]"><SelectValue placeholder="Интервал" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1h">Последний час</SelectItem>
+                <SelectItem value="24h">Последние 24ч</SelectItem>
+                <SelectItem value="7d">Последние 7д</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Top grid */}
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 xl:col-span-8">
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base"><Activity className="size-4" />Секторная карта • клик по дому</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SectorMap
+                  sector={SECTOR}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                  threshold={threshold}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="col-span-12 xl:col-span-4">
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Пороговые значения</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-3 gap-3 text-sm">
+                  <div>
+                    <div className="text-muted-foreground">критично</div>
+                    <div className="font-medium">{threshold.critical.toFixed(2)}%</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">предупр.</div>
+                    <div className="font-medium">{threshold.warning.toFixed(2)}%</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">верхний</div>
+                    <div className="font-medium">{threshold.upper.toFixed(2)}%</div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">Сдвинь нижние пороги (критично/предупреждение)</div>
+                  <Slider
+                    value={[threshold.critical, threshold.warning]}
+                    min={17.5}
+                    max={20.9}
+                    step={0.05}
+                    onValueChange={([c, w]) => setThreshold((t) => ({ ...t, critical: Math.min(c, w - 0.1), warning: Math.max(w, c + 0.1) }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">Верхняя граница нормы</div>
+                  <Slider
+                    value={[threshold.upper]}
+                    min={21.0}
+                    max={23.0}
+                    step={0.05}
+                    onValueChange={([u]) => setThreshold((t) => ({ ...t, upper: u }))}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground">Цветовая шкала на карте использует эти пороги.</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Main panels */}
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 xl:col-span-8 space-y-4">
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">{selectedHouse?.name}: динамика О₂</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-4 gap-3 mb-4">
+                  <Kpi label="Текущее" value={(stats?.last ?? 0).toFixed(3)} unit="%" trend={stats?.trend} />
+                  <Kpi label="Мин." value={(stats?.min ?? 0).toFixed(3)} unit="%" />
+                  <Kpi label="Макс." value={(stats?.max ?? 0).toFixed(3)} unit="%" />
+                  <Kpi label="Пробои <19.5%" value={stats?.below195 ?? 0} unit="раз" />
+                </div>
+                <div className="w-full h-[260px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={series.map((d) => ({ ...d, time: formatTime(d.t) }))} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="o2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                      <YAxis domain={[17, 23]} tick={{ fontSize: 12 }} />
+                      <Tooltip formatter={(v) => [`${Number(v).toFixed(3)}%`, "О₂"]} labelFormatter={(l, p) => formatDate(series[p && p[0] ? p[0].payload.t : 0])} />
+                      <ReferenceLine y={threshold.warning} stroke="#f59e0b" strokeDasharray="4 4" />
+                      <ReferenceLine y={threshold.critical} stroke="#ef4444" strokeDasharray="4 4" />
+                      <ReferenceLine y={threshold.upper} stroke="#94a3b8" strokeDasharray="2 4" />
+                      <Area type="monotone" dataKey="value" stroke="#3b82f6" fill="url(#o2)" strokeWidth={2} isAnimationActive={false} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Логи и события ({selectedHouse?.name})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between mb-3 gap-2">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="rounded-full">всего: {logs.length}</Badge>
+                    <Badge className="rounded-full bg-amber-100 text-amber-800">warning: {stats?.warnings ?? 0}</Badge>
+                    <Badge className="rounded-full bg-red-100 text-red-800">critical: {stats?.critical ?? 0}</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" onClick={exportLogs}><Download className="size-4 mr-2" />Экспорт CSV</Button>
+                  </div>
+                </div>
+                <div className="max-h-[260px] overflow-auto rounded-xl border">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-white">
+                      <tr className="text-left text-xs text-muted-foreground">
+                        <th className="px-3 py-2 w-[180px]">Время</th>
+                        <th className="px-3 py-2">Дом</th>
+                        <th className="px-3 py-2">Серьёзность</th>
+                        <th className="px-3 py-2">Сообщение</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logs.map((l) => (
+                        <tr key={l.id} className="border-t">
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">{formatDate(l.ts)}</td>
+                          <td className="px-3 py-2">{l.house}</td>
+                          <td className="px-3 py-2"><SeverityBadge severity={l.severity} /></td>
+                          <td className="px-3 py-2">{l.message}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="col-span-12 xl:col-span-4 space-y-4">
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Дома в секторе</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2 mb-3">
+                  <Input placeholder="поиск дома" value={query} onChange={(e) => setQuery(e.target.value)} />
+                </div>
+                <div className="max-h-[260px] overflow-auto space-y-1 pr-1">
+                  {housesFiltered.map((h) => (
+                    <button
+                      key={h.id}
+                      onClick={() => setSelectedId(h.id)}
+                      className={`w-full text-left px-3 py-2 rounded-xl border hover:bg-slate-50 transition ${
+                        h.id === selectedId ? "border-slate-900 bg-slate-50" : "border-slate-200"
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{h.name}</div>
+                      <div className="text-xs text-muted-foreground">база {h.base.toFixed(2)}%</div>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Сводка состояния</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full h-[210px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={80}>
+                        {pieData.map((e, i) => (
+                          <Cell key={i} fill={i === 0 ? "#10b981" : "#e5e7eb"} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(v, n) => [v + "%", n]} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="text-sm text-muted-foreground">Зелёный сектор показывает положение текущего значения между порогами.</div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">События (таймлайн)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 max-h-[220px] overflow-auto pr-1">
+                  {incidents.length === 0 && (
+                    <div className="text-sm text-muted-foreground">За выбранный период инцидентов не зафиксировано.</div>
+                  )}
+                  {incidents.map((ev, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <AlertTriangle className={`mt-0.5 size-4 ${ev.severity === "critical" ? "text-red-500" : "text-amber-500"}`} />
+                      <div>
+                        <div className="text-sm font-medium">{ev.severity === "critical" ? "Критическое" : "Предупреждение"}</div>
+                        <div className="text-xs text-muted-foreground">{formatDate(ev.ts)}</div>
+                        <div className="text-sm">{ev.message}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Footer: how to wire real data */}
+        <Card className="rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Интеграция с реальными данными</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Замените хук <code>useO2Data</code> на загрузку ваших временных рядов по дому: ожидание формата [{"{ t:number, value:number }"}].</li>
+              <li>Раскраска карты использует <code>threshold</code>. Подстройте критичные/предупредительные/верхние пороги под вашу систему.</li>
+              <li>Схема сектора: отредактируйте <code>SECTOR</code> (ширина/высота сетки и координаты домов). Размер SVG адаптивный.</li>
+              <li>Экспорт логов создаёт CSV в браузере. Для сервера отправляйте <code>logs</code> POST-ом куда надо.</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    </TooltipProvider>
+  );
+}
