@@ -2,22 +2,19 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Кайнракс · Сектор D-7 · O₂ / Подача / Спектр</title>
+  <title>D-7 · O₂ / Подача / Спектр</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
   <style>
-    :root{
-      --bg:#0c1118; --panel:#0f1622; --ink:#e9f1ff; --muted:#a9b7d6;
-      --accent:#7de0ff; --ok:#10b981; --warn:#f59e0b; --crit:#ef4444; --line:#223047;
-      --card:#0e1521; --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px; --gap:16px;
-    }
+    :root{ --bg:#0c1118; --panel:#0f1622; --ink:#e9f1ff; --muted:#a9b7d6; --accent:#7de0ff;
+           --ok:#10b981; --warn:#f59e0b; --crit:#ef4444; --line:#223047; --card:#0e1521; --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px; --gap:16px;}
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,Ubuntu,Noto Sans,sans-serif}
     a{color:var(--accent);text-decoration:none}
-    .wrap{max-width:1200px;margin:0 auto;padding:18px}
+    .wrap{max-width:1280px;margin:0 auto;padding:18px}
     .row{display:grid;grid-template-columns:1.25fr .75fr;gap:var(--gap)}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .card h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+    .card h3{margin:0;padding:10px 14px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
     .pad{padding:14px}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .controls label{font-size:12px;color:var(--muted)}
@@ -37,31 +34,30 @@
     .b-crit{background:#2b0d0d;color:#f87171}
     .legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
     .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
-    .flex{display:flex;gap:10px;align-items:center}
-    .right{justify-content:flex-end}
     .muted{color:var(--muted)}
+    .right{display:flex;justify-content:flex-end}
     #tooltip{position:fixed;pointer-events:none;background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--ink);box-shadow:var(--shadow);display:none;z-index:10}
     @media (max-width:980px){ .row{grid-template-columns:1fr} .grid2{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,1fr)} }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="flex" style="justify-content:space-between;margin-bottom:10px">
-      <h1 style="margin:0;font-size:18px">Сектор D-7 · Устаревший Хаб · Мониторинг O₂</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h1 style="margin:0;font-size:18px">Сектор D-7 · УЛХ · Мониторинг</h1>
       <div class="legend">
         <span class="dot" style="background:#3b82f6"></span><span class="muted">выше нормы</span>
         <span class="dot" style="background:#10b981"></span><span class="muted">норма</span>
-        <span class="dot" style="background:#f59e0b"></span><span class="muted">ниже нормы</span>
+        <span class="dot" style="background:#f59e0b"></span><span class="muted">ниже</span>
         <span class="dot" style="background:#ef4444"></span><span class="muted">критично</span>
-        <span class="dot" style="background:#60a5fa"></span><span class="muted">контур A-категории</span>
+        <span class="dot" style="background:#60a5fa"></span><span class="muted">контур A</span>
         <span class="dot" style="background:#22c55e"></span><span class="muted">канюли обновлены</span>
-        <span class="dot" style="background:#f59e0b"></span><span class="muted">канюли НЕ обновлены</span>
+        <span class="dot" style="background:#f59e0b"></span><span class="muted">канюли не обновлены</span>
       </div>
     </div>
 
     <div class="row">
       <div class="card">
-        <h3>Карта сектора · чёрный парк, трубы, ядро обмена · колесо: масштаб · ЛКМ: выбрать</h3>
+        <h3>Карта сектора • чёрный парк, трубы, ядро обмена • колесо: масштаб • ЛКМ: выбрать</h3>
         <div class="pad">
           <div class="controls" style="margin-bottom:10px">
             <label>Интервал</label>
@@ -73,39 +69,38 @@
 
             <label>График</label>
             <select id="modeSel">
-              <option value="o2" selected>O₂ % (комната)</option>
+              <option value="o2" selected>O₂ % (комнаты)</option>
               <option value="rawema">RAW vs EMA (подача)</option>
               <option value="supply">Подача, л/мин</option>
               <option value="spectrum">Спектр (двойной «вдох»)</option>
             </select>
 
             <label>Дома</label>
-            <select id="filterSel">
+            <select id="houseFilter">
               <option value="all" selected>все</option>
-              <option value="aclass">только A-категория</option>
-              <option value="nonaclass">без A-категории</option>
+              <option value="aonly">только A-категория</option>
+              <option value="selected">только выбранный</option>
             </select>
 
             <label>Логи</label>
-            <select id="logScopeSel">
+            <select id="logScope">
               <option value="selected" selected>только выбранный</option>
-              <option value="all">весь сектор</option>
+              <option value="all">все</option>
             </select>
 
             <label class="pill"><input id="liveChk" type="checkbox" checked /> live</label>
-
-            <label>критично</label><input id="critSlider" type="range" min="16.0" max="18.5" step="0.05" value="17.0" style="width:120px">
-            <label>предупр.</label><input id="warnSlider" type="range" min="17.0" max="20.0" step="0.05" value="18.5" style="width:120px">
-            <label>верхн.</label><input id="topSlider"  type="range" min="19.5" max="21.5" step="0.05" value="20.3" style="width:110px">
+            <label style="margin-left:8px">критично</label><input id="critSlider" type="range" min="17.5" max="20.0" step="0.05" value="18.5" style="width:120px">
+            <label>предупр.</label><input id="warnSlider" type="range" min="18.0" max="20.9" step="0.05" value="19.3" style="width:120px">
+            <label>верхн.</label><input id="topSlider"  type="range" min="21.0" max="23.0" step="0.05" value="21.6" style="width:110px">
             <span id="thVals" class="muted"></span>
           </div>
 
-          <div class="flex" style="justify-content:space-between;margin-bottom:8px">
-            <div class="muted">Нормальный уровень O₂ в Кайнраксе: 18–19%. 20% подаётся только A-категории. Снаружи бывает ниже.</div>
-            <a href="https://kainrax.netlify.app/#/read-article/doctrine2" target="_blank" rel="noreferrer">Доктрина СМСБ</a>
+          <div class="muted" style="margin:-4px 0 8px 2px">
+            Нормальный уровень O₂ в Кайрнаксе: 18–19%. 20% подаётся только A-категории. Снаружи бывает ниже.
+            <a href="#" onclick="return false;">Доктрина СМСБ</a>
           </div>
 
-          <canvas id="map" width="960" height="600" style="width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#0a0f17;cursor:grab"></canvas>
+          <canvas id="map" width="960" height="600" style="width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#0a0f17"></canvas>
           <div id="tooltip"></div>
         </div>
       </div>
@@ -128,23 +123,22 @@
             </div>
             <div class="card" style="border:1px dashed var(--line)">
               <h3>RAW ↔ EMA / пояснение</h3>
-              <div class="pad" id="explain" class="muted" style="color:#a9b7d6;font-size:13px">
-                RAW — реальная подача в л/мин; EMA — сглаживание системы. В «Спектре» два пика указывают на два потребителя («двойной вдох»).
+              <div class="pad" id="explain" style="color:#a9b7d6;font-size:13px">
+                RAW — реальная подача в л/мин; EMA — сглаживание системы. В «Спектре» два пика указывают на двух потребителей («двойной вдох»).
               </div>
             </div>
           </div>
-          <div class="flex right" style="margin-top:10px"><button id="btnExport">Экспорт логов CSV</button></div>
+
+          <div class="right" style="margin-top:10px"><button id="btnExport">Экспорт логов CSV</button></div>
         </div>
       </div>
     </div>
 
     <div class="card" style="margin-top:16px">
       <h3>Логи и события</h3>
-      <div class="pad" style="overflow:auto;max-height:340px">
+      <div class="pad" style="overflow:auto;max-height:320px">
         <table class="logtable" id="logTable">
-          <thead>
-          <tr><th>Время</th><th>Дом</th><th>Субъект</th><th>Серьёзность</th><th>Сообщение</th></tr>
-          </thead>
+          <thead><tr><th>Время</th><th>Дом</th><th>Серьёзность</th><th>Сообщение</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
