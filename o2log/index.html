@@ -2,127 +2,133 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Кайнракс · D-7 · O₂/Подача/Спектр</title>
+  <title>Kainrax · D-7 · O₂ мониторинг</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
   <style>
     :root{
-      --bg:#0c1118; --card:#0e1521; --line:#223047; --ink:#e9f1ff; --muted:#a9b7d6;
-      --ok:#10b981; --warn:#f59e0b; --crit:#ef4444; --accent:#7de0ff;
-      --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px; --gap:16px;
+      --bg:#0c1118; --panel:#0f1622; --ink:#e9f1ff; --muted:#a9b7d6;
+      --accent:#7de0ff; --ok:#10b981; --warn:#f59e0b; --crit:#ef4444; --line:#223047;
+      --card:#0e1521; --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
     a{color:var(--accent);text-decoration:none}
-    .wrap{max-width:1200px;margin:0 auto;padding:18px}
-    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--gap)}
+    .wrap{max-width:1240px;margin:0 auto;padding:18px}
+    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
     .card h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
     .pad{padding:14px}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .controls label{font-size:12px;color:var(--muted)}
-    select,button,input[type="range"]{background:#0b1320;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
-    .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#0a0f18}
+    select,button,input[type="range"],input[type="checkbox"]{background:#0b1320;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+    button{cursor:pointer}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
     .kpi{background:#0a101a;border:1px solid var(--line);border-radius:12px;padding:10px}
     .kpi .lbl{font-size:12px;color:var(--muted)}
     .kpi .val{font:600 20px/1.2 system-ui}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .logtable{width:100%;border-collapse:collapse}
     .logtable th,.logtable td{padding:8px;border-top:1px solid var(--line);text-align:left}
     .badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px}
     .b-info{background:#0c2136;color:#8ecaff}
     .b-warn{background:#2a1c00;color:#fbbf24}
     .b-crit{background:#2b0d0d;color:#f87171}
-    .legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
-    #map{width:100%;min-height:520px;border:1px solid var(--line);border-radius:12px;background:#0a0f17;cursor:grab}
+    .muted{color:var(--muted)}
     #tooltip{position:fixed;pointer-events:none;background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--ink);box-shadow:var(--shadow);display:none;z-index:10}
     @media (max-width:980px){ .row{grid-template-columns:1fr} .grid2{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,1fr)} }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="flex" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <h1 style="margin:0;font-size:18px">Сектор D-7 · Устаревший Хаб · мониторинг</h1>
+    <div class="legend" style="justify-content:space-between;margin-bottom:10px">
       <div class="legend">
-        <span class="dot" style="background:#3b82f6"></span><span style="color:#a9b7d6">выше нормы</span>
-        <span class="dot" style="background:#10b981"></span><span style="color:#a9b7d6">норма</span>
-        <span class="dot" style="background:#f59e0b"></span><span style="color:#a9b7d6">ниже</span>
-        <span class="dot" style="background:#ef4444"></span><span style="color:#a9b7d6">критично</span>
-        <span class="dot" style="background:#60a5fa"></span><span style="color:#a9b7d6">A-кат.</span>
+        <strong style="font-size:18px">Сектор D-7 · Устаревший Хаб</strong>
+        <span class="dot" style="background:#3b82f6"></span><span class="muted">выше нормы</span>
+        <span class="dot" style="background:#10b981"></span><span class="muted">норма</span>
+        <span class="dot" style="background:#f59e0b"></span><span class="muted">ниже нормы</span>
+        <span class="dot" style="background:#ef4444"></span><span class="muted">критично</span>
+        <span class="dot" style="background:#000"></span><span class="muted">парковая зона</span>
+        <span class="dot" style="background:#7de0ff"></span><span class="muted">магистрали O₂</span>
+        <span class="dot" style="background:#7f5af0"></span><span class="muted">сервисные шахты</span>
+        <span class="dot" style="background:#ffd86b"></span><span class="muted">Ядро обмена</span>
+        <span class="muted">Зум: колесо, Панорама: ЛКМ</span>
       </div>
+      <div><a href="https://kainrax.netlify.app/#/read-article/doctrine2" target="_blank" rel="noopener">СМСБ →</a></div>
     </div>
 
     <div class="row">
       <div class="card">
-        <h3>Интерактивная карта · клик по дому · трубы = поток</h3>
+        <h3>Интерактивная карта · клик по дому</h3>
         <div class="pad">
-          <div class="controls" style="margin-bottom:8px">
+          <div class="controls" style="margin-bottom:10px">
             <label>Интервал</label>
-            <select id="rangeSel"><option value="1h">1ч</option><option value="24h" selected>24ч</option><option value="7d">7д</option></select>
+            <select id="rangeSel">
+              <option value="1h">последний час</option>
+              <option value="24h" selected>последние 24ч</option>
+              <option value="7d">последние 7д</option>
+            </select>
+            <label class="pill"><input id="liveChk" type="checkbox" checked /> live</label>
 
-            <label>График</label>
-            <select id="modeSel">
-              <option value="o2" selected>O₂ %</option>
-              <option value="rawema">RAW+EMA</option>
-              <option value="supply">Подача (л/мин)</option>
-              <option value="spectrum">Спектр</option>
-              <option value="ideal">«Идеальный»</option>
+            <label>Вид анализа</label>
+            <select id="viewSel">
+              <option value="o2">O₂ во времени</option>
+              <option value="rawema">RAW + EMA (расход, л/мин)</option>
+              <option value="spectrum">Спектр (двойной вдох)</option>
             </select>
 
             <label>Фильтр</label>
-            <select id="filterSel"><option value="all" selected>все</option><option value="aclass">только A-кат</option><option value="nonaclass">без A-кат</option></select>
+            <select id="filterSel">
+              <option value="all" selected>все дома</option>
+              <option value="aclass">только A-категория</option>
+              <option value="nonaclass">без A-категории</option>
+            </select>
 
-            <label>Логи</label>
-            <select id="logScopeSel"><option value="selected" selected>выбранный</option><option value="all">весь сектор</option></select>
-
-            <label><input id="showPipes" type="checkbox" checked> трубы</label>
-            <label><input id="showPark"  type="checkbox" checked> парковая зона</label>
-            <label><input id="liveChk"   type="checkbox" checked> live</label>
+            <label class="pill"><input id="pipesChk" type="checkbox" checked /> трубы</label>
+            <label class="pill"><input id="shaftsChk" type="checkbox" checked /> шахты</label>
+            <label class="pill"><input id="parkChk" type="checkbox" checked /> парк</label>
+            <label class="pill"><input id="cannulaChk" type="checkbox" checked /> канюли</label>
+            <button id="resetView">Сброс зума</button>
           </div>
 
-          <div style="display:flex;justify-content:space-between;margin:2px 0 10px;color:#a9b7d6">
-            <div>Норма в Кайнраксе: 18–19%. 20% подают только A-категории. Снаружи бывает меньше.</div>
-            <a href="https://kainrax.netlify.app/#/read-article/doctrine2" target="_blank" rel="noreferrer">Доктрина СМСБ</a>
+          <div class="controls" style="margin-bottom:10px">
+            <label>критично</label><input id="critSlider" type="range" min="17.0" max="19.5" step="0.05" value="18.2" style="width:160px">
+            <label>предупр.</label><input id="warnSlider" type="range" min="17.5" max="20.0" step="0.05" value="18.8" style="width:160px">
+            <label>верхн.</label><input id="topSlider"  type="range" min="19.8" max="21.0" step="0.05" value="20.0" style="width:140px">
+            <span id="thVals" class="muted"></span>
           </div>
 
-          <div class="controls" style="margin-bottom:8px">
-            <label>критично</label><input id="critSlider" type="range" min="16.0" max="18.5" step="0.05" value="17.0" style="width:140px">
-            <label>предупр.</label><input id="warnSlider" type="range" min="17.0" max="20.0" step="0.05" value="18.5" style="width:140px">
-            <label>верхн.</label><input id="topSlider"  type="range" min="19.5" max="21.5" step="0.05" value="20.3" style="width:120px">
-            <span id="thVals" style="color:#a9b7d6"></span>
-          </div>
-
-          <canvas id="map" width="960" height="600"></canvas>
+          <canvas id="map" width="1100" height="700" style="width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#0a0f17"></canvas>
           <div id="tooltip"></div>
         </div>
       </div>
 
       <div class="card">
-        <h3>Выбранная ячейка · сводка</h3>
+        <h3>Дом и сводка</h3>
         <div class="pad">
           <div class="kpis" style="margin-bottom:12px">
-            <div class="kpi"><div class="lbl">Ячейка</div><div class="val" id="k-house">—</div></div>
             <div class="kpi"><div class="lbl">Текущее O₂</div><div class="val"><span id="k-last">—</span> <span class="muted">%</span></div></div>
-            <div class="kpi"><div class="lbl">Подача</div><div class="val"><span id="k-flow">—</span> <span class="muted">л/мин</span></div></div>
-            <div class="kpi"><div class="lbl">Пробои &lt;18.5%</div><div class="val"><span id="k-brk">—</span></div></div>
-            <div class="kpi"><div class="lbl">Мин/макс</div><div class="val"><span id="k-min">—</span>/<span id="k-max">—</span></div></div>
+            <div class="kpi"><div class="lbl">Мин / Макс</div><div class="val"><span id="k-min">—</span><span class="muted"> / </span><span id="k-max">—</span></div></div>
+            <div class="kpi"><div class="lbl">Подача сейчас</div><div class="val"><span id="k-flow">—</span> <span class="muted">л/мин</span></div></div>
+            <div class="kpi"><div class="lbl">Общий объём (интервал)</div><div class="val"><span id="k-liters">—</span> <span class="muted">л</span></div></div>
           </div>
 
           <div class="grid2">
             <div class="card" style="border:1px dashed var(--line)">
-              <h3 id="chartTitle">График</h3>
+              <h3 id="chartTitle">Динамика O₂</h3>
               <div class="pad"><canvas id="chartMain" height="260"></canvas></div>
             </div>
             <div class="card" style="border:1px dashed var(--line)">
-              <h3>Пояснение</h3>
-              <div class="pad" id="explain" style="color:#a9b7d6;font-size:13px">
-                RAW — реальная подача; EMA — сглаживание. В «Спектре» у «двойного вдоха» два пика.
-              </div>
+              <h3>Сигналы / Пороговые</h3>
+              <div class="pad"><canvas id="chartAux" height="260"></canvas></div>
             </div>
           </div>
 
-          <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <div class="controls" style="justify-content:flex-end;margin-top:8px">
+            <label class="pill"><input id="showAllLogs" type="checkbox" /> логи всех домов</label>
             <button id="btnExport">Экспорт логов CSV</button>
           </div>
         </div>
@@ -131,19 +137,22 @@
 
     <div class="card" style="margin-top:16px">
       <h3>Логи и события</h3>
-      <div class="pad" style="overflow:auto;max-height:340px">
+      <div class="pad" style="overflow:auto;max-height:360px">
         <table class="logtable" id="logTable">
-          <thead><tr><th>Время</th><th>Дом</th><th>Субъект</th><th>Серьёзность</th><th>Сообщение</th></tr></thead>
+          <thead>
+          <tr><th>Время</th><th>Дом/персонаж</th><th>Серьёзность</th><th>Сообщение</th></tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Чистый Chart.js, без плагинов -->
+  <!-- Charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <!-- Локальные скрипты без ES-модулей, чтобы открывалось по file:// -->
-  <script src="./O2LogApp.js"></script>
-  <script src="./main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+
+  <!-- App -->
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
