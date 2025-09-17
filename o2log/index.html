@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Кайнракс · Мониторинг O₂ сектора</title>
+  <title>Кайнракс · Сектор D-7 · O₂/подача/спектр</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
   <style>
@@ -16,7 +16,7 @@
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
     a{color:var(--accent);text-decoration:none}
     .wrap{max-width:1200px;margin:0 auto;padding:18px}
-    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--grid-gap)}
+    .row{display:grid;grid-template-columns:1.25fr .75fr;gap:var(--grid-gap)}
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
     .card h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
     .pad{padding:14px}
@@ -25,7 +25,7 @@
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#0a0f18}
     select,button,input[type="range"]{background:#0b1320;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
     button{cursor:pointer}
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
     .kpi{background:#0a101a;border:1px solid var(--line);border-radius:12px;padding:10px}
     .kpi .lbl{font-size:12px;color:var(--muted)}
     .kpi .val{font:600 20px/1.2 system-ui}
@@ -36,7 +36,7 @@
     .b-info{background:#0c2136;color:#8ecaff}
     .b-warn{background:#2a1c00;color:#fbbf24}
     .b-crit{background:#2b0d0d;color:#f87171}
-    .legend{display:flex;gap:10px;align-items:center}
+    .legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
     .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
     .flex{display:flex;gap:10px;align-items:center}
     .right{justify-content:flex-end}
@@ -48,18 +48,21 @@
 <body>
   <div class="wrap">
     <div class="flex" style="justify-content:space-between;margin-bottom:10px">
-      <h1 style="margin:0;font-size:18px">Мониторинг O₂ · Сектор 7А</h1>
+      <h1 style="margin:0;font-size:18px">Сектор D-7 · Устаревший Хаб · Мониторинг O₂</h1>
       <div class="legend">
         <span class="dot" style="background:#3b82f6"></span><span class="muted">выше нормы</span>
         <span class="dot" style="background:#10b981"></span><span class="muted">норма</span>
         <span class="dot" style="background:#f59e0b"></span><span class="muted">ниже нормы</span>
         <span class="dot" style="background:#ef4444"></span><span class="muted">критично</span>
+        <span class="dot" style="background:#60a5fa"></span><span class="muted">контур А-категории</span>
+        <span class="dot" style="background:#22c55e"></span><span class="muted">канюли обновлены</span>
+        <span class="dot" style="background:#f59e0b"></span><span class="muted">канюли НЕ обновлены</span>
       </div>
     </div>
 
     <div class="row">
       <div class="card">
-        <h3>Интерактивная карта сектора · клик по дому</h3>
+        <h3>Карта сектора · парк, трубы, ядро обмена · клик по дому/трубе</h3>
         <div class="pad">
           <div class="controls" style="margin-bottom:10px">
             <label>Интервал</label>
@@ -68,11 +71,20 @@
               <option value="24h" selected>последние 24ч</option>
               <option value="7d">последние 7д</option>
             </select>
+
+            <label>График</label>
+            <select id="modeSel">
+              <option value="o2" selected>O₂ % (комнаты)</option>
+              <option value="rawema">RAW vs EMA (подача)</option>
+              <option value="supply">Подача, л/мин</option>
+              <option value="spectrum">Спектр (двойной «вдох»)</option>
+            </select>
+
             <label class="pill"><input id="liveChk" type="checkbox" checked /> live</label>
 
-            <label>критично</label><input id="critSlider" type="range" min="17.5" max="20.0" step="0.05" value="19.0" style="width:160px">
-            <label>предупр.</label><input id="warnSlider" type="range" min="18.0" max="20.9" step="0.05" value="19.5" style="width:160px">
-            <label>верхн.</label><input id="topSlider"  type="range" min="21.0" max="23.0" step="0.05" value="21.4" style="width:140px">
+            <label>критично</label><input id="critSlider" type="range" min="17.5" max="20.0" step="0.05" value="19.0" style="width:140px">
+            <label>предупр.</label><input id="warnSlider" type="range" min="18.0" max="20.9" step="0.05" value="19.5" style="width:140px">
+            <label>верхн.</label><input id="topSlider"  type="range" min="21.0" max="23.0" step="0.05" value="21.4" style="width:120px">
             <span id="thVals" class="muted"></span>
           </div>
 
@@ -82,25 +94,30 @@
       </div>
 
       <div class="card">
-        <h3>Дом и сводка</h3>
+        <h3>Дом/труба · сводка</h3>
         <div class="pad">
           <div class="kpis" style="margin-bottom:12px">
-            <div class="kpi"><div class="lbl">Текущее</div><div class="val"><span id="k-last">—</span> <span class="muted">%</span></div></div>
-            <div class="kpi"><div class="lbl">Мин.</div>    <div class="val"><span id="k-min">—</span> <span class="muted">%</span></div></div>
-            <div class="kpi"><div class="lbl">Макс.</div>   <div class="val"><span id="k-max">—</span> <span class="muted">%</span></div></div>
+            <div class="kpi"><div class="lbl">Текущее O₂</div><div class="val"><span id="k-last">—</span> <span class="muted">%</span></div></div>
+            <div class="kpi"><div class="lbl">Мин. O₂</div>    <div class="val"><span id="k-min">—</span> <span class="muted">%</span></div></div>
+            <div class="kpi"><div class="lbl">Макс. O₂</div>   <div class="val"><span id="k-max">—</span> <span class="muted">%</span></div></div>
             <div class="kpi"><div class="lbl">Пробои &lt;19.5%</div><div class="val"><span id="k-brk">—</span></div></div>
+            <div class="kpi"><div class="lbl">Подача сейчас</div><div class="val"><span id="k-flow">—</span> <span class="muted">л/мин</span></div></div>
           </div>
 
           <div class="grid2">
             <div class="card" style="border:1px dashed var(--line)">
-              <h3>Динамика O₂</h3>
-              <div class="pad"><canvas id="chartLine" height="220"></canvas></div>
+              <h3 id="chartTitle">График</h3>
+              <div class="pad"><canvas id="chartMain" height="260"></canvas></div>
             </div>
             <div class="card" style="border:1px dashed var(--line)">
-              <h3>Нормализация</h3>
-              <div class="pad"><canvas id="chartPie" height="220"></canvas></div>
+              <h3>RAW ↔ EMA / пояснение</h3>
+              <div class="pad" id="explain" class="muted" style="color:#a9b7d6;font-size:13px">
+                В режиме RAW vs EMA показывается «как система врёт»: сырые подачные л/мин и сглаженная экспоненциальная EMA.
+                В «Спектре» два пика у домов с «двойным вдохом» указывают на двух потребителей.
+              </div>
             </div>
           </div>
+
           <div class="flex right" style="margin-top:10px"><button id="btnExport">Экспорт логов CSV</button></div>
         </div>
       </div>
