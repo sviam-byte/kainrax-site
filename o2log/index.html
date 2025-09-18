@@ -97,7 +97,7 @@
           <div class="controls" style="margin-bottom:10px">
             <label>критично</label><input id="critSlider" type="range" min="17.0" max="19.5" step="0.05" value="18.2" style="width:160px">
             <label>предупр.</label><input id="warnSlider" type="range" min="17.5" max="20.0" step="0.05" value="18.8" style="width:160px">
-            <label>верхн.</label><input id="topSlider"  type="range" min="19.8" max="21.0" step="0.05" value="20.0" style="width:140px">
+            <label>верхн.</label><input id="topSlider"  type="range" min="19.8" max="21.2" step="0.05" value="20.6" style="width:140px">
             <span id="thVals" class="muted"></span>
           </div>
 
@@ -113,7 +113,7 @@
             <div class="kpi"><div class="lbl">Текущее O₂</div><div class="val"><span id="k-last">—</span> <span class="muted">%</span></div></div>
             <div class="kpi"><div class="lbl">Мин / Макс</div><div class="val"><span id="k-min">—</span><span class="muted"> / </span><span id="k-max">—</span></div></div>
             <div class="kpi"><div class="lbl">Подача сейчас</div><div class="val"><span id="k-flow">—</span> <span class="muted">л/мин</span></div></div>
-            <div class="kpi"><div class="lbl">Общий объём (интервал)</div><div class="val"><span id="k-liters">—</span> <span class="muted">л</span></div></div>
+            <div class="kpi"><div class="lbl">Общий объём (за интервал)</div><div class="val"><span id="k-liters">—</span> <span class="muted">л</span></div></div>
           </div>
 
           <div class="grid2">
@@ -122,7 +122,7 @@
               <div class="pad"><canvas id="chartMain" height="260"></canvas></div>
             </div>
             <div class="card" style="border:1px dashed var(--line)">
-              <h3>Сигналы / Пороговые</h3>
+              <h3>Сопутствующие сигналы</h3>
               <div class="pad"><canvas id="chartAux" height="260"></canvas></div>
             </div>
           </div>
