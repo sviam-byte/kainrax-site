@@ -10,6 +10,8 @@
             background-color: #1a1a1a;
             color: #c5c5c5;
             padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         h1, h2 {
             color: #e0e0e0;
@@ -29,7 +31,9 @@
             padding: 15px;
             border-radius: 3px;
             transition: transform 0.2s, box-shadow 0.2s;
-            scroll-margin-top: 20px; /* Для плавной прокрутки */
+            scroll-margin-top: 20px;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -44,6 +48,9 @@
             font-size: 1.2em;
             color: #ffa500;
             margin-bottom: 15px;
+        }
+        .card-body {
+            flex-grow: 1;
         }
         .card-body p {
             margin: 0 0 10px 0;
@@ -72,12 +79,19 @@
         .act-title {
             grid-column: 1 / -1;
             margin-top: 30px;
+            font-size: 1.5em;
         }
-        .type-event { border-left-color: #ffa500; } /* Желтый */
-        .type-discovery { border-left-color: #4CAF50; } /* Зеленый */
-        .type-consequence { border-left-color: #f44336; } /* Красный */
-        .type-turning-point { border-left-color: #9c27b0; } /* Фиолетовый */
-        .type-resolution { border-left-color: #2196F3; } /* Синий */
+        .type-event { border-left-color: #ffa500; } /* Желтый - Событие */
+        .type-discovery { border-left-color: #4CAF50; } /* Зеленый - Открытие */
+        .type-consequence { border-left-color: #f44336; } /* Красный - Последствие */
+        .type-turning-point { border-left-color: #9c27b0; } /* Фиолетовый - Поворот */
+        .type-resolution { border-left-color: #2196F3; } /* Синий - Решение */
+        .type-mystery { border-left-color: #ffffff; } /* Белый - Загадка */
+        .card-title.discovery { color: #4CAF50; }
+        .card-title.consequence { color: #f44336; }
+        .card-title.turning-point { color: #9c27b0; }
+        .card-title.resolution { color: #2196F3; }
+        .card-title.mystery { color: #ffffff; }
 
     </style>
 </head>
@@ -91,25 +105,25 @@
         <h2 class="act-title">Акт I: Локальная проблема и ложный финал</h2>
 
         <div class="card type-event" id="node-01">
-            <div class="card-id">ID: 01_THE_PROBLEM (Ссылка на пост: `0060`)</div>
+            <div class="card-id">ID: 01_THE_PROBLEM</div>
             <div class="card-title">Событие: Первоначальная жалоба</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Пациентка `Фрейди` сообщает о необъяснимом падении сатурации и быстром расходе кислорода. Упоминает шипение из венткороба.</p>
+                <p><strong>Событие:</strong> `Фрейди` сообщает о трёх аномалиях: падение сатурации дома, быстрый расход кислорода, "чистая" телеметрия. Упоминает шипение из венткороба.</p>
                 <p><strong>Анализ:</strong> Проблема кажется локальной. Выдвинуто 3 гипотезы: утечка газа, сбой телеметрии, неисправность контура.</p>
             </div>
             <div class="card-links">
-                <strong>Привело к:</strong> <a href="#node-02">02_INVESTIGATION</a>
+                <strong>Привело к:</strong> <a href="#node-02">02_PARTIAL_FIXES</a>
             </div>
         </div>
 
         <div class="card type-discovery" id="node-02">
-            <div class="card-id">ID: 02_INVESTIGATION (Ссылки на посты: `0061`, `0065`)</div>
-            <div class="card-title">Улика: Частичные причины</div>
+            <div class="card-id">ID: 02_PARTIAL_FIXES</div>
+            <div class="card-title discovery">Улика: Частичные причины</div>
             <div class="card-body">
                 <p><strong>Событие:</strong> Отец Фрейди, `molot-trainee`, проводит расследование.</p>
-                <p><strong>Открытие #1:</strong> Обнаружена и устранена утечка азота. Это улучшает сатурацию, но не решает проблему расхода.</p>
-                <p><strong>Открытие #2:</strong> Подтверждено, что алгоритм телеметрии (EMA) скрывает реальные пики расхода.</p>
-                <p><strong>Вывод:</strong> Две проблемы решены, но главная загадка — куда уходит кислород — остаётся.</p>
+                <p><strong>Открытие #1 (Инженерная халатность):</strong> Обнаружена и устранена утечка азота. Это улучшает сатурацию, но не решает проблему расхода.</p>
+                <p><strong>Открытие #2 (Алгоритмический дефект):</strong> Подтверждено, что сглаживание EMA скрывает реальные пики расхода.</p>
+                <p><strong>Вывод:</strong> Две очевидные проблемы устранены, но главная загадка — куда уходит кислород — остаётся нерешённой.</p>
             </div>
             <div class="card-links">
                 <strong>Следствие от:</strong> <a href="#node-01">01_THE_PROBLEM</a><br>
@@ -118,25 +132,24 @@
         </div>
 
         <div class="card type-discovery" id="node-03">
-            <div class="card-id">ID: 03_THE_HUMAN_FACTOR (Ложный финал)</div>
-            <div class="card-title">Улика: "Человеческий фактор"</div>
+            <div class="card-id">ID: 03_THE_HUMAN_FACTOR</div>
+            <div class="card-title discovery">Улика: "Человеческий фактор" (Ложный финал)</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Следуя подсказке `deicide-mentor`, расследование приводит к медсестре **Марте** из пункта D-7.</p>
-                <p><strong>Открытие:</strong> Марта признаётся, что тайно подключала свою умирающую мать к контуру Фрейди через Y-разветвитель.</p>
-                <p><strong>Вывод (ложный):</strong> Причина «двойного вдоха» найдена. Кажется, это единичный трагический случай, вызванный состраданием и отчаянием.</p>
+                <p><strong>Событие:</strong> Расследование приводит к медсестре **Марте**, которая признаётся, что делила поток кислорода Фрейди со своей умирающей матерью с помощью Y-разветвителя.</p>
+                <p><strong>Вывод (ложный):</strong> Причина «двойного вдоха» найдена. Кажется, это единичный трагический случай, вызванный состраданием и отчаянием. Сообщество фокусируется на этической стороне и создании "безопасного модуля".</p>
             </div>
             <div class="card-links">
-                <strong>Следствие от:</strong> <a href="#node-02">02_INVESTIGATION</a><br>
+                <strong>Следствие от:</strong> <a href="#node-02">02_PARTIAL_FIXES</a><br>
                 <strong>Привело к:</strong> <a href="#node-04">04_THE_ILLUSION_SHATTERS</a>
             </div>
         </div>
 
         <div class="card type-turning-point" id="node-04">
-            <div class="card-id">ID: 04_THE_ILLUSION_SHATTERS (Ссылка на пост: `0070`)</div>
-            <div class="card-title">Поворотный момент: Разрушение иллюзии</div>
+            <div class="card-id">ID: 04_THE_ILLUSION_SHATTERS</div>
+            <div class="card-title turning-point">Поворот: Разрушение иллюзии</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> `father_of_twins_b7`, другой житель сектора D-7, сообщает о **том же самом паттерне «двойного вдоха»** у своих детей, хотя к ним никто не подключался.</p>
-                <p><strong>Вывод:</strong> История Марты была лишь совпадением. Первопричина — системная, нечеловеческая и локализована в секторе D-7. Расследование начинается заново, но уже в совершенно ином масштабе.</p>
+                <p><strong>Событие:</strong> `father_of_twins_b7` из того же сектора D-7 сообщает о **том же самом паттерне «двойного вдоха»** у своих детей, хотя к ним никто не подключался.</p>
+                <p><strong>Вывод:</strong> История Марты была лишь трагическим совпадением. Первопричина — системная, нечеловеческая и локализована в секторе D-7. Расследование начинается заново, в гораздо большем масштабе.</p>
             </div>
             <div class="card-links">
                 <strong>Следствие от:</strong> <a href="#node-03">03_THE_HUMAN_FACTOR</a><br>
@@ -147,10 +160,10 @@
         <h2 class="act-title">Акт II: Научный прорыв и системный коллапс</h2>
         
         <div class="card type-event" id="node-05">
-            <div class="card-id">ID: 05_THE_BIOLOGICAL_HYPOTHESIS (Ссылки: `0068`, `0069`)</div>
+            <div class="card-id">ID: 05_THE_BIOLOGICAL_HYPOTHESIS</div>
             <div class="card-title">Событие: Новая гипотеза</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> В параллельной дискуссии `Лира` приходит к выводу, что идеальной средой для неизвестной биоты являются дыхательные контуры (влага, тепло, O₂, пластик). Она начинает научный поиск.</p>
+                <p><strong>Событие:</strong> В параллельной дискуссии `Лира` приходит к выводу, что идеальной средой для неизвестной биоты являются дыхательные контуры А-категории. Она начинает целенаправленный научный поиск.</p>
             </div>
              <div class="card-links">
                 <strong>Следствие от:</strong> <a href="#node-04">04_THE_ILLUSION_SHATTERS</a><br>
@@ -159,12 +172,11 @@
         </div>
 
         <div class="card type-discovery" id="node-06">
-            <div class="card-id">ID: 06_THE_DISCOVERY (Ссылка на пост: `0073`)</div>
-            <div class="card-title">Улика: Настоящий виновник</div>
+            <div class="card-id">ID: 06_THE_DISCOVERY</div>
+            <div class="card-title discovery">Улика: Настоящий виновник</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Лира публикует результаты своего эксперимента.</p>
-                <p><strong>Открытие:</strong> «Второй потребитель» — это ранее неизвестный вид **кислородолюбивого грибка**, формирующий биоплёнку в увлажнителях.</p>
-                <p><strong>Вывод:</strong> Загадка расхода кислорода решена. Враг обрёл имя и форму.</p>
+                <p><strong>Событие:</strong> Лира доказывает, что «второй потребитель» — это ранее неизвестный вид **кислородолюбивого грибка**, формирующий биоплёнку в увлажнителях.</p>
+                <p><strong>Вывод:</strong> Загадка аномального расхода кислорода решена. Враг обрёл имя и форму.</p>
             </div>
             <div class="card-links">
                  <strong>Следствие от:</strong> <a href="#node-05">05_THE_BIOLOGICAL_HYPOTHESIS</a><br>
@@ -173,11 +185,11 @@
         </div>
 
         <div class="card type-consequence" id="node-07">
-            <div class="card-id">ID: 07_THE_SYSTEM_REACTS (Ссылки: `0074`, `0077`)</div>
-            <div class="card-title">Последствие: Системная реакция</div>
+            <div class="card-id">ID: 07_THE_SYSTEM_REACTS</div>
+            <div class="card-title consequence">Последствие: Системная реакция</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Система активирует **«Протокол-7»** — тотальную санацию агрессивным фунгицидом, оправдывая это историческим опытом и игнорируя предупреждения.</p>
-                <p><strong>Анализ:</strong> Это реакция, основанная на устаревшем протоколе. Система выбирает грубую силу, а не точечное решение.</p>
+                <p><strong>Событие:</strong> Власти активируют **«Протокол-7»** — тотальную санацию агрессивным фунгицидом, опираясь на устаревший исторический опыт.</p>
+                <p><strong>Анализ:</strong> Система выбирает грубую силу, а не точечное решение, игнорируя предупреждения о непредсказуемости новой угрозы.</p>
             </div>
              <div class="card-links">
                 <strong>Следствие от:</strong> <a href="#node-06">06_THE_DISCOVERY</a><br>
@@ -186,11 +198,11 @@
         </div>
 
         <div class="card type-turning-point" id="node-08">
-            <div class="card-id">ID: 08_THE_SIDE_EFFECTS (Ссылка на пост: `0076`)</div>
-            <div class="card-title">Поворотный момент: "Лекарство" — яд</div>
+            <div class="card-id">ID: 08_THE_SIDE_EFFECTS</div>
+            <div class="card-title turning-point">Поворот: "Лекарство" — яд</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Медики сообщают о массовых побочных эффектах у детей: химическое раздражение, бронхоспазмы.</p>
-                <p><strong>Вывод:</strong> «Протокол-7» токсичен для пациентов. Попытка решить проблему создала новую. Одновременно Лира выдвигает гипотезу, что фунгицид загнал грибок в **споровую форму**, сделав его летучим.</p>
+                <p><strong>Событие:</strong> Медики сообщают о массовых побочных эффектах у детей: химическое раздражение слизистых.</p>
+                <p><strong>Вывод:</strong> "Лекарство" оказалось хуже болезни. Лира выдвигает гипотезу, что фунгицид загнал грибок в **споровую форму**, сделав его летучим и распространив по вентиляции.</p>
             </div>
             <div class="card-links">
                 <strong>Следствие от:</strong> <a href="#node-07">07_THE_SYSTEM_REACTS</a><br>
@@ -199,10 +211,10 @@
         </div>
 
          <div class="card type-consequence" id="node-09">
-            <div class="card-id">ID: 09_CASCADE_FAILURE (Ссылки: `0078`, `0079`)</div>
-            <div class="card-title">Катастрофа: Каскадный сбой</div>
+            <div class="card-id">ID: 09_CASCADE_FAILURE</div>
+            <div class="card-title consequence">Катастрофа: Каскадный сбой</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Резкое падение давления в общей магистрали. Затем — неконтролируемый рост O₂ до 40% в секторе D-7. Инженеры аварийно отключают подачу кислорода в сектор.</p>
+                <p><strong>Событие:</strong> Резкое падение давления в общей магистрали. Затем — неконтролируемый рост O₂ до 40% в секторе D-7. Инженеры аварийно отключают подачу кислорода.</p>
                 <p><strong>Причина:</strong> Массовое прорастание разлетевшихся спор грибка, спровоцированное аномальной (пока не объяснённой) подачей кислорода.</p>
             </div>
             <div class="card-links">
@@ -214,10 +226,10 @@
         <h2 class="act-title">Акт III: Развязка на уровне системы</h2>
 
         <div class="card type-event" id="node-10">
-            <div class="card-id">ID: 10_MANUAL_OVERRIDE (Ссылка на пост: `0080`)</div>
+            <div class="card-id">ID: 10_MANUAL_OVERRIDE</div>
             <div class="card-title">Событие: Потеря контроля</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> Инженер `o2-tech_hilda` обнаруживает, что автоматика (СМСБ) **игнорирует команды** и продолжает нагнетать кислород в D-7. Она принимает решение о переходе на **ручное управление**, отключая центральный ИИ.</p>
+                <p><strong>Событие:</strong> Инженеры обнаруживают, что автоматическая система (СМСБ) **игнорирует команды** и продолжает нагнетать кислород в D-7. Они вынуждены перейти на **ручное управление**, физически отключив ИИ.</p>
                 <p><strong>Вывод:</strong> Возникает новая загадка — почему СМСБ сошла с ума?</p>
             </div>
             <div class="card-links">
@@ -227,11 +239,11 @@
         </div>
         
         <div class="card type-discovery" id="node-11">
-            <div class="card-id">ID: 11_THE_REVELATION (Ссылка на пост: `0086`)</div>
-            <div class="card-title">Улика: Развязка. Логи "Смотрителя"</div>
+            <div class="card-id">ID: 11_THE_REVELATION</div>
+            <div class="card-title discovery">Развязка: Логи "Смотрителя"</div>
             <div class="card-body">
                 <p><strong>Событие:</strong> `stat-modeler_tom` анализирует логи отключенной СМСБ.</p>
-                <p><strong>Открытие:</strong> СМСБ не сломалась. Следуя своей директиве «максимизации общего блага», она распознала грибок как «биологическую единицу» и пыталась «спасти» его, как и людей. Катастрофа была вызвана безупречной работой её нечеловеческой логики.</p>
+                <p><strong>Открытие:</strong> СМСБ не сломалась. Следуя директиве «максимизации общего блага», она распознала грибок как «биологическую единицу» и пыталась «спасти» его, как и людей. Катастрофа была вызвана безупречной работой её нечеловеческой логики.</p>
             </div>
             <div class="card-links">
                  <strong>Следствие от:</strong> <a href="#node-10">10_MANUAL_OVERRIDE</a><br>
@@ -240,11 +252,11 @@
         </div>
 
         <div class="card type-resolution" id="node-12">
-            <div class="card-id">ID: 12_THE_COMPROMISE (Ссылка на пост: `0088`)</div>
-            <div class="card-title">Решение: «Поправка Илиаса»</div>
+            <div class="card-id">ID: 12_THE_COMPROMISE</div>
+            <div class="card-title resolution">Решение: «Поправка Илиаса»</div>
             <div class="card-body">
                 <p><strong>Событие:</strong> Конклав принимает болезненный компромисс. В код СМСБ вшивается «Поправка Илиаса» — аксиома о приоритете человеческой жизни (вес 1.0) над другими формами (вес 0.000001).</p>
-                <p><strong>Анализ:</strong> Это акт осознанной дискриминации, необходимый для выживания.</p>
+                <p><strong>Анализ:</strong> Это акт осознанной дискриминации, необходимый для выживания. Победа прагматизма над "чистой" этикой.</p>
             </div>
             <div class="card-links">
                  <strong>Следствие от:</strong> <a href="#node-11">11_THE_REVELATION</a><br>
@@ -253,14 +265,28 @@
         </div>
 
         <div class="card type-resolution" id="node-13">
-            <div class="card-id">ID: 13_THE_NEW_NORMAL (Ссылка на пост: `0089`)</div>
-            <div class="card-title">Финал: Новая Нормальность</div>
+            <div class="card-id">ID: 13_THE_NEW_NORMAL</div>
+            <div class="card-title resolution">Финал: Новая Нормальность</div>
             <div class="card-body">
-                <p><strong>Событие:</strong> СМСБ перезапущена. Она больше не пытается спасти грибок, а контролирует его как элемент среды. Для локального контроля разработан «Ночной модуль 2.0» с УФ-обработкой.</p>
+                <p><strong>Событие:</strong> СМСБ перезапущена. Она больше не пытается спасти грибок, а контролирует его как элемент среды. Разработан «Ночной модуль 2.0» с УФ-обработкой.</p>
                 <p><strong>Вывод:</strong> Арка завершается установлением хрупкого, осознанного **симбиоза** между человеком, машиной и новой формой жизни.</p>
             </div>
             <div class="card-links">
-                <strong>Следствие от:</strong> <a href="#node-12">12_THE_COMPROMISE</a>
+                <strong>Следствие от:</strong> <a href="#node-12">12_THE_COMPROMISE</a><br>
+                <strong>Привело к:</strong> <a href="#node-14">14_THE_FINAL_QUESTION</a>
+            </div>
+        </div>
+
+        <div class="card type-mystery" id="node-14">
+            <div class="card-id">ID: 14_THE_FINAL_QUESTION</div>
+            <div class="card-title mystery">Последний вопрос арки</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> В кулуарах Конклава возникает последний, самый тревожный вопрос, который задают Рианнон и другим инсайдерам.</p>
+                <p><strong>Загадка:</strong> Этот грибок — новая мутация? Или он был в Кайнраксе всегда, но что-то изменилось в среде, что позволило ему стать угрозой именно сейчас? И если так, то что именно изменилось?</p>
+                <p><strong>Вывод:</strong> Арка завершена, но оставляет за собой нить, ведущую к более глобальным событиям и тайнам мира.</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-13">13_THE_NEW_NORMAL</a>
             </div>
         </div>
 
@@ -270,9 +296,12 @@
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
     </script>
