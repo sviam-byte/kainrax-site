@@ -29,22 +29,11 @@ const els = {
   showAllLogs: $('#showAllLogs'),
 };
 
-// персонажи и заселение
+// только два «населённых» дома: Фрейди (с отцом) и отец близнецов
 const ACTORS = [
   { id:'freydi_a_pediatric_a_class', name:'Фрейди', house:'H-101', aClass:true, baseFlow:0.6, doubleBreath:false, cannulaUpdated:false },
   { id:'molot_trainee', name:'molot-trainee (отец Фрейди)', house:'H-101', aClass:true, baseFlow:0.0, doubleBreath:false, cannulaUpdated:false },
-  { id:'mother_freydi', name:'мама Фрейди', house:'H-101', aClass:true, baseFlow:0.0, doubleBreath:false, cannulaUpdated:false },
-
   { id:'father_of_twins_b7', name:'Отец Близнецов (B-7)', house:'H-103', aClass:false, baseFlow:0.4, doubleBreath:true, cannulaUpdated:true },
-  { id:'mother_kai_a_ped', name:'Мать Кай (A-ped)', house:'H-104', aClass:true, baseFlow:0.5, doubleBreath:false, cannulaUpdated:true },
-
-  { id:'resp_therapist_ina', name:'resp_therapist_ina', house:'H-107', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
-  { id:'techie_linus', name:'techie-linus', house:'H-108', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
-  { id:'marta', name:'Марта (пункт обмена)', house:'H-110', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
-  { id:'night_owl_shift', name:'night-owl_shift', house:'H-111', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
-  { id:'stat_modeler_tom', name:'stat-modeler_tom', house:'H-112', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
-  { id:'assi_the_runner_99', name:'assi-the-runner_99', house:'H-105', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
-  { id:'deicide_mentor', name:'deicide-mentor', house:'H-106', aClass:false, baseFlow:0, doubleBreath:false, cannulaUpdated:true },
 ];
 
 const app = new O2LogApp({
@@ -86,5 +75,4 @@ els.top .addEventListener('input', () => { app.thresholds.upper    = Number(els.
 els.btnExport.addEventListener('click', () => app.exportLogsCsv());
 els.showAllLogs.addEventListener('change', () => app.renderLogs(els.showAllLogs.checked));
 
-// kick off
 app.start();
