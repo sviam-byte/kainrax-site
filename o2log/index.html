@@ -1,68 +1,74 @@
-<!doctype html>
+// =========================
+// index.html
+// =========================
+const INDEX_HTML = `<!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Kainrax · D-7 · O₂ мониторинг</title>
+  <title>Кайнракс · D‑7 · Мониторинг O₂</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
   <style>
     :root{
-      --bg:#0c1118; --panel:#0f1622; --ink:#e9f1ff; --muted:#a9b7d6;
-      --accent:#7de0ff; --ok:#10b981; --warn:#f59e0b; --crit:#ef4444; --line:#223047;
-      --card:#0e1521; --shadow:0 10px 30px rgba(0,0,0,.35); --radius:16px;
+      --bg:#0b0f16; --panel:#0f1624; --ink:#e9f2ff; --muted:#a6b5d5; --line:#1c2740;
+      --ok:#10b981; --warn:#f59e0b; --crit:#ef4444; --extra:#3b82f6; --park:#000000; --pipe:#6fb1ff;
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
-    a{color:var(--accent);text-decoration:none}
-    .wrap{max-width:1240px;margin:0 auto;padding:18px}
-    .row{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:14px/1.45 ui-sans-serif, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif}
+    a{color:#7de0ff;text-decoration:none}
+    .wrap{max-width:1280px;margin:0 auto;padding:18px}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+    .card{background:#0b121e;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
     .card h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
     .pad{padding:14px}
     .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .controls label{font-size:12px;color:var(--muted)}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#0a0f18}
-    select,button,input[type="range"],input[type="checkbox"]{background:#0b1320;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+    select,button,input[type="range"],input[type="checkbox"]{background:#0b1322;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
     button{cursor:pointer}
+    .pill{border-radius:999px;border:1px solid var(--line);padding:6px 10px;background:#0a101a}
+    .legend{display:flex;gap:10px;align-items:center}
+    .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
     .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
     .kpi{background:#0a101a;border:1px solid var(--line);border-radius:12px;padding:10px}
     .kpi .lbl{font-size:12px;color:var(--muted)}
-    .kpi .val{font:600 20px/1.2 system-ui}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .kpi .val{font:600 20px/1.2 ui-sans-serif}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+    .tab{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#0b1322;cursor:pointer}
+    .tab.active{background:#12253d}
+    #tooltip{position:fixed;pointer-events:none;background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--ink);box-shadow:var(--shadow);display:none;z-index:10}
     .logtable{width:100%;border-collapse:collapse}
-    .logtable th,.logtable td{padding:8px;border-top:1px solid var(--line);text-align:left}
+    .logtable th,.logtable td{padding:8px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
     .badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px}
     .b-info{background:#0c2136;color:#8ecaff}
     .b-warn{background:#2a1c00;color:#fbbf24}
     .b-crit{background:#2b0d0d;color:#f87171}
-    .legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
     .muted{color:var(--muted)}
-    #tooltip{position:fixed;pointer-events:none;background:#0b1320;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--ink);box-shadow:var(--shadow);display:none;z-index:10}
-    @media (max-width:980px){ .row{grid-template-columns:1fr} .grid2{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,1fr)} }
+    .right{display:flex;justify-content:flex-end}
+    @media (max-width:1100px){ .grid{grid-template-columns:1fr} .row{grid-template-columns:1fr} .kpis{grid-template-columns:repeat(2,1fr)} }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="legend" style="justify-content:space-between;margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div>
+        <h1 style="margin:0;font-size:18px">Сектор D‑7 · Устаревший Хаб · Мониторинг O₂</h1>
+        <div class="muted" style="font-size:12px">Пункт обмена D‑7 (радиальная разводка). Связано с СМСБ: <a href="https://kainrax.netlify.app/#/read-article/doctrine2" target="_blank" rel="noopener">Доктрина всеобщего блага</a></div>
+      </div>
       <div class="legend">
-        <strong style="font-size:18px">Сектор D-7 · Устаревший Хаб</strong>
         <span class="dot" style="background:#3b82f6"></span><span class="muted">выше нормы</span>
         <span class="dot" style="background:#10b981"></span><span class="muted">норма</span>
         <span class="dot" style="background:#f59e0b"></span><span class="muted">ниже нормы</span>
         <span class="dot" style="background:#ef4444"></span><span class="muted">критично</span>
-        <span class="dot" style="background:#000"></span><span class="muted">парковая зона</span>
-        <span class="dot" style="background:#7de0ff"></span><span class="muted">магистрали O₂</span>
-        <span class="dot" style="background:#7f5af0"></span><span class="muted">сервисные шахты</span>
-        <span class="dot" style="background:#ffd86b"></span><span class="muted">Ядро обмена</span>
-        <span class="muted">Зум: колесо, Панорама: ЛКМ</span>
+        <span class="dot" style="background:#000"></span><span class="muted">Парк Дзета</span>
+        <span class="dot" style="background:#6fb1ff"></span><span class="muted">магистраль O₂</span>
       </div>
-      <div><a href="https://kainrax.netlify.app/#/read-article/doctrine2" target="_blank" rel="noopener">СМСБ →</a></div>
     </div>
 
-    <div class="row">
+    <div class="grid">
+      <!-- MAP -->
       <div class="card">
-        <h3>Интерактивная карта · клик по дому</h3>
+        <h3>Интерактивная карта (zoom/pan) · клик по дому</h3>
         <div class="pad">
           <div class="controls" style="margin-bottom:10px">
             <label>Интервал</label>
@@ -72,63 +78,48 @@
               <option value="7d">последние 7д</option>
             </select>
             <label class="pill"><input id="liveChk" type="checkbox" checked /> live</label>
-
-            <label>Вид анализа</label>
-            <select id="viewSel">
-              <option value="o2">O₂ во времени</option>
-              <option value="rawema">RAW + EMA (расход, л/мин)</option>
-              <option value="spectrum">Спектр (двойной вдох)</option>
-            </select>
-
-            <label>Фильтр</label>
-            <select id="filterSel">
-              <option value="all" selected>все дома</option>
-              <option value="aclass">только A-категория</option>
-              <option value="nonaclass">без A-категории</option>
-            </select>
-
-            <label class="pill"><input id="pipesChk" type="checkbox" checked /> трубы</label>
-            <label class="pill"><input id="shaftsChk" type="checkbox" checked /> шахты</label>
-            <label class="pill"><input id="parkChk" type="checkbox" checked /> парк</label>
-            <label class="pill"><input id="cannulaChk" type="checkbox" checked /> канюли</label>
-            <button id="resetView">Сброс зума</button>
-          </div>
-
-          <div class="controls" style="margin-bottom:10px">
-            <label>критично</label><input id="critSlider" type="range" min="17.0" max="19.5" step="0.05" value="18.2" style="width:160px">
-            <label>предупр.</label><input id="warnSlider" type="range" min="17.5" max="20.0" step="0.05" value="18.8" style="width:160px">
-            <label>верхн.</label><input id="topSlider"  type="range" min="19.8" max="21.2" step="0.05" value="20.6" style="width:140px">
+            <label>критично</label><input id="critSlider" type="range" min="17.5" max="20.0" step="0.05" value="18.8" style="width:150px">
+            <label>предупр.</label><input id="warnSlider" type="range" min="18.0" max="21.0" step="0.05" value="19.3" style="width:150px">
+            <label>верхн.</label><input id="topSlider"  type="range" min="20.5" max="22.0" step="0.05" value="21.2" style="width:130px">
             <span id="thVals" class="muted"></span>
+            <label class="pill"><input id="overlayCannula" type="checkbox" checked /> показать канюли</label>
+            <label class="pill"><input id="overlayPipes" type="checkbox" checked /> показать трубы</label>
           </div>
-
-          <canvas id="map" width="1100" height="700" style="width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#0a0f17"></canvas>
+          <canvas id="map" width="1200" height="720" style="width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#0a0f17"></canvas>
           <div id="tooltip"></div>
         </div>
       </div>
 
+      <!-- SIDE: KPIs + CHARTS -->
       <div class="card">
         <h3>Дом и сводка</h3>
         <div class="pad">
           <div class="kpis" style="margin-bottom:12px">
             <div class="kpi"><div class="lbl">Текущее O₂</div><div class="val"><span id="k-last">—</span> <span class="muted">%</span></div></div>
-            <div class="kpi"><div class="lbl">Мин / Макс</div><div class="val"><span id="k-min">—</span><span class="muted"> / </span><span id="k-max">—</span></div></div>
-            <div class="kpi"><div class="lbl">Подача сейчас</div><div class="val"><span id="k-flow">—</span> <span class="muted">л/мин</span></div></div>
-            <div class="kpi"><div class="lbl">Общий объём (за интервал)</div><div class="val"><span id="k-liters">—</span> <span class="muted">л</span></div></div>
+            <div class="kpi"><div class="lbl">Мин/Макс</div><div class="val"><span id="k-min">—</span>/<span id="k-max">—</span></div></div>
+            <div class="kpi"><div class="lbl">Пробои &lt;19%</div><div class="val"><span id="k-brk">—</span></div></div>
+            <div class="kpi"><div class="lbl">Подача, л/мин</div><div class="val"><span id="k-flow">—</span></div></div>
           </div>
 
-          <div class="grid2">
+          <div class="tabs">
+            <button class="tab active" data-tab="o2">O₂ концентрация</button>
+            <button class="tab" data-tab="flow">Подача RAW/EMA/идеальный</button>
+            <button class="tab" data-tab="spectrum">Спектр (двойной вдох)</button>
+          </div>
+          <div class="row">
             <div class="card" style="border:1px dashed var(--line)">
-              <h3 id="chartTitle">Динамика O₂</h3>
-              <div class="pad"><canvas id="chartMain" height="260"></canvas></div>
+              <h3 id="chartTitle">O₂ · %</h3>
+              <div class="pad"><canvas id="chartA" height="240"></canvas></div>
             </div>
             <div class="card" style="border:1px dashed var(--line)">
-              <h3>Сопутствующие сигналы</h3>
-              <div class="pad"><canvas id="chartAux" height="260"></canvas></div>
+              <h3>Нормализация / наполнение</h3>
+              <div class="pad"><canvas id="chartB" height="240"></canvas></div>
             </div>
           </div>
-
-          <div class="controls" style="justify-content:flex-end;margin-top:8px">
-            <label class="pill"><input id="showAllLogs" type="checkbox" /> логи всех домов</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
+            <label class="pill"><input id="idealChk" type="checkbox" /> показать «идеальный» 0.5 л/мин</label>
+            <div class="muted" id="houseMeta"></div>
+            <div style="flex:1"></div>
             <button id="btnExport">Экспорт логов CSV</button>
           </div>
         </div>
@@ -136,11 +127,11 @@
     </div>
 
     <div class="card" style="margin-top:16px">
-      <h3>Логи и события</h3>
-      <div class="pad" style="overflow:auto;max-height:360px">
+      <h3>Логи и события (персонажи, канюли, сервис, спектр)</h3>
+      <div class="pad" style="overflow:auto;max-height:340px">
         <table class="logtable" id="logTable">
           <thead>
-          <tr><th>Время</th><th>Дом/персонаж</th><th>Серьёзность</th><th>Сообщение</th></tr>
+          <tr><th>Время</th><th>Кто</th><th>Дом</th><th>Серьёзность</th><th>Сообщение</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -148,11 +139,426 @@
     </div>
   </div>
 
-  <!-- Charts -->
+  <!-- Chart.js + annotation -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0/dist/chartjs-plugin-annotation.min.js"></script>
-
-  <!-- App -->
   <script type="module" src="./main.js"></script>
 </body>
-</html>
+</html>`;
+
+// =========================
+// main.js
+// =========================
+const MAIN_JS = `import { O2LogApp } from './O2LogApp.js';
+const $ = sel => document.querySelector(sel);
+const els = {
+  canvas:   $('#map'), tooltip:  $('#tooltip'),
+  rangeSel: $('#rangeSel'), liveChk:  $('#liveChk'),
+  crit:     $('#critSlider'), warn:     $('#warnSlider'), top: $('#topSlider'),
+  thVals:   $('#thVals'),
+  overlayCann: $('#overlayCannula'), overlayPipes: $('#overlayPipes'),
+  idealChk: $('#idealChk'),
+  kLast: $('#k-last'), kMin: $('#k-min'), kMax: $('#k-max'), kBrk: $('#k-brk'), kFlow: $('#k-flow'),
+  chartA: $('#chartA'), chartB: $('#chartB'), chartTitle: $('#chartTitle'),
+  logsTbody: $('#logTable tbody'),
+  btnExport: $('#btnExport'),
+  houseMeta: $('#houseMeta'),
+};
+
+const app = new O2LogApp({
+  canvas: els.canvas, tooltip: els.tooltip,
+  kpis: { last: els.kLast, min: els.kMin, max: els.kMax, brk: els.kBrk, flow: els.kFlow },
+  charts: { a: els.chartA, b: els.chartB, titleNode: els.chartTitle },
+  logsTbody: els.logsTbody,
+  thresholds: { critical: Number(els.crit.value), warning: Number(els.warn.value), upper: Number(els.top.value) },
+  range: els.rangeSel.value,
+  overlays: { cannula:true, pipes:true },
+  onHouseMeta: (html)=> els.houseMeta.innerHTML = html
+});
+
+function renderThVals(){
+  els.thVals.textContent = 
+    \`(пороги: \${app.thresholds.critical.toFixed(2)} / \${app.thresholds.warning.toFixed(2)} / \${app.thresholds.upper.toFixed(2)} %)\`;
+}
+renderThVals();
+
+els.rangeSel.addEventListener('change', e => app.setRange(e.target.value));
+els.liveChk.addEventListener('change', e => app.setLive(e.target.checked));
+
+els.crit.addEventListener('input', () => { app.thresholds.critical = Math.min(Number(els.crit.value), app.thresholds.warning - 0.05); renderThVals(); app.updateAll(); });
+els.warn.addEventListener('input', () => { app.thresholds.warning = Math.max(Number(els.warn.value), app.thresholds.critical + 0.05); renderThVals(); app.updateAll(); });
+els.top .addEventListener('input', () => { app.thresholds.upper    = Number(els.top.value); renderThVals(); app.updateAll(); });
+
+els.overlayCann.addEventListener('change', ()=> { app.overlays.cannula = els.overlayCann.checked; app.redraw(); });
+els.overlayPipes.addEventListener('change', ()=> { app.overlays.pipes   = els.overlayPipes.checked; app.redraw(); });
+
+els.idealChk.addEventListener('change', ()=>{ app.showIdeal = els.idealChk.checked; app.updateCharts(); });
+
+els.btnExport.addEventListener('click', ()=> app.exportLogsCsv());
+
+app.start();`;
+
+// =========================
+// O2LogApp.js (BIG)
+// =========================
+const O2LOGAPP_JS = `// O2LogApp: карта D‑7 с парком, трубами, zoom/pan; O₂ (карта+серии),
+// Подача RAW/EMA/«идеальный» и спектр (двойной вдох). Логи с персонажами.
+
+export class O2LogApp {
+  constructor(opts){
+    this.canvas = opts.canvas; this.ctx = this.canvas.getContext('2d');
+    this.tooltip = opts.tooltip; this.kpis = opts.kpis; this.logsTbody = opts.logsTbody;
+    this.chartNodes = opts.charts; this.onHouseMeta = opts.onHouseMeta || (()=>{});
+    this.thresholds = opts.thresholds ?? { critical:18.8, warning:19.3, upper:21.2 };
+    this.range = opts.range ?? '24h'; this.live = true; this.showIdeal = false;
+    this.overlays = opts.overlays ?? { cannula:true, pipes:true };
+
+    // ======= секторная сетка
+    this.gridW = 200; this.gridH = 130; this.padding = 6;
+    this.resizeCanvas();
+
+    // ======= геометрия D‑7
+    this.park = { name:'Парк Дзета', poly: this.rectPoly(18, 18, 52, 32) };
+    this.hub = { x: 100, y: 65, r: 5, name:'Пункт обмена D‑7' };
+    this.pipes = this.buildPipes();
+
+    // ======= дома (только номера; персонажей «поселим» частично)
+    this.houses = this.buildHouses();
+    // персонажи/метаданные по домам
+    this.people = this.buildPeople();
+
+    this.selectedHouse = this.houses[0];
+
+    // шум и базовые уровни
+    this.seed = 7331;
+
+    // графики
+    this._charts = this.buildCharts();
+
+    // интерактив
+    this.zoom = 1; this.offsetX = 0; this.offsetY = 0; this.bindPointer();
+
+    this.rebuildSeries();
+    this.buildLogs();
+  }
+
+  // ======= helpers
+  rectPoly(x,y,w,h){ return [[x,y],[x+w,y],[x+w,y+h],[x,y+h]]; }
+  rng(i){ let t=(i+this.seed)>>>0; t+=0x6D2B79F5; t=Math.imul(t^(t>>>15), t|1); t^=t+Math.imul(t^(t>>>7), t|61); return ((t^(t>>>14))>>>0)/4294967296; }
+  fade(t){ return t*t*(3-2*t); }
+  lerp(a,b,t){ return a+(b-a)*t; }
+  valueNoise(x,y){ const xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi; const idx=(X,Y)=>this.rng((X*73856093)^(Y*19349663)); const u=this.fade(xf), v=this.fade(yf); const v00=idx(xi,yi), v10=idx(xi+1,yi), v01=idx(xi,yi+1), v11=idx(xi+1,yi+1); return this.lerp(this.lerp(v00,v10,u), this.lerp(v01,v11,u), v); }
+  flowField(x,y){ return 0.6*this.valueNoise(x*0.06,y*0.06) + 0.3*this.valueNoise(x*0.02+10,y*0.02-7) + 0.1*this.valueNoise(x*0.14-3,y*0.14+5); }
+  pointInPoly(px,py,poly){ let inside=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const [xi,yi]=poly[i], [xj,yj]=poly[j]; const inter=((yi>py)!==(yj>py)) && (px < (xj-xi)*(py-yi)/(yj-yi)+xi); if(inter) inside=!inside; } return inside; }
+  distPointSeg(px,py, ax,ay, bx,by){ const dx=bx-ax, dy=by-ay; const t = Math.max(0, Math.min(1, ((px-ax)*dx + (py-ay)*dy)/(dx*dx+dy*dy||1))); const cx=ax+t*dx, cy=ay+t*dy; const rx=px-cx, ry=py-cy; return Math.sqrt(rx*rx+ry*ry); }
+
+  // ======= построение геометрии
+  buildPipes(){
+    // радиальная разводка из хаба
+    const spokes = [
+      [[this.hub.x,this.hub.y],[160,20]],
+      [[this.hub.x,this.hub.y],[175,70]],
+      [[this.hub.x,this.hub.y],[160,110]],
+      [[this.hub.x,this.hub.y],[40,22]],
+      [[this.hub.x,this.hub.y],[35,60]],
+      [[this.hub.x,this.hub.y],[45,105]]
+    ];
+    // кольцевой обход
+    const ring = [[35,60],[45,105],[160,110],[175,70],[160,20],[40,22],[35,60]];
+    return { spokes, ring };
+  }
+
+  buildHouses(){
+    const hs=[]; let n=1;
+    // три «луча» домов вокруг хаба
+    const blocks = [
+      { baseIn:19.0, rects:[[60,18,22,18],[85,18,22,18],[110,18,22,18]] },
+      { baseIn:19.0, rects:[[60,56,22,18],[85,56,22,18],[110,56,22,18]] },
+      { baseIn:19.0, rects:[[60,94,22,18],[85,94,22,18],[110,94,22,18]] },
+    ];
+    for(const b of blocks){ for(const r of b.rects){ hs.push({ id:`H-${n}`, name:`дом №${n}`, poly:this.rectPoly(...r), baseInside:b.baseIn, aClass:false, cannulaUpdated: (n%2===0) }); n++; } }
+    // переставим два важных дома ближе к парку/хабу
+    hs[1].name += ' · Близнецы'; hs[1].meta='father_of_twins_b7'; hs[1].doubleBreath=true; // Дом №2
+    hs[1].cannulaUpdated=true;
+    hs[4].name += ' · Фрейди'; hs[4].meta='freydi_a_pediatric_a_class'; hs[4].aClass=true; hs[4].baseInside=20.6; // Дом №5
+    hs[4].cannulaUpdated=false;
+    return hs;
+  }
+
+  buildPeople(){
+    return [
+      { id:'freydi_a_pediatric_a_class', label:'Фрейди (A‑кат., педиатрия)', house:'H-5' },
+      { id:'molot_trainee', label:'molot‑trainee (отец Фрейди)', house:'H-5' },
+      { id:'mother_kai_a_ped', label:'мать Кай (родитель A‑кат.)', house:null },
+      { id:'father_of_twins_b7', label:'Отец Близнецов (B‑7)', house:'H-2' },
+      { id:'resp_therapist_ina', label:'resp_therapist_ina', house:null },
+      { id:'techie_linus', label:'techie‑linus', house:null },
+      { id:'assi_runner_99', label:'assi‑the‑runner_99', house:null },
+      { id:'stat_modeler_tom', label:'stat‑modeler_tom', house:null },
+      { id:'deicide_mentor', label:'deicide‑mentor', house:null },
+      { id:'med_unit_7', label:'med‑unit‑7', house:null },
+    ];
+  }
+
+  // ======= time helpers
+  rangeToMs(r){ const H=3600e3,D=24*H; if(r==='1h')return 1*H; if(r==='7d')return 7*D; return 1*D; }
+  stepForRange(r){ const MIN=60e3; if(r==='1h')return 30*1000; if(r==='7d')return 30*MIN; return 5*MIN; }
+
+  // ======= физика/матмодель O₂
+  envBase(){ return 18.7; } // снаружи по умолчанию
+  parkBoost(gx,gy){ // повышенный O₂ вокруг парка
+    // расстояние до парка: возьмём до центра прямоугольника
+    const [x0,y0]=this.park.poly[0], [x1,y1]=this.park.poly[2];
+    const cx=(x0+x1)/2, cy=(y0+y1)/2; const dx=gx-cx, dy=gy-cy; const d=Math.sqrt(dx*dx+dy*dy);
+    const r = Math.max(18, (x1-x0)); // радиус влияния ~ ширина парка
+    const k = Math.max(0, 1 - d/r);
+    return 0.35*k; // до +0.35% в центре
+  }
+  pipeBoost(gx,gy){ // пониженный градиент/утечки у труб
+    let min=1e9;
+    for(const s of this.pipes.spokes){ const [[ax,ay],[bx,by]]=s; min=Math.min(min, this.distPointSeg(gx,gy,ax,ay,bx,by)); }
+    for(let i=0;i<this.pipes.ring.length-1;i++){ const [ax,ay]=this.pipes.ring[i], [bx,by]=this.pipes.ring[i+1]; min=Math.min(min, this.distPointSeg(gx,gy,ax,ay,bx,by)); }
+    const k = Math.max(0, 1 - min/25); // влияние в пределах ~25 ячеек
+    return 0.22*k; // до +0.22% на трубе
+  }
+  o2AtTile(tMillis, gx, gy, inHouse=false, houseSetpoint=19.0){
+    // дневная волна слабая
+    const day=24*3600e3; const phase=Math.sin((tMillis%day)/day*Math.PI*2)*0.04;
+    const flow = this.flowField(gx,gy); // 0..1
+    const drift = (flow-0.5)*0.18 + (this.rng(gx*9173 ^ gy*2273)*0.05 - 0.025);
+    const jitter = (this.rng(Math.floor(tMillis/60000) ^ (gx*131 + gy*911))) * 0.06 - 0.03;
+    if(inHouse){
+      // внутри дома таргетим сетпоинт + слабая дрожь
+      return houseSetpoint + phase + jitter*0.6 + drift*0.1;
+    } else {
+      // снаружи: базовый уровень + парк + трубы
+      return this.envBase() + phase + drift + jitter + this.parkBoost(gx,gy) + this.pipeBoost(gx,gy);
+    }
+  }
+
+  seriesForHouse(house, start, end, step){
+    // среднее по плиткам внутри дома
+    const [x0,y0]=house.poly[0], [x1,y1]=house.poly[2];
+    const sx=Math.max(1, Math.floor((x1-x0)/8)); const sy=Math.max(1, Math.floor((y1-y0)/8));
+    const pts=[];
+    for(let t=start;t<=end;t+=step){ let sum=0,n=0; for(let gx=x0;gx<=x1;gx+=sx){ for(let gy=y0;gy<=y1;gy+=sy){ sum+=this.o2AtTile(t,gx,gy,true,house.baseInside); n++; }} const v=sum/n; pts.push({t, value:Number(v.toFixed(3))}); }
+    return pts;
+  }
+
+  // ======= Подача л/мин (RAW/EMA/идеальный). Синтетика для «двойного вдоха»
+  flowSeries(house, minutes=10){
+    // шаг 1с для дыхания
+    const dt=1000; const N=minutes*60; const now=Date.now(); const start=now - N*dt;
+    const raw=[];
+    // базовый поток
+    const base = house.aClass? 1.0 : 0.5; // л/мин
+    // частоты дыхания (Гц)
+    const f1 = 0.25; // 15/мин
+    const f2 = house.doubleBreath? 0.33 : 0.0; // 20/мин для близнецов
+    for(let i=0;i<N;i++){
+      const t=start+i*dt; const x=i/N; // немного нестабильности
+      const breath1 = 0.25*Math.max(0, Math.sin(2*Math.PI*f1*i) );
+      const breath2 = house.doubleBreath? 0.20*Math.max(0, Math.sin(2*Math.PI*f2*i + Math.PI/5) ):0;
+      // ночные пики у Фрейди
+      const nightBoost = (house.meta==='freydi_a_pediatric_a_class')? ( (new Date(t).getHours()>=1 && new Date(t).getHours()<=5)? 0.15: 0 ):0;
+      const val = base + breath1 + breath2 + nightBoost + (this.rng(i^1234)-0.5)*0.05;
+      raw.push({t, value:Number(val.toFixed(3))});
+    }
+    // EMA
+    const alpha=0.08; const ema=[]; let s=raw[0].value; for(const r of raw){ s=alpha*r.value+(1-alpha)*s; ema.push({t:r.t, value:Number(s.toFixed(3))}); }
+    // «идеальный» (по запросу — ровная линия 0.5 л/мин)
+    const ideal = raw.map(r=>({t:r.t, value:0.5}));
+    return {raw, ema, ideal, start, end: start+N*dt };
+  }
+
+  // спектр амплитуд (наивный DFT) для минутного окна
+  spectrum(series){
+    const N=256; // возьмём 256 отсчётов равномерно из конца
+    const tail = series.slice(-N);
+    const vals = tail.map(p=>p.value - tail.reduce((a,b)=>a+b.value,0)/tail.length);
+    const re=[], im=[], mag=[], freq=[]; for(let k=1;k<N/2;k++){ let r=0,i=0; for(let n=0;n<N;n++){ const ph=-2*Math.PI*k*n/N; r+=vals[n]*Math.cos(ph); i+=vals[n]*Math.sin(ph); } re[k]=r; im[k]=i; mag[k]=Math.sqrt(r*r+i*i); freq[k]=k; }
+    return {freq, mag};
+  }
+
+  // ======= charts
+  buildCharts(){
+    Chart.register(window['chartjs-plugin-annotation']);
+    const baseOptions = { responsive:true, maintainAspectRatio:false, scales:{ x:{ticks:{color:'#9fb3d8'}}, y:{ticks:{color:'#9fb3d8'}} }, plugins:{ legend:{labels:{color:'#c7d6ff'}}, tooltip:{callbacks:{label:(c)=>c.formattedValue+(this.mode==='o2'?' %':'')}} }};
+
+    const A = new Chart(this.chartNodes.a.getContext('2d'), { type:'line', data:{ labels:[], datasets:[] }, options: JSON.parse(JSON.stringify(baseOptions)) });
+    const B = new Chart(this.chartNodes.b.getContext('2d'), { type:'doughnut', data:{ labels:['норма','дефицит/избыток'], datasets:[{data:[50,50], backgroundColor:['#10b981','#223047'], borderWidth:0}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
+    return { A, B };
+  }
+
+  updateCharts(){
+    const {A,B}=this._charts;
+    if(this.mode==='flow' || this.mode==='spectrum'){
+      // левая панель: flow или спектр
+      if(this.mode==='flow'){
+        const F=this.flow;
+        A.options.scales.y.title={display:true,text:'л/мин',color:'#9fb3d8'};
+        A.data.labels = F.raw.map(p=> new Date(p.t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'}) );
+        A.data.datasets = [
+          { label:'RAW', data:F.raw.map(p=>p.value), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,.15)', tension:.2, pointRadius:0 },
+          { label:'EMA', data:F.ema.map(p=>p.value), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.10)', tension:.25, pointRadius:0 },
+        ];
+        if(this.showIdeal){ A.data.datasets.push({ label:'идеальный 0.5', data:F.ideal.map(p=>p.value), borderColor:'#94a3b8', borderDash:[6,4], pointRadius:0 }); }
+        A.update('none');
+        // правая панель: пончик по текущему O₂
+        const v = this.series.at(-1)?.value ?? 0; const norm = Math.max(0, Math.min(1, (v - this.thresholds.critical)/(this.thresholds.upper - this.thresholds.critical)));
+        B.data.datasets[0].data=[Math.round(norm*100), 100-Math.round(norm*100)]; B.update('none');
+      } else {
+        // спектр
+        const S=this.spectrumData;
+        A.options.scales.y.title={display:false};
+        A.data.labels = S.freq.slice(1, S.freq.length/2).map(k=>k);
+        A.data.datasets = [{ label:'амплитуда', data:S.mag.slice(1, S.mag.length/2), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,.15)', pointRadius:0 }];
+        A.update('none');
+        // правый: пустим пончик как у flow
+        const v = this.series.at(-1)?.value ?? 0; const norm = Math.max(0, Math.min(1, (v - this.thresholds.critical)/(this.thresholds.upper - this.thresholds.critical)));
+        B.data.datasets[0].data=[Math.round(norm*100), 100-Math.round(norm*100)]; B.update('none');
+      }
+    } else {
+      // режим O₂
+      A.options.scales.y.title={display:true,text:'%',color:'#9fb3d8'};
+      A.data.labels = this.series.map(p=> new Date(p.t).toLocaleString([], {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}) );
+      A.data.datasets = [{ label:'O₂', data:this.series.map(p=>p.value), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.15)', pointRadius:0, tension:.25 }];
+      // пороги как аннотации избыточно, но для простоты — нормализация в пончике
+      A.update('none');
+      const v = this.series.at(-1)?.value ?? 0; const norm = Math.max(0, Math.min(1, (v - this.thresholds.critical)/(this.thresholds.upper - this.thresholds.critical)));
+      B.data.datasets[0].data=[Math.round(norm*100), 100-Math.round(norm*100)]; B.update('none');
+    }
+
+    // KPIs
+    const vals=this.series.map(p=>p.value); const min=Math.min(...vals), max=Math.max(...vals), last=vals.at(-1);
+    const below = vals.filter(x=>x<19.0).length; this.kpis.last.textContent = last?.toFixed(3) ?? '—'; this.kpis.min.textContent = isFinite(min)?min.toFixed(3):'—'; this.kpis.max.textContent=isFinite(max)?max.toFixed(3):'—'; this.kpis.brk.textContent=below;
+    // текущая подача (среднее по 60с из RAW)
+    const flow60 = this.flow?.raw.slice(-60) ?? []; const fAvg = flow60.length? flow60.reduce((a,b)=>a+b.value,0)/flow60.length : NaN; this.kpis.flow.textContent = isFinite(fAvg)? fAvg.toFixed(2): '—';
+
+    // заголовок чарта
+    this.chartNodes.titleNode.textContent = (this.mode==='o2')? 'O₂ · %' : (this.mode==='flow')? 'Подача · л/мин (RAW/EMA/идеальный)': 'Спектр (двойной вдох)';
+  }
+
+  // ======= логи
+  buildLogs(){
+    const house = this.selectedHouse; const who = (id)=> this.people.find(p=>p.id===id)?.label ?? id;
+    const L=[]; const now=Date.now();
+    // инциденты по порогам
+    for(const p of this.series){ if(p.value < this.thresholds.critical) L.push({ts:p.t, who:who(house.meta||'med_unit_7'), sev:'critical', msg:'Падение O₂ ниже критического порога'}); else if(p.value < this.thresholds.warning) L.push({ts:p.t, who:who('med_unit_7'), sev:'warning', msg:'Снижение O₂ ниже нормы'}); }
+
+    // событийная лента для арки
+    if(house.meta==='freydi_a_pediatric_a_class'){
+      L.push({ts:now-6*3600e3, who:who('freydi_a_pediatric_a_class'), sev:'info', msg:'Пост: «сатурация падает, баллоны пустеют быстрее»'});
+      L.push({ts:now-5.8*3600e3, who:who('molot_trainee'), sev:'info', msg:'получен газоанализатор через assi‑the‑runner_99'});
+      L.push({ts:now-4.5*3600e3, who:who('techie_linus'), sev:'info', msg:'доступ к несглаженным данным открыт'});
+    }
+    if(house.doubleBreath){
+      L.push({ts:now-3.5*3600e3, who:who('father_of_twins_b7'), sev:'warning', msg:'подтверждён паттерн «двойного вдоха»'});
+      L.push({ts:now-3.2*3600e3, who:who('stat_modeler_tom'), sev:'info', msg:'пост №72: RAW vs EMA опубликован'});
+      L.push({ts:now-3.1*3600e3, who:who('stat_modeler_tom'), sev:'info', msg:'спектр: два пика (двое потребителей)'});
+    }
+    // канюли
+    L.push({ts:now-2.4*3600e3, who:who('resp_therapist_ina'), sev: house.cannulaUpdated? 'info':'warning', msg: house.cannulaUpdated? 'канюли заменены':'канюли НЕ обновлены'});
+
+    this.logs = L.sort((a,b)=>b.ts-a.ts);
+    this.renderLogs();
+  }
+  renderLogs(){
+    const tbody=this.logsTbody; tbody.innerHTML=''; const fmt=ts=> new Date(ts).toLocaleString([], {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    for(const l of this.logs){ const tr=document.createElement('tr'); const badge=`<span class="badge ${l.sev==='critical'?'b-crit':l.sev==='warning'?'b-warn':'b-info'}">${l.sev}</span>`; tr.innerHTML=`<td>${fmt(l.ts)}</td><td>${l.who}</td><td>${this.selectedHouse.name}</td><td>${badge}</td><td>${l.msg}</td>`; tbody.appendChild(tr);} }
+  exportLogsCsv(){ const rows=[["timestamp","who","house","severity","message"]].concat(this.logs.map(l=>[new Date(l.ts).toISOString(), l.who, this.selectedHouse.name, l.sev, l.msg.replace(/"/g,'""')])); const csv=rows.map(r=>r.map(v=>/,|"/.test(v)?`"${v}"`:v).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`o2-logs-${this.selectedHouse.id}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
+
+  // ======= selection/range
+  setRange(r){ this.range=r; this.rebuildSeries(); this.buildLogs(); this.updateCharts(); }
+  setLive(v){ this.live=v; }
+
+  rebuildSeries(){
+    const now=Date.now(); const span=this.rangeToMs(this.range); const step=this.stepForRange(this.range);
+    this.series = this.seriesForHouse(this.selectedHouse, now-span, now, step);
+    this.mode = this.mode || 'o2';
+    this.flow = this.flowSeries(this.selectedHouse, 10);
+    this.spectrumData = this.spectrum(this.flow.raw);
+    this.updateCharts();
+    const meta=[]; if(this.selectedHouse.aClass) meta.push('<b>ЗДЕСЬ А‑КАТЕГОРИЯ</b>'); meta.push('канюли: '+(this.selectedHouse.cannulaUpdated?'обновлены':'нет')); this.onHouseMeta(meta.join(' • '));
+    this.redraw();
+  }
+
+  // ======= drawing
+  resizeCanvas(){ const ratio=Math.max(window.devicePixelRatio||1,1); const cssW=Math.min(1200, this.canvas.clientWidth||1200); const cssH=Math.round(cssW*0.6); this.canvas.style.height=cssH+'px'; this.canvas.width=cssW*ratio; this.canvas.height=cssH*ratio; this.ratio=ratio; }
+  toScreen(x,y){ const s=this.zoom; const ox=this.offsetX, oy=this.offsetY; const px=this.padding*this.ratio + (x+ox)* (this.canvas.width - this.padding*2*this.ratio)/this.gridW * s; const py=this.padding*this.ratio + (y+oy)* (this.canvas.height- this.padding*2*this.ratio)/this.gridH * s; return [px,py]; }
+  fromScreen(px,py){ const s=this.zoom; const ox=this.offsetX, oy=this.offsetY; const gx = ((px - this.padding*this.ratio)/s) / ((this.canvas.width - this.padding*2*this.ratio)/this.gridW) - ox; const gy = ((py - this.padding*
+this.ratio)/s) / ((this.canvas.height- this.padding*2*this.ratio)/this.gridH) - oy; return [gx,gy]; }
+
+  redraw(){ const ctx=this.ctx; ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+    const now=Date.now();
+    // фон плитками
+    const step=1; for(let gy=0; gy<this.gridH; gy+=step){ for(let gx=0; gx<this.gridW; gx+=step){ const inHouse = this.houses.some(h=> this.pointInPoly(gx+0.5,gy+0.5,h.poly)); let setp=19.0; const h=this.houses.find(h=> this.pointInPoly(gx+0.5,gy+0.5,h.poly)); if(h) setp=h.baseInside; const v=this.o2AtTile(now,gx,gy, !!h, setp); const col=this.valueToColor(v); const [x,y]=this.toScreen(gx,gy); const [x2,y2]=this.toScreen(gx+1,gy+1); ctx.fillStyle=col; ctx.fillRect(x,y,x2-x-0.8,y2-y-0.8); }}
+
+    // парк (поверх): чёрный прямоугольник с деревьями
+    ctx.save(); ctx.globalAlpha=0.9; ctx.fillStyle='#000'; ctx.strokeStyle='#3a3a3a'; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<this.park.poly.length;i++){ const [sx,sy]=this.toScreen(...this.park.poly[i]); if(i===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);} ctx.closePath(); ctx.fill(); ctx.stroke();
+    // деревья
+    ctx.globalAlpha=1; for(let i=0;i<34;i++){ const rx=this.park.poly[0][0]+(this.rng(i)* (this.park.poly[2][0]-this.park.poly[0][0])); const ry=this.park.poly[0][1]+(this.rng(i+99)* (this.park.poly[2][1]-this.park.poly[0][1])); const [sx,sy]=this.toScreen(rx,ry); ctx.fillStyle='#0e8f4a'; ctx.beginPath(); ctx.arc(sx,sy, 3*this.ratio, 0, Math.PI*2); ctx.fill(); }
+    // подпись парка
+    ctx.fillStyle='#e5e7eb'; ctx.font= (12*this.ratio)+'px system-ui'; const [tx,ty]=this.toScreen(this.park.poly[0][0]+2, this.park.poly[0][1]+4); ctx.fillText('Парк Дзета', tx, ty);
+    ctx.restore();
+
+    // трубы
+    if(this.overlays.pipes){ ctx.save(); ctx.strokeStyle='#6fb1ff'; ctx.lineWidth=3*this.ratio; ctx.setLineDash([10,6]); for(const s of this.pipes.spokes){ const [a,b]=s; const [ax,ay]=this.toScreen(...a), [bx,by]=this.toScreen(...b); ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke(); }
+      ctx.setLineDash([]); ctx.lineWidth=2*this.ratio; ctx.beginPath(); for(let i=0;i<this.pipes.ring.length-1;i++){ const [a,b]=[this.pipes.ring[i], this.pipes.ring[i+1]]; const [ax,ay]=this.toScreen(...a), [bx,by]=this.toScreen(...b); if(i===0) ctx.moveTo(ax,ay); else ctx.lineTo(bx,by);} ctx.stroke();
+      // хаб
+      const [hx,hy]=this.toScreen(this.hub.x,this.hub.y); ctx.fillStyle='#0ea5e9'; ctx.beginPath(); ctx.arc(hx,hy, 6*this.ratio, 0, Math.PI*2); ctx.fill(); ctx.fillStyle='#cfe8ff'; ctx.font=(12*this.ratio)+'px system-ui'; ctx.fillText(this.hub.name, hx+8*this.ratio, hy-6*this.ratio);
+      ctx.restore(); }
+
+    // дома: контуры + подписи + значки (A-кат./канюли)
+    for(const h of this.houses){ const isSel=(h===this.selectedHouse); const col=isSel?'#e5e7eb':'#6b7280';
+      ctx.beginPath(); for(let i=0;i<h.poly.length;i++){ const [sx,sy]=this.toScreen(...h.poly[i]); if(i===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);} ctx.closePath(); ctx.lineWidth=isSel?3*this.ratio:1.5*this.ratio; ctx.strokeStyle=col; ctx.stroke();
+      // подписи
+      const [x0,y0]=this.toScreen(h.poly[0][0]+1, h.poly[0][1]+2); ctx.fillStyle='#e5e7eb'; ctx.font=(12*this.ratio)+'px system-ui'; ctx.fillText(h.name, x0, y0);
+      // бейджи
+      if(h.aClass){ ctx.fillStyle='#10b981'; ctx.fillRect(x0, y0+4*this.ratio, 10*this.ratio, 10*this.ratio); ctx.fillStyle:'#06110d'; ctx.fillRect(x0+2*this.ratio, y0+6*this.ratio, 6*this.ratio, 6*this.ratio); }
+      if(this.overlays.cannula){ ctx.fillStyle= h.cannulaUpdated? '#8ecaff':'#fbbf24'; ctx.beginPath(); ctx.arc(x0+18*this.ratio, y0+9*this.ratio, 5*this.ratio, 0, Math.PI*2); ctx.fill(); }
+    }
+  }
+
+  valueToColor(v){ if(v < this.thresholds.critical) return '#ef4444'; if(v < this.thresholds.warning) return '#f59e0b'; if(v <= this.thresholds.upper) return '#10b981'; return '#3b82f6'; }
+
+  // ======= pointer/zoom/pan & tabs
+  bindPointer(){
+    const rect=()=>this.canvas.getBoundingClientRect();
+    let dragging=false, lx=0, ly=0;
+    this.canvas.addEventListener('mousedown', e=>{ dragging=true; lx=e.clientX; ly=e.clientY; });
+    window.addEventListener('mouseup', ()=> dragging=false);
+    window.addEventListener('mousemove', e=>{ if(dragging){ const dx=(e.clientX-lx)/40, dy=(e.clientY-ly)/40; this.offsetX-=dx/this.zoom; this.offsetY-=dy/this.zoom; lx=e.clientX; ly=e.clientY; this.redraw(); }});
+    this.canvas.addEventListener('wheel', e=>{ e.preventDefault(); const delta = e.deltaY<0? 1.1: 0.9; this.zoom= Math.max(0.6, Math.min(3.5, this.zoom*delta)); this.redraw(); }, {passive:false});
+
+    this.canvas.addEventListener('mousemove', e=>{
+      const r=rect(); const px=(e.clientX-r.left)*(window.devicePixelRatio||1); const py=(e.clientY-r.top)*(window.devicePixelRatio||1); const [gx,gy]=this.fromScreen(px,py);
+      const h = this.houses.find(h=> this.pointInPoly(gx,gy,h.poly)); const setp = h? h.baseInside : 0; const v=this.o2AtTile(Date.now(), Math.floor(gx),Math.floor(gy), !!h, setp);
+      this.tooltip.style.display='block'; this.tooltip.innerHTML = `<div><strong>${h? h.name:'вне дома'}</strong></div><div class="muted">(${Math.floor(gx)}, ${Math.floor(gy)})</div><div>O₂: <b>${v.toFixed(3)}%</b></div>`; this.tooltip.style.left=(e.pageX+14)+'px'; this.tooltip.style.top=(e.pageY+14)+'px';
+    });
+    this.canvas.addEventListener('mouseleave', ()=> this.tooltip.style.display='none');
+
+    this.canvas.addEventListener('click', e=>{ const r=this.canvas.getBoundingClientRect(); const px=(e.clientX-r.left)*(window.devicePixelRatio||1); const py=(e.clientY-r.top)*(window.devicePixelRatio||1); const [gx,gy]=this.fromScreen(px,py); const h=this.houses.find(h=> this.pointInPoly(gx,gy,h.poly)); if(h){ this.selectedHouse=h; this.rebuildSeries(); this.buildLogs(); }});
+
+    // tabs
+    document.querySelectorAll('.tab').forEach(btn=> btn.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); this.mode = btn.dataset.tab; this.updateCharts(); }));
+
+    window.addEventListener('resize', ()=>{ this.resizeCanvas(); this.redraw(); });
+  }
+
+  // ======= tick
+  start(){ const tick=()=>{ if(this.live){ const lastT=this.series.at(-1)?.t ?? Date.now(); const step=this.stepForRange(this.range); const nextT=lastT + Math.max(step/6, 5000); const s2=this.series.slice(1); const pt=this.seriesForHouse(this.selectedHouse, nextT, nextT, step)[0]; s2.push(pt); this.series=s2; // flow скользящее окно
+      const F=this.flow.raw; const dt=1000; const t=F.at(-1)?.t + dt; const i=F.length; const base=this.selectedHouse.aClass?1.0:0.5; const f1=0.25, f2=this.selectedHouse.doubleBreath?0.33:0.0; const breath1=0.25*Math.max(0, Math.sin(2*Math.PI*f1*i)); const breath2=this.selectedHouse.doubleBreath? 0.20*Math.max(0, Math.sin(2*Math.PI*f2*i+Math.PI/5)):0; const night=(new Date(t).getHours()>=1&&new Date(t).getHours()<=5 && this.selectedHouse.meta==='freydi_a_pediatric_a_class')?0.15:0; const val=base+breath1+breath2+night+(this.rng(i^4321)-0.5)*0.05; this.flow.raw.push({t,value:Number(val.toFixed(3))}); const alpha=0.08; const prev=this.flow.ema.at(-1)?.value ?? val; const s=alpha*val+(1-alpha)*prev; this.flow.ema.push({t,value:Number(s.toFixed(3))}); this.flow.ideal.push({t,value:0.5}); if(this.flow.raw.length>10*60){ this.flow.raw.shift(); this.flow.ema.shift(); this.flow.ideal.shift(); } this.spectrumData=this.spectrum(this.flow.raw); this.updateCharts(); this.redraw(); } this._raf=requestAnimationFrame(tick); }; tick(); }
+
+  updateAll(){ this.updateCharts(); this.redraw(); }
+}
+`;
+
+// Export three files to the canvas as a single JS document for convenience.
+export default {
+  files: {
+    'index.html': INDEX_HTML,
+    'main.js': MAIN_JS,
+    'O2LogApp.js': O2LOGAPP_JS,
+  }
+};
