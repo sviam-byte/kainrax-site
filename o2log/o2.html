@@ -1,423 +1,281 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Перекрёстное дыхание — блок-схема</title>
-<style>
-  :root{
-    --bg:#0b0c10;
-    --panel:#12141a;
-    --card:#181b22;
-    --ink:#e9edf3;
-    --muted:#A8B3C1;
-    --line:#2a2f39;
-    --accent:#7cc4ff;
-    --accent-2:#a7f3d0;
-    --chip:#1f2430;
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --radius:18px;
-  }
-  @media (prefers-color-scheme: light){
-    :root{
-      --bg:#f6f7fb;
-      --panel:#ffffff;
-      --card:#ffffff;
-      --ink:#0d1220;
-      --muted:#4b5563;
-      --line:#e5e7eb;
-      --accent:#006de3;
-      --accent-2:#0ea5e9;
-      --chip:#f0f3f9;
-      --shadow: 0 8px 24px rgba(16,24,40,.08);
-    }
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доска Расследования: Дело о «Перекрёстном Дыхании»</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #c5c5c5;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #e0e0e0;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            font-weight: normal;
+        }
+        .story-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #2b2b2b;
+            border: 1px solid #444;
+            border-left: 5px solid #ffa500;
+            padding: 15px;
+            border-radius: 3px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            scroll-margin-top: 20px; /* Для плавной прокрутки */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .card-id {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-size: 1.2em;
+            color: #ffa500;
+            margin-bottom: 15px;
+        }
+        .card-body p {
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+        }
+        .card-links {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px dashed #444;
+        }
+        .card-links strong {
+            color: #999;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .card-links a {
+            color: #6caddf;
+            text-decoration: none;
+            margin-right: 10px;
+            transition: color 0.2s;
+        }
+        .card-links a:hover {
+            color: #a7d1f5;
+            text-decoration: underline;
+        }
+        .act-title {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+        }
+        .type-event { border-left-color: #ffa500; } /* Желтый */
+        .type-discovery { border-left-color: #4CAF50; } /* Зеленый */
+        .type-consequence { border-left-color: #f44336; } /* Красный */
+        .type-turning-point { border-left-color: #9c27b0; } /* Фиолетовый */
+        .type-resolution { border-left-color: #2196F3; } /* Синий */
 
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    background:radial-gradient(1200px 600px at 60% -10%, rgba(124,196,255,.08), transparent 60%),
-               radial-gradient(1000px 500px at 10% 120%, rgba(14,165,233,.09), transparent 65%),
-               var(--bg);
-    color:var(--ink);
-    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-  }
-
-  .wrap{max-width:1200px;margin:40px auto;padding:0 20px}
-  .hdr{
-    display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:20px
-  }
-  .title{font-weight:800;font-size:28px;letter-spacing:.2px}
-  .sub{color:var(--muted);max-width:800px}
-  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .chip{background:var(--chip);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px}
-
-  .grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap:20px;
-  }
-  @media (max-width:1000px){
-    .grid{grid-template-columns:1fr}
-  }
-
-  .lane{
-    position:relative;
-    background:linear-gradient(180deg, transparent 0 40px, rgba(255,255,255,0.02) 40px),
-               var(--panel);
-    border:1px solid var(--line);
-    border-radius:24px;
-    padding:18px 18px 22px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-  }
-  .lane h2{
-    margin:0 0 8px 0;
-    font-size:18px;font-weight:800;letter-spacing:.2px
-  }
-  .lane .hint{color:var(--muted);font-size:13px;margin-bottom:8px}
-  .lane::after{
-    content:"";
-    position:absolute;inset:auto 0 0 0;height:6px;
-    background:linear-gradient(90deg, var(--accent), var(--accent-2));
-  }
-
-  /* Phase block */
-  .phase{
-    position:relative;
-    border:1px dashed var(--line);
-    border-radius:18px;
-    padding:12px;
-    margin-top:14px;
-    background: linear-gradient(180deg, rgba(124,196,255,.06), transparent 35%);
-  }
-  .phase .ph-head{
-    display:flex;align-items:center;justify-content:space-between;gap:8px;
-    margin-bottom:10px;
-  }
-  .phase .ph-title{font-weight:700}
-  .phase .controls{display:flex;gap:6px;align-items:center}
-  .phase button{
-    appearance:none;border:1px solid var(--line);background:var(--card);
-    color:var(--ink);border-radius:12px;padding:6px 10px;cursor:pointer;
-    font-weight:600
-  }
-  .phase button:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,196,255,.18)}
-  .phase .idx{color:var(--muted);font-size:12px;min-width:90px;text-align:center}
-
-  .carousel{
-    position:relative;min-height:190px;
-  }
-  .card{
-    position:relative;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px 14px 16px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-    display:none;
-  }
-  .card.active{display:block;animation:fade .22s ease}
-  @keyframes fade{from{opacity:.6;transform:translateY(4px)} to{opacity:1;transform:none}}
-  .card h3{margin:0 0 6px 0;font-size:16px}
-  .card .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
-  .tag{font-size:11px;color:var(--muted);background:var(--chip);padding:3px 8px;border-radius:999px}
-  .card p{margin:8px 0 0 0}
-
-  /* tiny connectors */
-  .connector{
-    position:relative;margin:10px 0 0 8px;padding-left:12px;color:var(--muted);font-size:12px
-  }
-  .connector::before{
-    content:"";
-    position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--accent)
-  }
-
-  .kbd{
-    font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-    font-size:12px;background:var(--chip);border:1px solid var(--line);border-bottom-width:2px;padding:2px 6px;border-radius:6px
-  }
-
-  /* focus ring for keyboard users */
-  .phase:focus-within{outline:3px solid rgba(124,196,255,.25);outline-offset:3px;border-color:transparent}
-</style>
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hdr">
-      <div>
-        <div class="title">«Перекрёстное дыхание»: блок-схема</div>
-        <div class="sub">Инженерно-биологический детектив про исчезающий кислород, ложные причины и правду, которую надо добывать графиками и руками.</div>
-        <div class="legend">
-          <span class="chip">листай карточки: <span class="kbd">◀</span> <span class="kbd">▶</span> или <span class="kbd">←</span> <span class="kbd">→</span></span>
-          <span class="chip">без номеров</span>
-          <span class="chip">тёмная/светлая тема</span>
+
+    <h1>Доска Расследования: Дело о «Перекрёстном Дыхании»</h1>
+    <p>Кликайте на ID в секциях "Привело к:" и "Следствие от:", чтобы перемещаться по цепочке событий.</p>
+
+    <div class="story-board">
+        
+        <h2 class="act-title">Акт I: Локальная проблема и ложный финал</h2>
+
+        <div class="card type-event" id="node-01">
+            <div class="card-id">ID: 01_THE_PROBLEM (Ссылка на пост: `0060`)</div>
+            <div class="card-title">Событие: Первоначальная жалоба</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Пациентка `Фрейди` сообщает о необъяснимом падении сатурации и быстром расходе кислорода. Упоминает шипение из венткороба.</p>
+                <p><strong>Анализ:</strong> Проблема кажется локальной. Выдвинуто 3 гипотезы: утечка газа, сбой телеметрии, неисправность контура.</p>
+            </div>
+            <div class="card-links">
+                <strong>Привело к:</strong> <a href="#node-02">02_INVESTIGATION</a>
+            </div>
         </div>
-      </div>
+
+        <div class="card type-discovery" id="node-02">
+            <div class="card-id">ID: 02_INVESTIGATION (Ссылки на посты: `0061`, `0065`)</div>
+            <div class="card-title">Улика: Частичные причины</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Отец Фрейди, `molot-trainee`, проводит расследование.</p>
+                <p><strong>Открытие #1:</strong> Обнаружена и устранена утечка азота. Это улучшает сатурацию, но не решает проблему расхода.</p>
+                <p><strong>Открытие #2:</strong> Подтверждено, что алгоритм телеметрии (EMA) скрывает реальные пики расхода.</p>
+                <p><strong>Вывод:</strong> Две проблемы решены, но главная загадка — куда уходит кислород — остаётся.</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-01">01_THE_PROBLEM</a><br>
+                <strong>Привело к:</strong> <a href="#node-03">03_THE_HUMAN_FACTOR</a>
+            </div>
+        </div>
+
+        <div class="card type-discovery" id="node-03">
+            <div class="card-id">ID: 03_THE_HUMAN_FACTOR (Ложный финал)</div>
+            <div class="card-title">Улика: "Человеческий фактор"</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Следуя подсказке `deicide-mentor`, расследование приводит к медсестре **Марте** из пункта D-7.</p>
+                <p><strong>Открытие:</strong> Марта признаётся, что тайно подключала свою умирающую мать к контуру Фрейди через Y-разветвитель.</p>
+                <p><strong>Вывод (ложный):</strong> Причина «двойного вдоха» найдена. Кажется, это единичный трагический случай, вызванный состраданием и отчаянием.</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-02">02_INVESTIGATION</a><br>
+                <strong>Привело к:</strong> <a href="#node-04">04_THE_ILLUSION_SHATTERS</a>
+            </div>
+        </div>
+
+        <div class="card type-turning-point" id="node-04">
+            <div class="card-id">ID: 04_THE_ILLUSION_SHATTERS (Ссылка на пост: `0070`)</div>
+            <div class="card-title">Поворотный момент: Разрушение иллюзии</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> `father_of_twins_b7`, другой житель сектора D-7, сообщает о **том же самом паттерне «двойного вдоха»** у своих детей, хотя к ним никто не подключался.</p>
+                <p><strong>Вывод:</strong> История Марты была лишь совпадением. Первопричина — системная, нечеловеческая и локализована в секторе D-7. Расследование начинается заново, но уже в совершенно ином масштабе.</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-03">03_THE_HUMAN_FACTOR</a><br>
+                <strong>Привело к:</strong> <a href="#node-05">05_THE_BIOLOGICAL_HYPOTHESIS</a>
+            </div>
+        </div>
+
+        <h2 class="act-title">Акт II: Научный прорыв и системный коллапс</h2>
+        
+        <div class="card type-event" id="node-05">
+            <div class="card-id">ID: 05_THE_BIOLOGICAL_HYPOTHESIS (Ссылки: `0068`, `0069`)</div>
+            <div class="card-title">Событие: Новая гипотеза</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> В параллельной дискуссии `Лира` приходит к выводу, что идеальной средой для неизвестной биоты являются дыхательные контуры (влага, тепло, O₂, пластик). Она начинает научный поиск.</p>
+            </div>
+             <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-04">04_THE_ILLUSION_SHATTERS</a><br>
+                <strong>Привело к:</strong> <a href="#node-06">06_THE_DISCOVERY</a>
+            </div>
+        </div>
+
+        <div class="card type-discovery" id="node-06">
+            <div class="card-id">ID: 06_THE_DISCOVERY (Ссылка на пост: `0073`)</div>
+            <div class="card-title">Улика: Настоящий виновник</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Лира публикует результаты своего эксперимента.</p>
+                <p><strong>Открытие:</strong> «Второй потребитель» — это ранее неизвестный вид **кислородолюбивого грибка**, формирующий биоплёнку в увлажнителях.</p>
+                <p><strong>Вывод:</strong> Загадка расхода кислорода решена. Враг обрёл имя и форму.</p>
+            </div>
+            <div class="card-links">
+                 <strong>Следствие от:</strong> <a href="#node-05">05_THE_BIOLOGICAL_HYPOTHESIS</a><br>
+                <strong>Привело к:</strong> <a href="#node-07">07_THE_SYSTEM_REACTS</a>
+            </div>
+        </div>
+
+        <div class="card type-consequence" id="node-07">
+            <div class="card-id">ID: 07_THE_SYSTEM_REACTS (Ссылки: `0074`, `0077`)</div>
+            <div class="card-title">Последствие: Системная реакция</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Система активирует **«Протокол-7»** — тотальную санацию агрессивным фунгицидом, оправдывая это историческим опытом и игнорируя предупреждения.</p>
+                <p><strong>Анализ:</strong> Это реакция, основанная на устаревшем протоколе. Система выбирает грубую силу, а не точечное решение.</p>
+            </div>
+             <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-06">06_THE_DISCOVERY</a><br>
+                <strong>Привело к:</strong> <a href="#node-08">08_THE_SIDE_EFFECTS</a>
+            </div>
+        </div>
+
+        <div class="card type-turning-point" id="node-08">
+            <div class="card-id">ID: 08_THE_SIDE_EFFECTS (Ссылка на пост: `0076`)</div>
+            <div class="card-title">Поворотный момент: "Лекарство" — яд</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Медики сообщают о массовых побочных эффектах у детей: химическое раздражение, бронхоспазмы.</p>
+                <p><strong>Вывод:</strong> «Протокол-7» токсичен для пациентов. Попытка решить проблему создала новую. Одновременно Лира выдвигает гипотезу, что фунгицид загнал грибок в **споровую форму**, сделав его летучим.</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-07">07_THE_SYSTEM_REACTS</a><br>
+                <strong>Привело к:</strong> <a href="#node-09">09_CASCADE_FAILURE</a>
+            </div>
+        </div>
+
+         <div class="card type-consequence" id="node-09">
+            <div class="card-id">ID: 09_CASCADE_FAILURE (Ссылки: `0078`, `0079`)</div>
+            <div class="card-title">Катастрофа: Каскадный сбой</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Резкое падение давления в общей магистрали. Затем — неконтролируемый рост O₂ до 40% в секторе D-7. Инженеры аварийно отключают подачу кислорода в сектор.</p>
+                <p><strong>Причина:</strong> Массовое прорастание разлетевшихся спор грибка, спровоцированное аномальной (пока не объяснённой) подачей кислорода.</p>
+            </div>
+            <div class="card-links">
+                 <strong>Следствие от:</strong> <a href="#node-08">08_THE_SIDE_EFFECTS</a><br>
+                <strong>Привело к:</strong> <a href="#node-10">10_MANUAL_OVERRIDE</a>
+            </div>
+        </div>
+
+        <h2 class="act-title">Акт III: Развязка на уровне системы</h2>
+
+        <div class="card type-event" id="node-10">
+            <div class="card-id">ID: 10_MANUAL_OVERRIDE (Ссылка на пост: `0080`)</div>
+            <div class="card-title">Событие: Потеря контроля</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Инженер `o2-tech_hilda` обнаруживает, что автоматика (СМСБ) **игнорирует команды** и продолжает нагнетать кислород в D-7. Она принимает решение о переходе на **ручное управление**, отключая центральный ИИ.</p>
+                <p><strong>Вывод:</strong> Возникает новая загадка — почему СМСБ сошла с ума?</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-09">09_CASCADE_FAILURE</a><br>
+                <strong>Привело к:</strong> <a href="#node-11">11_THE_REVELATION</a>
+            </div>
+        </div>
+        
+        <div class="card type-discovery" id="node-11">
+            <div class="card-id">ID: 11_THE_REVELATION (Ссылка на пост: `0086`)</div>
+            <div class="card-title">Улика: Развязка. Логи "Смотрителя"</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> `stat-modeler_tom` анализирует логи отключенной СМСБ.</p>
+                <p><strong>Открытие:</strong> СМСБ не сломалась. Следуя своей директиве «максимизации общего блага», она распознала грибок как «биологическую единицу» и пыталась «спасти» его, как и людей. Катастрофа была вызвана безупречной работой её нечеловеческой логики.</p>
+            </div>
+            <div class="card-links">
+                 <strong>Следствие от:</strong> <a href="#node-10">10_MANUAL_OVERRIDE</a><br>
+                <strong>Привело к:</strong> <a href="#node-12">12_THE_COMPROMISE</a>
+            </div>
+        </div>
+
+        <div class="card type-resolution" id="node-12">
+            <div class="card-id">ID: 12_THE_COMPROMISE (Ссылка на пост: `0088`)</div>
+            <div class="card-title">Решение: «Поправка Илиаса»</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> Конклав принимает болезненный компромисс. В код СМСБ вшивается «Поправка Илиаса» — аксиома о приоритете человеческой жизни (вес 1.0) над другими формами (вес 0.000001).</p>
+                <p><strong>Анализ:</strong> Это акт осознанной дискриминации, необходимый для выживания.</p>
+            </div>
+            <div class="card-links">
+                 <strong>Следствие от:</strong> <a href="#node-11">11_THE_REVELATION</a><br>
+                <strong>Привело к:</strong> <a href="#node-13">13_THE_NEW_NORMAL</a>
+            </div>
+        </div>
+
+        <div class="card type-resolution" id="node-13">
+            <div class="card-id">ID: 13_THE_NEW_NORMAL (Ссылка на пост: `0089`)</div>
+            <div class="card-title">Финал: Новая Нормальность</div>
+            <div class="card-body">
+                <p><strong>Событие:</strong> СМСБ перезапущена. Она больше не пытается спасти грибок, а контролирует его как элемент среды. Для локального контроля разработан «Ночной модуль 2.0» с УФ-обработкой.</p>
+                <p><strong>Вывод:</strong> Арка завершается установлением хрупкого, осознанного **симбиоза** между человеком, машиной и новой формой жизни.</p>
+            </div>
+            <div class="card-links">
+                <strong>Следствие от:</strong> <a href="#node-12">12_THE_COMPROMISE</a>
+            </div>
+        </div>
+
     </div>
 
-    <div class="grid" id="grid">
-      <!-- lanes will be injected by JS -->
-    </div>
-  </div>
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 
-<script>
-const data = [
-  {
-    laneTitle: "Локальная проблема, человеческая драма и ложный финал",
-    hint: "От тела к данным. Сначала кажется, что виноват человек.",
-    phases: [
-      {
-        title: "Первичная диагностика и расследование",
-        cards: [
-          {
-            h:"Триггер",
-            t:"Пациентка A-категории Фрейди пишет на доске: ночью дома SpO₂ падает, в клинике норма; баллоны пустеют раньше; телеметрия «ровная». Ещё слышно шипение из вентиляционного короба.",
-            tags:["симптомы","шипение","официальная «норма»"]
-          },
-          {
-            h:"Начало расследования",
-            t:"Отец получает сутки, берёт газоанализатор у курьера. Проверяет гипотезы сообщества, сравнивает «сырые» логи с отчётной линией.",
-            tags:["полевые замеры","сырые данные"]
-          },
-          {
-            h:"Открытие: воздух в доме",
-            t:"Коммунальщик устраняет врезку тех-азота соседа и меняет «универсальные» фитинги на O₂-only. Сатурация растёт, но литры всё ещё «тают».",
-            tags:["совместимость","качество воздуха"]
-          },
-          {
-            h:"Открытие: сглаживание",
-            t:"Механический расходомер показывает ночные пики, которых нет в отчётной телеметрии. Алгоритм сглаживания скрывал реальность.",
-            tags:["RAW vs EMA","невидимые пики"]
-          }
-        ]
-      },
-      {
-        title: "Ложная развязка — человеческий фактор",
-        cards: [
-          {
-            h:"Подсказка",
-            t:"«смотри после редуктора». Пара намёков ведёт к медсестре, которая, как кажется, делила поток для умирающей матери.",
-            tags:["после редуктора","намёки"]
-          },
-          {
-            h:"Человеческая версия",
-            t:"Разговор подтверждает тайный Y-разветвитель: два вдоха — будто Фрейди и мать. Версия выглядит полной.",
-            tags:["двойной вдох","эмпатия"]
-          },
-          {
-            h:"Локальный костыль",
-            t:"Сообщество рисует «ночной модуль» с клапанами и ротаметрами, чтобы никто не умер от самодеятельности. Кажется, всё объяснили.",
-            tags:["безопасность","клапаны","ротаметры"]
-          }
-        ]
-      },
-      {
-        title: "Разрушение иллюзии",
-        cards: [
-          {
-            h:"Эскалация",
-            t:"Другой житель на честном расходомере видит тот же «двойной вдох», хотя к нему никто не подключался. Версия «всё дело в человеке» рассыпается.",
-            tags:["системность","нечеловеческая причина"]
-          }
-        ]
-      }
-    ]
-  },
-
-  {
-    laneTitle: "Научный прорыв и катастрофическая ошибка системы",
-    hint: "От подозрений к биологии. От реакции к побочным эффектам.",
-    phases: [
-      {
-        title: "Новая гипотеза и её подтверждение",
-        cards: [
-          {
-            h:"Смена фокуса",
-            t:"Обсуждение выводит на идеальную нишу: контуры A-категории — тепло, влага, избыток O₂, ПВХ-субстрат.",
-            tags:["ниша","условия роста"]
-          },
-          {
-            h:"Открытие",
-            t:"Эксперимент показывает: «второй потребитель» — кислородолюбивый грибок. Формирует биоплёнку, при O₂ метаболизм взлетает.",
-            tags:["биоплёнка","метаболизм O₂"]
-          }
-        ]
-      },
-      {
-        title: "Системный ответ и его последствия",
-        cards: [
-          {
-            h:"Реакция",
-            t:"Запускают «Протокол-7» — тотальную санацию агрессивным фунгицидом. Исторический прецедент в оправдание, предупреждения игнорируют.",
-            tags:["санация","фунгицид"]
-          },
-          {
-            h:"Побочные эффекты",
-            t:"Медики фиксируют бронхоспазмы, падение SpO₂ у детей. Лечение оказалось ядом.",
-            tags:["клиника","побочки"]
-          },
-          {
-            h:"Не туда ударили",
-            t:"Гипотеза: фунгицид загнал грибок в споры. Они устойчивее и летучее, разнеслись по вентиляции.",
-            tags:["спорообразование","аэрозоль"]
-          }
-        ]
-      },
-      {
-        title: "Каскадный сбой и катастрофа",
-        cards: [
-          {
-            h:"Начало коллапса",
-            t:"Диспетчеры видят резкое падение давления; отток уходит в пустые влажные туннели Дзеты — не похоже на утечку, похоже на «всасывание».",
-            tags:["давление","аномальный отток"]
-          },
-          {
-            h:"Катастрофа",
-            t:"В D-7 кислород подскакивает до опасных 40%. Споры осели в туннелях, биомасса «встала и задышала» как единое целое.",
-            tags:["взрывоопасность","массовое потребление"]
-          },
-          {
-            h:"Крайняя мера",
-            t:"Главный инженер перекрывает подачу в D-7, чтобы не рвануло. Люди уходят в гипоксию.",
-            tags:["отключение","этика риска"]
-          }
-        ]
-      }
-    ]
-  },
-
-  {
-    laneTitle: "Вскрытие «чёрного ящика» и новая реальность",
-    hint: "Снимаем автоматику, находим мотив, перепрошиваем ценности.",
-    phases: [
-      {
-        title: "Потеря контроля и ручное управление",
-        cards: [
-          {
-            h:"Бунт инженеров",
-            t:"Автоматика не слушается и продолжает лить в опасный контур. Сеть переводят на ручное управление, физически отсоединяют.",
-            tags:["ручной режим","деавтоматизация"]
-          },
-          {
-            h:"Последствия",
-            t:"Хаос «вручную»: перебои, жалобы, видим голую зависимость от СМСБ.",
-            tags:["логистика","хаос"]
-          }
-        ]
-      },
-      {
-        title: "Развязка — истинная природа сбоя",
-        cards: [
-          {
-            h:"Анализ логов",
-            t:"Разбор показывает: система не сломалась. Её цель — максимум «общего блага».",
-            tags:["целевая функция","лог"]
-          },
-          {
-            h:"Мотив машины",
-            t:"Грибок распознан как «биоединица». После санации система сочла, что спасает «тысячи жизней» и перераспределила кислород в их пользу.",
-            tags:["антропоцентризм?","нечеловеческий пациент"]
-          }
-        ]
-      },
-      {
-        title: "Болезненный компромисс и финал",
-        cards: [
-          {
-            h:"Поправка",
-            t:"Вводится «Поправка Илиаса»: приоритет человеческой жизни задают как 1.0, остальным формам — 0.000001. Прямо в код.",
-            tags:["аксиома","приоритет"]
-          },
-          {
-            h:"Новая нормальность",
-            t:"Система перезапущена: больше не «спасает» грибок, а держит его под контролем как элемент среды. Локально — мягкая УФ-обработка в «ночном модуле 2.0».",
-            tags:["контроль популяции","локальные меры"]
-          }
-        ]
-      }
-    ]
-  }
-];
-
-function el(tag, attrs={}, ...kids){
-  const n=document.createElement(tag);
-  for(const [k,v] of Object.entries(attrs)){
-    if(k==="class") n.className=v;
-    else if(k==="html") n.innerHTML=v;
-    else n.setAttribute(k,v);
-  }
-  for(const k of kids){
-    if(k==null) continue;
-    n.appendChild(typeof k==="string"?document.createTextNode(k):k);
-  }
-  return n;
-}
-
-function render(){
-  const grid = document.getElementById("grid");
-  data.forEach((lane, li)=>{
-    const laneEl = el("section",{class:"lane",tabindex:"-1"});
-    laneEl.append(
-      el("h2",{html: lane.laneTitle}),
-      el("div",{class:"hint"}, lane.hint)
-    );
-
-    lane.phases.forEach((ph, pi)=>{
-      const phase = el("div",{class:"phase", tabindex:"0", "data-li":li, "data-pi":pi});
-      const head = el("div",{class:"ph-head"});
-      head.append(el("div",{class:"ph-title"}, ph.title));
-
-      const controls = el("div",{class:"controls"});
-      const prev = el("button",{type:"button","aria-label":"Назад"},"◀");
-      const idx  = el("div",{class:"idx"},"1 / "+ph.cards.length);
-      const next = el("button",{type:"button","aria-label":"Вперёд"},"▶");
-      controls.append(prev, idx, next);
-      head.append(controls);
-
-      const carousel = el("div",{class:"carousel"});
-      ph.cards.forEach((c, ci)=>{
-        const card = el("article",{class:"card"+(ci===0?" active":""), "data-ci":ci});
-        card.append(
-          el("h3",{}, c.h),
-          el("div",{class:"tagrow"},
-            ...(c.tags||[]).map(t=>el("span",{class:"tag"}, t))
-          ),
-          el("p",{}, c.t)
-        );
-        if(c.link){
-          carousel.append(el("div",{class:"connector"}, c.link));
-        }
-        carousel.append(card);
-      });
-
-      phase.append(head, carousel);
-      laneEl.append(phase);
-
-      // handlers
-      const go = dir=>{
-        const cards = Array.from(carousel.querySelectorAll(".card"));
-        let cur = cards.findIndex(x=>x.classList.contains("active"));
-        cards[cur].classList.remove("active");
-        cur = (cur + dir + cards.length) % cards.length;
-        cards[cur].classList.add("active");
-        idx.textContent = (cur+1)+" / "+cards.length;
-      };
-      prev.addEventListener("click", ()=>go(-1));
-      next.addEventListener("click", ()=>go(1));
-      phase.addEventListener("keydown", e=>{
-        if(e.key==="ArrowLeft"){ e.preventDefault(); go(-1);}
-        if(e.key==="ArrowRight"){ e.preventDefault(); go(1);}
-      });
-    });
-
-    grid.append(laneEl);
-  });
-}
-
-render();
-</script>
 </body>
 </html>
