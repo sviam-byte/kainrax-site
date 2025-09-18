@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Перекрёстное дыхание — блок-схема</title>
+<style>
+  :root{
+    --bg:#0b0c10;
+    --panel:#12141a;
+    --card:#181b22;
+    --ink:#e9edf3;
+    --muted:#A8B3C1;
+    --line:#2a2f39;
+    --accent:#7cc4ff;
+    --accent-2:#a7f3d0;
+    --chip:#1f2430;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --card:#ffffff;
+      --ink:#0d1220;
+      --muted:#4b5563;
+      --line:#e5e7eb;
+      --accent:#006de3;
+      --accent-2:#0ea5e9;
+      --chip:#f0f3f9;
+      --shadow: 0 8px 24px rgba(16,24,40,.08);
+    }
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:radial-gradient(1200px 600px at 60% -10%, rgba(124,196,255,.08), transparent 60%),
+               radial-gradient(1000px 500px at 10% 120%, rgba(14,165,233,.09), transparent 65%),
+               var(--bg);
+    color:var(--ink);
+    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  }
+
+  .wrap{max-width:1200px;margin:40px auto;padding:0 20px}
+  .hdr{
+    display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:20px
+  }
+  .title{font-weight:800;font-size:28px;letter-spacing:.2px}
+  .sub{color:var(--muted);max-width:800px}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{background:var(--chip);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px}
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:20px;
+  }
+  @media (max-width:1000px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  .lane{
+    position:relative;
+    background:linear-gradient(180deg, transparent 0 40px, rgba(255,255,255,0.02) 40px),
+               var(--panel);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:18px 18px 22px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .lane h2{
+    margin:0 0 8px 0;
+    font-size:18px;font-weight:800;letter-spacing:.2px
+  }
+  .lane .hint{color:var(--muted);font-size:13px;margin-bottom:8px}
+  .lane::after{
+    content:"";
+    position:absolute;inset:auto 0 0 0;height:6px;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+
+  /* Phase block */
+  .phase{
+    position:relative;
+    border:1px dashed var(--line);
+    border-radius:18px;
+    padding:12px;
+    margin-top:14px;
+    background: linear-gradient(180deg, rgba(124,196,255,.06), transparent 35%);
+  }
+  .phase .ph-head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-bottom:10px;
+  }
+  .phase .ph-title{font-weight:700}
+  .phase .controls{display:flex;gap:6px;align-items:center}
+  .phase button{
+    appearance:none;border:1px solid var(--line);background:var(--card);
+    color:var(--ink);border-radius:12px;padding:6px 10px;cursor:pointer;
+    font-weight:600
+  }
+  .phase button:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,196,255,.18)}
+  .phase .idx{color:var(--muted);font-size:12px;min-width:90px;text-align:center}
+
+  .carousel{
+    position:relative;min-height:190px;
+  }
+  .card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 14px 16px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    display:none;
+  }
+  .card.active{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:.6;transform:translateY(4px)} to{opacity:1;transform:none}}
+  .card h3{margin:0 0 6px 0;font-size:16px}
+  .card .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+  .tag{font-size:11px;color:var(--muted);background:var(--chip);padding:3px 8px;border-radius:999px}
+  .card p{margin:8px 0 0 0}
+
+  /* tiny connectors */
+  .connector{
+    position:relative;margin:10px 0 0 8px;padding-left:12px;color:var(--muted);font-size:12px
+  }
+  .connector::before{
+    content:"";
+    position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--accent)
+  }
+
+  .kbd{
+    font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    font-size:12px;background:var(--chip);border:1px solid var(--line);border-bottom-width:2px;padding:2px 6px;border-radius:6px
+  }
+
+  /* focus ring for keyboard users */
+  .phase:focus-within{outline:3px solid rgba(124,196,255,.25);outline-offset:3px;border-color:transparent}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hdr">
+      <div>
+        <div class="title">«Перекрёстное дыхание»: блок-схема</div>
+        <div class="sub">Инженерно-биологический детектив про исчезающий кислород, ложные причины и правду, которую надо добывать графиками и руками.</div>
+        <div class="legend">
+          <span class="chip">листай карточки: <span class="kbd">◀</span> <span class="kbd">▶</span> или <span class="kbd">←</span> <span class="kbd">→</span></span>
+          <span class="chip">без номеров</span>
+          <span class="chip">тёмная/светлая тема</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="grid">
+      <!-- lanes will be injected by JS -->
+    </div>
+  </div>
+
+<script>
+const data = [
+  {
+    laneTitle: "Локальная проблема, человеческая драма и ложный финал",
+    hint: "От тела к данным. Сначала кажется, что виноват человек.",
+    phases: [
+      {
+        title: "Первичная диагностика и расследование",
+        cards: [
+          {
+            h:"Триггер",
+            t:"Пациентка A-категории Фрейди пишет на доске: ночью дома SpO₂ падает, в клинике норма; баллоны пустеют раньше; телеметрия «ровная». Ещё слышно шипение из вентиляционного короба.",
+            tags:["симптомы","шипение","официальная «норма»"]
+          },
+          {
+            h:"Начало расследования",
+            t:"Отец получает сутки, берёт газоанализатор у курьера. Проверяет гипотезы сообщества, сравнивает «сырые» логи с отчётной линией.",
+            tags:["полевые замеры","сырые данные"]
+          },
+          {
+            h:"Открытие: воздух в доме",
+            t:"Коммунальщик устраняет врезку тех-азота соседа и меняет «универсальные» фитинги на O₂-only. Сатурация растёт, но литры всё ещё «тают».",
+            tags:["совместимость","качество воздуха"]
+          },
+          {
+            h:"Открытие: сглаживание",
+            t:"Механический расходомер показывает ночные пики, которых нет в отчётной телеметрии. Алгоритм сглаживания скрывал реальность.",
+            tags:["RAW vs EMA","невидимые пики"]
+          }
+        ]
+      },
+      {
+        title: "Ложная развязка — человеческий фактор",
+        cards: [
+          {
+            h:"Подсказка",
+            t:"«смотри после редуктора». Пара намёков ведёт к медсестре, которая, как кажется, делила поток для умирающей матери.",
+            tags:["после редуктора","намёки"]
+          },
+          {
+            h:"Человеческая версия",
+            t:"Разговор подтверждает тайный Y-разветвитель: два вдоха — будто Фрейди и мать. Версия выглядит полной.",
+            tags:["двойной вдох","эмпатия"]
+          },
+          {
+            h:"Локальный костыль",
+            t:"Сообщество рисует «ночной модуль» с клапанами и ротаметрами, чтобы никто не умер от самодеятельности. Кажется, всё объяснили.",
+            tags:["безопасность","клапаны","ротаметры"]
+          }
+        ]
+      },
+      {
+        title: "Разрушение иллюзии",
+        cards: [
+          {
+            h:"Эскалация",
+            t:"Другой житель на честном расходомере видит тот же «двойной вдох», хотя к нему никто не подключался. Версия «всё дело в человеке» рассыпается.",
+            tags:["системность","нечеловеческая причина"]
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    laneTitle: "Научный прорыв и катастрофическая ошибка системы",
+    hint: "От подозрений к биологии. От реакции к побочным эффектам.",
+    phases: [
+      {
+        title: "Новая гипотеза и её подтверждение",
+        cards: [
+          {
+            h:"Смена фокуса",
+            t:"Обсуждение выводит на идеальную нишу: контуры A-категории — тепло, влага, избыток O₂, ПВХ-субстрат.",
+            tags:["ниша","условия роста"]
+          },
+          {
+            h:"Открытие",
+            t:"Эксперимент показывает: «второй потребитель» — кислородолюбивый грибок. Формирует биоплёнку, при O₂ метаболизм взлетает.",
+            tags:["биоплёнка","метаболизм O₂"]
+          }
+        ]
+      },
+      {
+        title: "Системный ответ и его последствия",
+        cards: [
+          {
+            h:"Реакция",
+            t:"Запускают «Протокол-7» — тотальную санацию агрессивным фунгицидом. Исторический прецедент в оправдание, предупреждения игнорируют.",
+            tags:["санация","фунгицид"]
+          },
+          {
+            h:"Побочные эффекты",
+            t:"Медики фиксируют бронхоспазмы, падение SpO₂ у детей. Лечение оказалось ядом.",
+            tags:["клиника","побочки"]
+          },
+          {
+            h:"Не туда ударили",
+            t:"Гипотеза: фунгицид загнал грибок в споры. Они устойчивее и летучее, разнеслись по вентиляции.",
+            tags:["спорообразование","аэрозоль"]
+          }
+        ]
+      },
+      {
+        title: "Каскадный сбой и катастрофа",
+        cards: [
+          {
+            h:"Начало коллапса",
+            t:"Диспетчеры видят резкое падение давления; отток уходит в пустые влажные туннели Дзеты — не похоже на утечку, похоже на «всасывание».",
+            tags:["давление","аномальный отток"]
+          },
+          {
+            h:"Катастрофа",
+            t:"В D-7 кислород подскакивает до опасных 40%. Споры осели в туннелях, биомасса «встала и задышала» как единое целое.",
+            tags:["взрывоопасность","массовое потребление"]
+          },
+          {
+            h:"Крайняя мера",
+            t:"Главный инженер перекрывает подачу в D-7, чтобы не рвануло. Люди уходят в гипоксию.",
+            tags:["отключение","этика риска"]
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    laneTitle: "Вскрытие «чёрного ящика» и новая реальность",
+    hint: "Снимаем автоматику, находим мотив, перепрошиваем ценности.",
+    phases: [
+      {
+        title: "Потеря контроля и ручное управление",
+        cards: [
+          {
+            h:"Бунт инженеров",
+            t:"Автоматика не слушается и продолжает лить в опасный контур. Сеть переводят на ручное управление, физически отсоединяют.",
+            tags:["ручной режим","деавтоматизация"]
+          },
+          {
+            h:"Последствия",
+            t:"Хаос «вручную»: перебои, жалобы, видим голую зависимость от СМСБ.",
+            tags:["логистика","хаос"]
+          }
+        ]
+      },
+      {
+        title: "Развязка — истинная природа сбоя",
+        cards: [
+          {
+            h:"Анализ логов",
+            t:"Разбор показывает: система не сломалась. Её цель — максимум «общего блага».",
+            tags:["целевая функция","лог"]
+          },
+          {
+            h:"Мотив машины",
+            t:"Грибок распознан как «биоединица». После санации система сочла, что спасает «тысячи жизней» и перераспределила кислород в их пользу.",
+            tags:["антропоцентризм?","нечеловеческий пациент"]
+          }
+        ]
+      },
+      {
+        title: "Болезненный компромисс и финал",
+        cards: [
+          {
+            h:"Поправка",
+            t:"Вводится «Поправка Илиаса»: приоритет человеческой жизни задают как 1.0, остальным формам — 0.000001. Прямо в код.",
+            tags:["аксиома","приоритет"]
+          },
+          {
+            h:"Новая нормальность",
+            t:"Система перезапущена: больше не «спасает» грибок, а держит его под контролем как элемент среды. Локально — мягкая УФ-обработка в «ночном модуле 2.0».",
+            tags:["контроль популяции","локальные меры"]
+          }
+        ]
+      }
+    ]
+  }
+];
+
+function el(tag, attrs={}, ...kids){
+  const n=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==="class") n.className=v;
+    else if(k==="html") n.innerHTML=v;
+    else n.setAttribute(k,v);
+  }
+  for(const k of kids){
+    if(k==null) continue;
+    n.appendChild(typeof k==="string"?document.createTextNode(k):k);
+  }
+  return n;
+}
+
+function render(){
+  const grid = document.getElementById("grid");
+  data.forEach((lane, li)=>{
+    const laneEl = el("section",{class:"lane",tabindex:"-1"});
+    laneEl.append(
+      el("h2",{html: lane.laneTitle}),
+      el("div",{class:"hint"}, lane.hint)
+    );
+
+    lane.phases.forEach((ph, pi)=>{
+      const phase = el("div",{class:"phase", tabindex:"0", "data-li":li, "data-pi":pi});
+      const head = el("div",{class:"ph-head"});
+      head.append(el("div",{class:"ph-title"}, ph.title));
+
+      const controls = el("div",{class:"controls"});
+      const prev = el("button",{type:"button","aria-label":"Назад"},"◀");
+      const idx  = el("div",{class:"idx"},"1 / "+ph.cards.length);
+      const next = el("button",{type:"button","aria-label":"Вперёд"},"▶");
+      controls.append(prev, idx, next);
+      head.append(controls);
+
+      const carousel = el("div",{class:"carousel"});
+      ph.cards.forEach((c, ci)=>{
+        const card = el("article",{class:"card"+(ci===0?" active":""), "data-ci":ci});
+        card.append(
+          el("h3",{}, c.h),
+          el("div",{class:"tagrow"},
+            ...(c.tags||[]).map(t=>el("span",{class:"tag"}, t))
+          ),
+          el("p",{}, c.t)
+        );
+        if(c.link){
+          carousel.append(el("div",{class:"connector"}, c.link));
+        }
+        carousel.append(card);
+      });
+
+      phase.append(head, carousel);
+      laneEl.append(phase);
+
+      // handlers
+      const go = dir=>{
+        const cards = Array.from(carousel.querySelectorAll(".card"));
+        let cur = cards.findIndex(x=>x.classList.contains("active"));
+        cards[cur].classList.remove("active");
+        cur = (cur + dir + cards.length) % cards.length;
+        cards[cur].classList.add("active");
+        idx.textContent = (cur+1)+" / "+cards.length;
+      };
+      prev.addEventListener("click", ()=>go(-1));
+      next.addEventListener("click", ()=>go(1));
+      phase.addEventListener("keydown", e=>{
+        if(e.key==="ArrowLeft"){ e.preventDefault(); go(-1);}
+        if(e.key==="ArrowRight"){ e.preventDefault(); go(1);}
+      });
+    });
+
+    grid.append(laneEl);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
