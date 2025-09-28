@@ -7,7 +7,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  # Настройки медиапрокси (заполни в UI или здесь локально)
+  # Настройки медиапрокси 
   # MEDIA_HUB_BASE       = "https://hub.example.com/media"
   # MEDIA_ASSETS_BASE    = "https://assets.example.com"
   # MEDIA_DOMAIN_WHITELIST = "hub.example.com,assets.example.com,cdn.example.org"
