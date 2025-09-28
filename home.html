@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Переключение фона: добавь к <body> класс bg-terminal | bg-window | bg-schematic
+       или используй ?bg=terminal|window|schematic. Клавиша B — циклирует. */
 
     :root{
       --bg:#0b0d10; --fg:#e8ebee; --muted:#a3adb5;
@@ -199,7 +201,7 @@
             <div class="foot-desc">Здесь: анонсы и прогресс, планы релизов, опросы, бета‑материалы, заметки из «лаборатории» мира без спойлеров в ленте.</div>
           </div>
         </div>
-        <div class="foot-actions"><a id="tgLink" href="#" rel="noopener">ПОДПИСАТЬСЯ В TELEGRAM</a></div>
+        <div class="foot-actions"><a id="tgLink" href="https://t.me/kainrax" rel="noopener me">ПОДПИСАТЬСЯ В TELEGRAM</a></div>
       </div>
     </main>
   </div>
@@ -223,6 +225,7 @@
     // Небольшой глитч, редко
     const glitch=document.getElementById('glitch'); setInterval(()=>{glitch.classList.add('active'); setTimeout(()=>glitch.classList.remove('active'),600)},9000+Math.random()*6000);
 
+    // Внешние ссылки безопасно
     document.querySelectorAll('a[target="_blank"]').forEach(a=>{if(!a.rel.includes('noopener')) a.rel+=' noopener'});
 
     document.getElementById('tgLink').href = 'https://t.me/kainrax';
