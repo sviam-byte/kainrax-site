@@ -1,24 +1,33 @@
-# ── Сборка ───────────────────────────────────────────────────────
+# ── СБОРКА ───────────────────────────────────────────────────────
 [build]
-  # Индекс собирается функцией, так что build-index можно выкинуть.
+  # Твой генератор Пергамента
   command   = "node scripts/build-pergament.mjs"
   publish   = "."
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
-  # Настройки медиапрокси (заполни в UI или здесь локально)
-  # MEDIA_HUB_BASE       = "https://hub.example.com/media"
-  # MEDIA_ASSETS_BASE    = "https://assets.example.com"
-  # MEDIA_DOMAIN_WHITELIST = "hub.example.com,assets.example.com,cdn.example.org"
+  # Поставь эти штуки в UI, если нужно
+  # MEDIA_HUB_BASE            = "https://hub.example.com/media"
+  # MEDIA_ASSETS_BASE         = "https://assets.example.com"
+  # MEDIA_DOMAIN_WHITELIST    = "hub.example.com,assets.example.com,cdn.example.org"
 
-# ── Функции ──────────────────────────────────────────────────────
+# ── ФУНКЦИИ ──────────────────────────────────────────────────────
 [functions]
-  node_bundler   = "esbuild"
-  included_files = ["content/**"]
+  # esbuild нормальный, тянем внешний модуль deta
+  node_bundler           = "esbuild"
+  external_node_modules  = ["deta"]
+  included_files         = ["content/**"]  # твой контент доступен функциям
 
-# ── /o2log: отдельное статическое мини-приложение ───────────────
-# редиректим только голый /o2log → /o2log/
+# ── ГЛАВНАЯ: новый лендинг на /home.html ────────────────────────
+# Если хочешь, чтобы с корня открывался новый экран — редиректим
+[[redirects]]
+  from   = "/"
+  to     = "/home.html"
+  status = 200
+
+# ── /o2log: отдельное статическое мини-приложение ────────────────
+# /o2log → /o2log/
 [[redirects]]
   from   = "/o2log"
   to     = "/o2log/"
@@ -30,13 +39,13 @@
   to     = "/o2log/:splat"
   status = 200
 
-# ── Функции: безопасный алиас /api/* → /.netlify/functions/:splat ─
+# ── API: безопасный алиас /api/* → /.netlify/functions/:splat ───
 [[redirects]]
   from   = "/api/*"
   to     = "/.netlify/functions/:splat"
   status = 200
 
-# ── Статический контент ─────────────────────────────────────────
+# ── СТАТИКА /content/* ──────────────────────────────────────────
 [[redirects]]
   from   = "/content/*"
   to     = "/content/:splat"
@@ -48,9 +57,14 @@
   [headers.values]
     Cache-Control = "public, max-age=600"
 
-# Быстрый SPA: index.html не кэшируем, чтобы роутер и мета всегда свежие
+# Главные html без кэша, чтобы не залипала разметка/мета
 [[headers]]
   for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/home.html"
   [headers.values]
     Cache-Control = "no-store"
 
@@ -60,7 +74,9 @@
 #   [headers.values]
 #     Cache-Control = "public, max-age=31536000, immutable"
 
-# ── Общий SPA-фоллбек для основного сайта (последним!) ──────────
+# ── SPA-ФОЛЛБЭК (ПОСЛЕДНИМ!) ────────────────────────────────────
+# Если у тебя клиентская маршрутизация, незнакомые пути отправляем на index.
+# Важно: стоит ПОСЛЕ /api и /o2log, чтобы их не сломать.
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
