@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Добро пожаловать в симуляцию, которую бросили её создатели — Кайнракс</title>
+  <meta name="description" content="Кайнракс: подземная цивилизация под искусственным небом. Пергамент — священная книга, которую постоянно редактируют. Рассказы, форум, детская энциклопедия. Проект развивается; следите в Telegram." />
+  <meta name="theme-color" content="#0b0d10" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+
+    :root{
+      --bg:#0b0d10; --fg:#e8ebee; --muted:#a3adb5;
+      --blue:#8EC5FF; --saffron:#E4A843; --card:#10151b;
+      --glass: color-mix(in oklab, #111 70%, transparent);
+      --shadow: 0 30px 80px rgba(0,0,0,.45); --radius:16px;
+      --mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+      --sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans';
+    }
+    *{box-sizing:border-box}
+    html{height:100%}
+    body{margin:0; min-height:100%; color:var(--fg); background:var(--bg); font-family:var(--sans); line-height:1.5; letter-spacing:.2px}
+    a{color:#d7f3ff; text-decoration:none}
+    a:focus-visible{outline:2px solid var(--saffron); outline-offset:3px; border-radius:6px}
+
+    .screen{position:relative; min-height:100svh; display:grid; grid-template-rows:auto 1fr auto}
+
+    /* Фон */
+    .bg-layer{position:fixed; inset:0; z-index:-2; pointer-events:none}
+    .overlay-stripe{position:fixed; left:0; right:0; top:46%; height:2px; z-index:-1; background:linear-gradient(90deg, transparent, var(--blue), transparent); filter:drop-shadow(0 0 10px color-mix(in oklab, var(--blue) 50%, transparent)); opacity:.9}
+    .terminal-wrap{position:absolute; inset:0; display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; padding:6vh 6vw; opacity:.15}
+    .term-col{font-family:var(--mono); font-size:12px; color:#b7d4ff; white-space:pre; line-height:1.4; mask-image:linear-gradient(#0000,#000 10%,#000 90%,#0000)}
+    .scroll{animation:scroll 120s linear infinite}
+    .scroll:nth-child(2){animation-duration:140s}
+    .scroll:nth-child(3){animation-duration:160s}
+    @keyframes scroll{from{transform:translateY(0)} to{transform:translateY(-50%)} }
+    .window-wrap{position:absolute; inset:0; overflow:hidden; opacity:.22}
+    .city{position:absolute; inset:auto 0 0 0; height:58%; background:linear-gradient(180deg,transparent 0 70%, #0c1015 70%), linear-gradient(90deg,#0f141a 0 30%, #0e1318 30% 58%, #0d1116 58% 100%); clip-path:polygon(0% 100%,0% 45%,8% 40%,12% 48%,20% 44%,28% 60%,36% 50%,44% 58%,52% 52%,60% 62%,68% 56%,76% 66%,84% 60%,92% 72%,100% 68%,100% 100%); animation:city-breathe 18s ease-in-out infinite}
+    @keyframes city-breathe{50%{transform:translateY(1.2%)}}
+    .schematic{position:absolute; inset:0; opacity:.18}
+    .schematic svg{width:100%; height:100%}
+    .schematic path{stroke:#7aa6c9; stroke-width:.8; fill:none; stroke-dasharray:4 6; animation:dash 60s linear infinite}
+    @keyframes dash{to{stroke-dashoffset:-400}}
+    .glitch{position:fixed; inset:0; mix-blend-mode:screen; opacity:0; background:repeating-linear-gradient(0deg,#ffffff05 0 2px,#ffffff03 2px 4px); pointer-events:none}
+    .glitch.active{animation:glitch .6s steps(2,end)}
+    @keyframes glitch{0%,100%{opacity:0} 10%{opacity:.15; transform:translateY(-1px)} 20%{opacity:.08; transform:translateY(1px)} 40%{opacity:.12} 60%{opacity:.06} 80%{opacity:.1}}
+
+    /* Шапка */
+    header{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:20px 28px 10px; backdrop-filter:blur(6px)}
+    .sys{font-family:var(--mono); font-size:14px; color:#cfd7df}
+    .sys b{color:var(--blue)}
+    .badge{display:inline-block; margin-left:10px; padding:2px 8px; border:1px solid color-mix(in oklab, var(--fg) 10%, transparent); border-radius:999px; background:var(--glass); font-size:12px}
+    .switch{font-family:var(--mono); font-size:12px; color:var(--muted)}
+    .switch button{background:var(--glass); color:var(--fg); border:1px solid #263241; padding:6px 10px; border-radius:10px; margin-left:6px; cursor:pointer}
+    .switch button:hover{border-color:var(--blue)}
+
+    /* Контент: две колонки + CTA-полоса */
+    .main{display:grid; grid-template-columns:1.15fr 1.35fr; grid-template-rows:auto auto 1fr auto; gap:18px; padding:10px 28px 24px}
+
+    .title{grid-column:1/-1}
+    h1{margin:0 0 6px; font:700 clamp(20px,3.2vw,32px)/1.2 var(--mono)}
+    .subtitle{margin:0 0 2px; color:#cbd3d9}
+
+    .left-col{grid-column:1/2; display:grid; gap:12px; align-content:start}
+    .thesis{display:grid; grid-template-columns:24px 1fr; gap:12px; align-items:start; background:var(--glass); border:1px solid #1f2a35; border-radius:var(--radius); padding:12px}
+    .thesis h3{margin:0 6px 6px 0; font:600 14px var(--mono); color:var(--saffron)}
+    .thesis p{margin:0; color:#d3dde6; font-size:14px}
+    .icon{width:24px; height:24px; color:var(--blue)}
+
+    .hub{grid-column:2/3; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-content:start}
+    .tile{background:linear-gradient(180deg,#0f141a,#0c1116); border:1px solid #223244; border-radius:14px; padding:14px; box-shadow:var(--shadow)}
+    .tile .label{font:700 13px var(--mono); letter-spacing:.06em; color:#cfe9ff; margin-bottom:6px}
+    .tile p{margin:0 0 10px; color:#d3dde6}
+    .tile .btn{display:inline-block; padding:10px 14px; border-radius:10px; border:1px solid #2a3a4c; background:#0e141a; color:#dff3ff; font:700 12px var(--mono)}
+    .tile .btn:hover{border-color:var(--blue)}
+
+    .project{grid-column:1/-1; background:var(--glass); border:1px solid #1f2a35; border-radius:var(--radius); padding:12px}
+    .project b{color:var(--saffron)}
+
+    .footer-cta{grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; background:var(--glass); border:1px solid #1f2a35; border-radius:var(--radius); padding:12px}
+    .foot-left{display:flex; align-items:center; gap:12px}
+    .tg-icon{width:28px; height:28px}
+    .foot-title{font:700 13px var(--mono); color:#cfe9ff}
+    .foot-desc{font-size:14px; color:#cbd3d9}
+    .foot-actions a{display:inline-block; padding:10px 14px; border-radius:10px; border:1px solid #2a3a4c; background:#0e141a; color:#dff3ff; font:700 12px var(--mono)}
+
+    @media (max-width: 1000px){
+      .main{grid-template-columns:1fr; grid-template-rows:auto auto auto auto; gap:16px; padding:18px}
+      .hub{grid-template-columns:1fr}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .scroll, .schematic path, .city, .overlay-stripe{animation:none !important}
+    }
+  </style>
+</head>
+<body class="bg-terminal">
+  <!-- ФОН -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="terminal-wrap" id="terminal-bg">
+      <div class="term-col scroll" id="tcol1"></div>
+      <div class="term-col scroll" id="tcol2"></div>
+      <div class="term-col scroll" id="tcol3"></div>
+    </div>
+    <div class="window-wrap" id="window-bg" hidden><div class="city"></div></div>
+    <div class="schematic" id="schematic-bg" hidden>
+      <svg viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="grid" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#7aa6c9" stop-opacity="0.55"/><stop offset="100%" stop-color="#7aa6c9" stop-opacity="0.1"/></linearGradient></defs>
+        <g opacity="0.7">
+          <path d="M20,40 L980,40 M20,120 L980,120 M20,200 L980,200 M20,280 L980,280 M20,360 L980,360 M20,440 L980,440 M20,520 L980,520" stroke="url(#grid)"/>
+          <path d="M60,40 L60,560 M180,40 L180,560 M300,40 L300,560 M420,40 L420,560 M540,40 L540,560 M660,40 L660,560 M780,40 L780,560 M900,40 L900,560" stroke="url(#grid)"/>
+        </g>
+        <path d="M80,500 C200,300 400,360 520,280 S860,260 920,180"/>
+        <path d="M100,420 L240,340 L300,360 L420,300 L520,320 L700,260"/>
+        <path d="M220,520 L220,420 L340,380 L340,480 Z"/>
+      </svg>
+    </div>
+    <div class="overlay-stripe"></div>
+    <div class="glitch" id="glitch"></div>
+  </div>
+
+  <div class="screen">
+    <header>
+      <div class="sys" role="status" aria-live="polite">
+        <div><b>СИСТЕМНОЕ УВЕДОМЛЕНИЕ:</b> ВЫ НАХОДИТЕСЬ В СЕКТОРЕ «КАЙНАРКС» <span class="badge" id="geo">[локализация установлена]</span></div>
+        <div>ИНДЕКС УСТОЙЧИВОСТИ: <b id="stability">37%</b> <span class="badge">ПАДЕНИЕ</span> · СТАТУС: <b>ЧТЕНИЕ РАЗРЕШЕНО</b></div>
+      </div>
+      <div class="switch" aria-label="Переключатель фона">фон: <button data-bg="terminal">terminal</button><button data-bg="window">window</button><button data-bg="schematic">schematic</button></div>
+    </header>
+
+    <main class="main" id="main">
+      <div class="title">
+        <h1>Добро пожаловать в симуляцию, которую бросили её создатели.</h1>
+        <p class="subtitle">О людях, которые находят смысл жизни в мире, который распадается на части.</p>
+      </div>
+
+      <!-- ЛЕВАЯ КОЛОНКА: контекст -->
+      <section class="left-col" aria-label="Контекст мира">
+        <article class="thesis">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 .05-2l2.1-1.2-1.8-3.1-2.1 1.2a7.5 7.5 0 0 0-1.7-1l.2-2.4h-3.6l-.2 2.4c-.6.2-1.2.5-1.8.9L6.2 5.1 4.4 8.2l2.1 1.2a7.5 7.5 0 0 0-.05 2L4.4 12.6l1.8 3.1 2.1-1.2c.5.4 1.1.7 1.7 1l-.2 2.4h3.6l.2-2.4c.6-.2 1.2-.5 1.8-.9l2.4 1.4 1.8-3.1-2.1-1.2Zm-7.4 1.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg>
+          <div>
+            <h3>Что сломано?</h3>
+            <p>Всё. Законы физики трещат; вдохновение не чинит термодинамику.</p>
+          </div>
+        </article>
+        <article class="thesis">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 3h12a2 2 0 0 1 2 2v14l-4-3H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/></svg>
+          <div>
+            <h3>Что спасает?</h3>
+            <p>Протокол, инженерная этика, жёсткие регламенты. «Живая конституция», где у кислорода и воды есть право вето.</p>
+          </div>
+        </article>
+        <article class="thesis">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7-4.35-7-10a5 5 0 1 1 10 0 5 5 0 1 1 10 0c0 5.65-7 10-7 10s-3-1.87-6-4.7C9 19.13 12 21 12 21Z"/></svg>
+          <div>
+            <h3>О чём это?</h3>
+            <p>О подземной цивилизации под искусственным небом. О людях, которые держат форму смысла среди треска мира.</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- ЦЕНТР: Навигационный хаб без всплывашек -->
+      <section class="hub" aria-label="Навигация">
+        <article class="tile">
+          <div class="label">&gt; РАССКАЗЫ И СТАТЬИ · ОСНОВНОЙ САЙТ</div>
+          <p>Вход в мир через тексты. Многие истории снабжены допматериалами: карты, документы, аудио- и схема‑логи O₂.</p>
+          <a class="btn" href="https://kainrax.netlify.app/#/" target="_blank" rel="noopener" aria-label="Читать рассказы и статьи на основном сайте">ЧИТАТЬ НА САЙТЕ</a>
+        </article>
+        <article class="tile">
+          <div class="label">&gt; ЖИЗНЬ ГОРОДА · ФОРУМ</div>
+          <p>Голоса улиц и смен: споры о правилах, слухи, решения. Участвуй и вливайся.</p>
+          <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener" aria-label="Перейти на форум Кайнракс">ОТКРЫТЬ ФОРУМ</a>
+        </article>
+        <article class="tile">
+          <div class="label">&gt; ДЕТСКАЯ ЭНЦИКЛОПЕДИЯ · ЧТО СЧИТАЮТ БЕЗОПАСНЫМ</div>
+          <p>Официальная, «стерилизованная» версия мира. Через неё видно, о чём Система молчит.</p>
+          <a class="btn" href="https://kainrax.netlify.app/kids" target="_blank" rel="noopener" aria-label="Перейти в детскую энциклопедию">ОТКРЫТЬ KIDS</a>
+        </article>
+        <article class="tile">
+          <div class="label">&gt; ПЕРГАМЕНТ · ЖИВАЯ КНИГА</div>
+          <p>Не архив, а <b>священная книга, которую постоянно редактируют</b>: верифицируемый лог реальности и власти над версией.</p>
+          <a class="btn" href="https://kainrax.netlify.app/#/perg" target="_blank" rel="noopener" aria-label="Открыть Пергамент">ЧИТАТЬ ПЕРГАМЕНТ</a>
+        </article>
+      </section>
+
+      <!-- Полоса о проекте -->
+      <section class="project" aria-label="О проекте">
+        <p><b>Проект развивается</b>: регулярные обновления, грядёт роман. Жанры: рациональная фантастика и фантазия без дешёвой магии. Многие сюжетные линии снабжены документами сопровождения (например, схема‑логи O₂).</p>
+      </section>
+
+      <!-- Телеграм: чёткая ссылка и пояснение -->
+      <div class="footer-cta" aria-label="Канал связи">
+        <div class="foot-left">
+          <svg class="tg-icon" viewBox="0 0 240 240" aria-hidden="true"><path fill="#229ED9" d="M120 0a120 120 0 1 0 0 240a120 120 0 0 0 0-240Z"/><path fill="#fff" d="m53 119 108-41c5-2 9 1 7 8l-18 84c-1 6-5 8-10 5l-28-21-13 13c-1 1-3 2-5 2l2-29 53-48c2-2 0-2-3-1l-66 42-28-9c-6-2-6-6 1-8Z"/></svg>
+          <div>
+            <div class="foot-title">// КАНАЛ «КАЙНАРКС»</div>
+            <div class="foot-desc">Здесь: анонсы и прогресс, планы релизов, опросы, бета‑материалы, заметки из «лаборатории» мира без спойлеров в ленте.</div>
+          </div>
+        </div>
+        <div class="foot-actions"><a id="tgLink" href="#" rel="noopener">ПОДПИСАТЬСЯ В TELEGRAM</a></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Фон: переключение
+    const body=document.body,term=document.getElementById('terminal-bg'),winB=document.getElementById('window-bg'),sch=document.getElementById('schematic-bg');
+    const q=new URLSearchParams(location.search).get('bg')||(location.hash.startsWith('#bg=')?location.hash.replace('#bg=',''):null);const modes=['terminal','window','schematic'];
+    function applyBG(m){modes.forEach(x=>body.classList.toggle('bg-'+x,x===m)); term.hidden=m!=='terminal'; winB.hidden=m!=='window'; sch.hidden=m!=='schematic'}
+    applyBG(modes.includes(q)?q:'terminal');
+    document.querySelectorAll('[data-bg]').forEach(b=>b.addEventListener('click',()=>applyBG(b.dataset.bg)));
+    window.addEventListener('keydown',e=>{if((e.key==='b'||e.key==='B')&&!e.metaKey&&!e.ctrlKey){const i=modes.findIndex(x=>body.classList.contains('bg-'+x));applyBG(modes[(i+1)%modes.length])}});
+
+    // Терминальные логи
+    const lines=[], prefixes=['[O2]','[WTR]','[NAV]','[CORE]','[FEM]','[LEX]','[MEM]','[SIG]'], msgs=['checksum ok','delta applied','quota: warn','reroute planned','audit passed','cache cold','resync 1/3','vote: 3/5','telemetry linked','anomaly: benign','fallback ready','peer ping','crc match','sbom clean','knurl ok','tempo hold'];
+    function R(a){return a[Math.floor(Math.random()*a.length)]} function pad(n){return String(n).padStart(2,'0')}
+    for(let i=0;i<200;i++){const t=`${pad((i*7)%24)}:${pad((i*13)%60)}:${pad((i*29)%60)}`; lines.push(`${t} ${R(prefixes)} ${R(msgs)}; v${(Math.random()*1.7+1.1).toFixed(2)}`)}
+    function fill(el){el.textContent=lines.concat(lines).join('
+')} fill(document.getElementById('tcol1')); fill(document.getElementById('tcol2')); fill(document.getElementById('tcol3'));
+
+    // Небольшой глитч, редко
+    const glitch=document.getElementById('glitch'); setInterval(()=>{glitch.classList.add('active'); setTimeout(()=>glitch.classList.remove('active'),600)},9000+Math.random()*6000);
+
+    document.querySelectorAll('a[target="_blank"]').forEach(a=>{if(!a.rel.includes('noopener')) a.rel+=' noopener'});
+
+    document.getElementById('tgLink').href = 'https://t.me/kainrax';
+  </script>
+</body>
+</html>
