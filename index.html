@@ -933,16 +933,14 @@
       {href:'#/arcs',       title:'Ветки',          desc:'Сгруппированные подборки: Поверхность, Кайнракс, ИБУТ.'},
       {href:'#/articles',   title:'Статьи',         desc:'Мини-архив статей с формулами и иллюстрациями.'},
       {href:'#/perg',       title:'Пергамент',      desc:'Хроники мира. Несколько редакций, даты, заметки.'},
-      {href:'#/notes',      title:'Заметки',        desc:'Короткие рабочие записи, черновые мысли.'},
-      {href:'#/project',    title:'О проекте',      desc:'Что это, частота обновлений, куда смотреть дальше.'},
       {href:'/o2log/',      title:'Логи O₂',        desc:'Внутримировые журналы кислорода. Открывается как раздел.'},
       {href:'kids.html',    title:'Детская энциклопедия', desc:'Облегчённые объяснения для юных и взрослых.'},
-      {href:'https://chrishpoderi.netlify.app/', title:'Внутримировая доска', desc:'Сайд-проект с визуальными материалами.', ext:true},
+      {href:'https://chrishpoderi.netlify.app/', title:'Внутримировая доска', desc:'Внутримировой форум.', ext:true},
     ];
     app.innerHTML = `
       <section class="card">
         <h1>Меню</h1>
-        <p class="muted">То, что тебе нужно, за 2 касания. Нажми на пункт, чтобы открыть, или раскрой описание.</p>
+        <p class="muted">Развилка, куда идти.</p>
         <div class="menu-grid">
           ${items.map(it=>`
             <div class="menu-item">
@@ -957,7 +955,7 @@
           <div class="row">
             <a class="btn tg-link" href="https://t.me/kainrax" target="_blank" rel="noopener">Открыть @kainrax</a>
             <details open><summary class="muted">телеграм</summary><div class="muted" style="margin-top:6px">
-              На телефонах откроется приложение; если нет — упадёт в веб. Подпишись, чтобы новые тексты не терялись.
+              Подпишись, чтоб не потерять. Там -- анонсы, доп. материалы, авторские заметки.
             </div></details>
           </div>
         </div>
