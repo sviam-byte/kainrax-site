@@ -6,8 +6,6 @@
   <title>Кайнракс — рассказы и статьи</title>
   <meta name="description" content="Короткая НФ без лорового барьера. Обновления — пятница/суббота. Ветки: Поверхность, Кайнракс, ИБУТ." />
   <meta name="theme-color" content="#0b0f14" />
-
-  <!-- OG/Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Кайнракс — рассказы и статьи">
   <meta property="og:title" content="Кайнракс — рассказы и статьи">
@@ -18,15 +16,10 @@
   <meta name="twitter:title" content="Кайнракс — рассказы и статьи">
   <meta name="twitter:description" content="Короткая НФ без лорового барьера. Обновления — пт/сб.">
   <meta name="twitter:image" content="https://kainrax.site/og/kainrax-og.jpg">
-  
-  <!-- perf hints -->
+  <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="https://plausible.io">
-
-  <!-- Favicon -->
-  <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23FFD54A' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E">
-
   <style>
   :root{
     --bg:#0b0f14; --fg:#e6e6e6; --muted:#9aa5b1;
@@ -58,10 +51,8 @@
   .muted{color:var(--muted)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12px}
   .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);overflow:hidden}
-  .card::after{
-    content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.28;
-    background-image: radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%);
-  }
+  .card::after{content:""; position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.28;
+    background-image: radial-gradient(120px 120px at 12% -10%, rgba(125,211,252,.08), transparent 60%);}
 
   .btn,button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer;text-decoration:none;box-shadow:var(--shadow)}
   input[type="search"]{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
@@ -85,10 +76,8 @@
   .story-item{position:relative;padding:14px 14px 14px 16px;border-radius:12px;background:linear-gradient(180deg, rgba(125,211,252,.08), transparent);border:1px solid rgba(125,211,252,.18)}
   .story-item a{color:var(--fg);text-decoration:none}
   .title{font-weight:700}
-  .story-item::before{
-    content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
-    background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);
-  }
+  .story-item::before{content:""; position:absolute; left:-2px; top:-2px; height:8px; width:40%;
+    background:linear-gradient(12deg, var(--kainrax), transparent 60%); border-top-left-radius:12px; transform:skewX(-12deg);}
   .story-item[data-arc="surface"]::before{ background:linear-gradient(12deg, var(--surface), transparent 60%) }
   .story-item[data-arc="kainrax"]::before{ background:linear-gradient(12deg, var(--kainrax), transparent 60%) }
   .story-item[data-arc="ibut"]::before{    background:linear-gradient(12deg, var(--ibut),    transparent 60%) }
@@ -108,60 +97,18 @@
   details.anno-dtl summary{cursor:pointer;user-select:none}
 
   #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
-  #ceiling,#mountains{display:none}
-  [data-theme="cringe"] #ceiling,[data-theme="cringe"] #mountains{display:block}
-  #ceiling{position:fixed;left:0;right:0;top:0;height:18vh;z-index:0;pointer-events:none;opacity:.95}
-  #ceiling svg{width:100%;height:100%;display:block;transform:scaleY(-1)}
-  #ceiling path{fill:var(--mountain)}
-  #mountains{position:fixed;left:0;right:0;bottom:0;height:28vh;z-index:0;pointer-events:none;opacity:.92}
-  #mountains svg{width:100%;height:100%;display:block}
-  #mountains path{fill:var(--mountain)}
-
   #sky-line { position: fixed; left: 0; right: 0; height: 3px; z-index: 0; pointer-events: none; opacity: .7; filter: blur(1px);
     background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #ffab00) 0%, transparent 50%); }
-  [data-theme="light"] #sky-line { background: radial-gradient(ellipse 80% 150% at 50% 50%, var(--accent, #0ea5e9) 0%, transparent 40%); opacity: .6; }
-  [data-theme="cringe"] #sky-line { height: 4px; background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
-    background-size: 200% 200%; animation: cringe-line-anim 3s linear infinite; filter: blur(2px); opacity: .8; }
-  @keyframes cringe-line-anim { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
 
   .readbox{background:rgba(20,26,38,.98); border:1px solid #2a3a52; border-radius:18px; padding:16px; box-shadow: var(--shadow)}
   [data-theme="light"] .readbox{background:#fff; border-color:#e6ecf2}
   [data-theme="cringe"] .readbox{background:#fff; color:#1a1a1a; border-color:#e9e1d6}
-
-  .parchment{
-    position:relative;
-    background: radial-gradient(120% 120% at 50% 0%, rgba(255,245,230,.35), transparent 60%), linear-gradient(#f6efe1, #efe6d3);
-    color:#2b2418; border:1px solid #e4d7bd; box-shadow: 0 10px 30px rgba(0,0,0,.18); background-blend-mode:multiply;
-  }
-  .parchment::before{
-    content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; mix-blend-mode:multiply; opacity:.55;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0.1'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0 .03 .06 .03 0 0 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' fill='rgba(0,0,0,1)'/></svg>");
-  }
 
   .with-margin{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px}
   @media (max-width:980px){ .with-margin{grid-template-columns:1fr} }
   .margin-notes{position:sticky;top:76px;align-self:start}
   .margin-notes .mnote{font-size:13px; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; margin-bottom:12px}
   .mnote .linklike{cursor:pointer; text-decoration:underline}
-
-  /* ===== Панель выбора года ===== */
-  .yearbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
-  .pill.year{cursor:pointer;position:relative;user-select:none}
-  .pill.year .badge{ position:absolute; right:-6px; top:-6px; font-size:11px; line-height:1; padding:2px 6px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--muted) }
-  .pill[data-active="true"]{ color:var(--fg); border-color:var(--accent); box-shadow:0 0 0 1px rgba(125,211,252,.35) inset, var(--shadow) }
-
-  /* ===== MathJax: устойчивость ===== */
-  html, body { max-width: 100%; overflow-x: hidden; }
-  .prose .mjx-container{
-    display:block; max-inline-size:100%; box-sizing:border-box;
-    overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; margin:12px 0;
-  }
-  .prose .mjx-container mjx-mtext,
-  .prose .mjx-container mjx-mi,
-  .prose .mjx-container mjx-mn{ white-space:normal !important; word-break:break-word; overflow-wrap:anywhere; }
-  .kx-math-fit{ width:100%; overflow:hidden; position:relative; }
-  .kx-math-fit > .mjx-container{ will-change:transform; transform-origin:left top; }
-  .with-margin > * { min-width: 0; }
 
   /* ===== Мобилка: только логотип + кнопка меню ===== */
   .menu-btn{display:none}
@@ -170,34 +117,31 @@
     .brand{margin:0 auto}
     .menu-btn{
       display:inline-flex;
-      position:absolute; left:12px; top:8px;
-      z-index:1000;
-      padding:8px 10px; line-height:1;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      position:absolute; left:12px; top:8px; z-index:1000;
+      padding:8px 10px; line-height:1; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
   }
 
   /* Drawer + scrim */
-  #scrim{
-    position:fixed; inset:0; background:rgba(0,0,0,.45);
-    opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7;
-  }
-  .drawer{
-    position:fixed; inset:0 auto 0 0; width:min(86vw,360px);
+  #scrim{ position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:7; }
+  .drawer{ position:fixed; inset:0 auto 0 0; width:min(86vw,360px);
     transform:translateX(-102%); transition:transform .22s ease;
     background:var(--card); border-right:1px solid var(--line); z-index:8;
     display:flex; flex-direction:column; gap:12px; padding:14px;
-    overflow:auto; -webkit-overflow-scrolling:touch;
-  }
+    overflow:auto; -webkit-overflow-scrolling:touch;}
   .drawer .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
   .drawer h3{margin:4px 0 6px}
   .drawer a.btn, .drawer button.btn{width:auto}
   .drawer .muted{font-size:13px}
-
   body.drawer-open #scrim{opacity:1; pointer-events:auto}
   body.drawer-open .drawer{transform:none}
   body.drawer-open{ overflow:hidden }
+
+  /* ===== Страница меню для мобилки ===== */
+  .menu-grid{display:grid; gap:12px}
+  .menu-item{border:1px solid var(--line); border-radius:12px; padding:12px; background:var(--card)}
+  .menu-item .row{display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .menu-item details{margin-top:8px}
   </style>
 </head>
 
@@ -206,21 +150,15 @@
 
   <div id="sky-line" aria-hidden="true"></div>
   <canvas id="stars" aria-hidden="true"></canvas>
-  <div id="ceiling" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L8,18 L18,22 L28,15 L38,20 L48,12 L58,19 L68,13 L78,22 L88,16 L100,23 L100,30 L0,30 Z"/></svg></div>
-  <div id="mountains" aria-hidden="true"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0,25 L10,18 L20,22 L30,14 L40,20 L50,10 L60,19 L70,13 L80,22 L90,16 L100,23 L100,30 L0,30 Z"/></svg></div>
   <div class="progress" id="progress"></div>
 
   <header>
     <div class="head">
-      <button id="menuBtn"
-              class="btn menu-btn"
-              aria-label="Меню"
-              aria-controls="mobileNav"
-              aria-expanded="false">☰</button>
-
-      <div class="brand"><a href="#/">Кайнракс ✶</a></div>
+      <button id="menuBtn" class="btn menu-btn" aria-label="Меню" aria-controls="mobileNav" aria-expanded="false">☰</button>
+      <div class="brand"><a id="brandLink" href="#/">Кайнракс ✶</a></div>
 
       <div class="search" style="max-width:860px">
+        <a class="btn" href="#/">На главную</a>
         <span class="pill" title="Новые тексты чаще всего выходят в эти дни">Обновления: пт/сб</span>
         <input id="q" type="search" placeholder="Поиск по рассказам и статьям…" aria-label="Поиск" />
         <a class="btn" href="#/arcs">Ветки</a>
@@ -229,8 +167,8 @@
         <a class="btn" href="#/notes">Заметки</a>
         <a class="btn" href="#/project">О проекте | планы</a>
         <a class="btn" href="/o2log/">Логи O₂</a>
-        <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
         <a class="btn" href="kids.html">Детская энциклопедия</a>
+        <a class="btn tg-link" href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a>
         <button id="themeBtn" class="btn" title="Сменить тему (T)">🌓</button>
         <span id="adminBtns" style="display:none">
           <a class="btn" href="/admin/" target="_blank" rel="noopener">Админка</a>
@@ -262,12 +200,11 @@
       <a class="btn" href="#/notes">Заметки</a>
       <a class="btn" href="#/project">О проекте</a>
       <a class="btn" href="/o2log/">Логи O₂</a>
-      <a href="kids.html">Детская энциклопедия</a>
-      
+      <a class="btn" href="kids.html">Детская энциклопедия</a>
     </div>
     <div class="row">
       <a class="btn" href="https://chrishpoderi.netlify.app/" target="_blank" rel="noopener">Внутримировая доска</a>
-      <a class="btn" href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a>
+      <a class="btn tg-link" href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a>
     </div>
     <div id="adminMobile" data-admin-only style="display:none">
       <h3>Администрирование</h3>
@@ -283,80 +220,26 @@
   </aside>
 
   <div id="adminDock"><a class="btn" id="editThisBtn" target="_blank" rel="noopener">✏️ Править</a></div>
-  <main id="app" aria-live="полite"></main>
+  <main id="app" aria-live="polite"></main>
 
-  <!-- ===== JS: конфиг/утилиты ===== -->
   <script>
-  const PERG = { CODE: 'Chronicle', CODE_HASH: null };
+  // ===== Конфиг / утилиты =====
   const PROD_HOSTS = ['kainrax.netlify.app','kainrax.site'];
   const MEDIA_PROXY = '/api/media';
   const API_INDEX_CANDIDATES = ['/api/content-index','/.netlify/functions/content-index','content/index.json'];
-  // НОВОЕ: кандидаты источников «Пергамента»
   const PERG_API_CANDIDATES = ['/api/pergament-index','/.netlify/functions/pergament-index','content/pergament/index.json'];
 
-  // Plausible (лениво)
-  (function(){
-    if (PROD_HOSTS.includes(location.hostname)) {
-      window.addEventListener('load', () => {
-        const loader = () => {
-          const s=document.createElement('script'); s.defer=true;
-          s.setAttribute('data-domain', location.hostname);
-          s.src='https://plausible.io/js/script.js';
-          document.head.appendChild(s);
-        };
-        ('requestIdleCallback' in window) ? requestIdleCallback(loader) : setTimeout(loader, 1200);
-      });
-    }
-  })();
-
-  // Метрика (лениво)
-  function initYM(){
-    if (window.__ymInited) return; window.__ymInited = true;
-    (function(m,e,t,r,i,k,a){
-      m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)}; m[i].l=1*new Date();
-      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
-    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=103716449', 'ym');
-    try{
-      ym(103716449,'init',{webvisor:true,clickmap:true,trackLinks:true,accurateTrackBounce:true,ecommerce:'dataLayer'});
-      let last=location.href;
-      const hit=()=>{ try{ ym(103716449,'hit',location.href,{referer:last,title:document.title}); last=location.href; }catch(e){} };
-      if (document.readyState !== 'loading') hit(); else document.addEventListener('DOMContentLoaded', hit, {once:true});
-      addEventListener('hashchange', hit);
-    }catch(_){}
-  }
-  window.addEventListener('load', () => {
-    ('requestIdleCallback' in window) ? requestIdleCallback(initYM) : setTimeout(initYM, 1500);
-  });
-
-  // Утилиты
   const timeout = (ms)=> new Promise(res=> setTimeout(res, ms));
   async function fetchJson(url,{timeoutMs=1500,headers={}}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal,headers}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); } finally{ clearTimeout(t); } }
   async function fetchText(url,{timeoutMs=4000,cacheMode}={}){ const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs); try{ const r=await fetch(url,{signal:ctrl.signal, ...(cacheMode?{cache:cacheMode}:{})}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.text(); } finally{ clearTimeout(t); } }
+  const CACHE = { get(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(_){ return null; } }, set(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(_){ } } };
+  function rewriteMediaUrl(src){ if(!src) return src; if(/^https?:\/\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`; if(/^hub:\//i.test(src) || /^asset:\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`; return src; }
 
-  const CACHE = {
-    get(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(_){ return null; } },
-    set(k,v){ try{ sessionStorage.setItem(k, JSON.stringify(v)); }catch(_){ } }
-  };
-
-  function rewriteMediaUrl(src){
-    if(!src) return src;
-    if(/^https?:\/\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
-    if(/^hub:\//i.test(src) || /^asset:\//i.test(src)) return `${MEDIA_PROXY}?url=${encodeURIComponent(src)}`;
-    return src;
-  }
-  </script>
-
-  <!-- ===== Тема и ДРОВЕР ===== -->
-  <script>
-  const app=document.getElementById('app');
-  const qEl=document.getElementById('q');
+  // ===== Тема =====
   const state={ theme: localStorage.getItem('theme') || 'dark', route: location.hash.slice(1)||'/', q:'', year: null };
-
   function applyTheme(){
     document.documentElement.setAttribute('data-theme', state.theme);
     localStorage.setItem('theme', state.theme);
-    setUtterancesTheme(state.theme);
-    setCusdisTheme();
     const el=document.getElementById('favicon');
     const color = state.theme==='light' ? '%230A1830' : '%23FFD54A';
     el.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='${color}' d='M32 6 L36 24 L58 28 L36 32 L32 50 L28 32 L6 28 L28 24 Z'/%3E%3C/svg%3E`;
@@ -366,22 +249,21 @@
   if (themeBtn) themeBtn.onclick=()=>{ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); };
   document.addEventListener('keyup',(e)=>{ if((e.key||'').toLowerCase()==='t'){ state.theme = state.theme==='dark' ? 'light' : (state.theme==='light' ? 'cringe' : 'dark'); applyTheme(); } });
 
-  /* ===== Мобильный дровер: устойчиво для iOS/Android ===== */
+  // ===== Мобильный дровер (устойчивый) =====
   (function(){
     var d = document, body = d.body;
     var btn    = d.getElementById('menuBtn');
     var drawer = d.getElementById('mobileNav');
     var scrim  = d.getElementById('scrim');
     var xBtn   = d.getElementById('drawerClose');
+    var qEl    = d.getElementById('q');
     var qMobile= d.getElementById('qMobile');
     var themeBtnMobile = d.getElementById('themeBtnMobile');
-
-    if(!btn || !drawer){ return; }
 
     function setOpen(v){
       body.classList.toggle('drawer-open', v);
       drawer.setAttribute('aria-hidden', v ? 'false' : 'true');
-      btn.setAttribute('aria-expanded', v ? 'true' : 'false');
+      btn && btn.setAttribute('aria-expanded', v ? 'true' : 'false');
       if (v) { try{ drawer.focus(); }catch(_){ } }
     }
     function isOpen(){ return body.classList.contains('drawer-open'); }
@@ -389,20 +271,17 @@
     function close(){ setOpen(false); }
     function toggle(){ setOpen(!isOpen()); }
 
-    ['click','pointerup','touchend'].forEach(function(evt){
-      btn.addEventListener(evt, function(e){
-        e.preventDefault(); e.stopPropagation();
-        toggle();
-      }, {passive:false});
-    });
-
+    if(btn){
+      ['click','pointerup','touchend'].forEach(function(evt){
+        btn.addEventListener(evt, function(e){ e.preventDefault(); e.stopPropagation(); toggle(); }, {passive:false});
+      });
+    }
     [scrim, xBtn].forEach(function(el){
       if(!el) return;
       ['click','pointerup','touchend'].forEach(function(evt){
         el.addEventListener(evt, function(e){ e.preventDefault(); close(); }, {passive:false});
       });
     });
-
     d.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
 
     if (themeBtnMobile){
@@ -423,11 +302,13 @@
     if(qEl) qEl.addEventListener('input', function(){ syncQ(qEl.value); }, {passive:true});
     if(qMobile) qMobile.addEventListener('input', function(){ syncQ(qMobile.value); }, {passive:true});
 
+    // Закрывать дровер на любой клик по ссылке
     drawer.addEventListener('click', function(e){
-      var a = e.target.closest && e.target.closest('a[href^="#/"]');
+      var a = e.target.closest && e.target.closest('a');
       if(a){ setTimeout(close, 0); }
     });
 
+    // Блокировка резиновая при прокрутке краёв
     var lastY = 0;
     drawer.addEventListener('touchstart', function(e){ if(e.touches && e.touches[0]) lastY = e.touches[0].clientY; }, {passive:true});
     drawer.addEventListener('touchmove', function(e){
@@ -439,34 +320,8 @@
       lastY = curY;
     }, {passive:false});
   })();
-  </script>
 
-  <!-- ===== Markdown / парсинг ===== -->
-  <script>
-  const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
-
-  function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
-    if(typeof val==='number') return new Date(val);
-    if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; }
-    return null;
-  }
-  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
-  function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
-  function fmtHumanDateTime(v){ const d=toDate(v); return d ? d.toLocaleString('ru-RU',{year:'numeric',month:'long',day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''; }
-  function fmtPergDayYear(s){ if(typeof s!=='string') return String(s||''); const m=s.match(/^(\d{4})-(\d{3})$/); if(!m) return fmtHumanDate(s); const year=+m[1], day=+m[2]; return `${day}-й день ${year}-го года.`; }
-  const getAnno = (s) => { const a=(s.annotation||s.anno||s.summary||'').trim(); if(a) return a; const txt=(s.text||'').replace(/\s+/g,' ').trim(); if(!txt) return ''; const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt; };
-
-  function normalizeTags(val){
-    if (Array.isArray(val)) return val;
-    if (typeof val === 'string') {
-      const s = val.trim();
-      if (!s) return [];
-      if (/^\[.*\]$/.test(s)) { try { return JSON.parse(s.replace(/'/g,'"')); } catch(_){} }
-      return s.split(',').map(x=>x.trim()).filter(Boolean);
-    }
-    return [];
-  }
-
+  // ===== Markdown / парсинг =====
   function parseFrontMatter(md){
     const m = md.match(/^---\s*([\s\S]*?)\s*---\s*\n?([\s\S]*)$/);
     if (!m) return { attributes:{}, body: md.trim() };
@@ -480,7 +335,6 @@
     });
     return { attributes: attrs, body };
   }
-
   function mdToHtml(md) {
     let html = md
       .replace(/```([\s\S]*?)```/g, (m,code)=> `<pre><code>${code.replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</code></pre>`)
@@ -502,12 +356,19 @@
     html = html.split(/\n{2,}/).map(b => /<(h\d|ul|ol|pre|blockquote|figure|hr)/i.test(b) ? b : `<p>${b.replace(/\n/g,'<br>')}</p>`).join('\n');
     return html;
   }
-  </script>
+  const safeYear = (y)=> Number.isInteger(+y) && +y>0 ? +y : null;
+  function toDate(val){ if(!val) return null; if(val instanceof Date) return val;
+    if(typeof val==='number') return new Date(val);
+    if(typeof val==='string'){ const s=val.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00Z'); const d=new Date(s); if(!isNaN(d)) return d; }
+    return null; }
+  function ts(val){ const d=toDate(val); return d? d.getTime() : 0; }
+  function fmtHumanDate(v){ const d=toDate(v); return d ? d.toLocaleDateString('ru-RU',{year:'numeric',month:'long',day:'numeric'}) : ''; }
+  function fmtHumanDateTime(v){ const d=toDate(v); return d ? d.toLocaleString('ru-RU',{year:'numeric',month:'long',day:'numeric', hour:'2-digit', minute:'2-digit'}) : ''; }
+  const getAnno = (s) => { const a=(s.annotation||s.anno||s.summary||'').trim(); if(a) return a; const txt=(s.text||'').replace(/\s+/g,' ').trim(); if(!txt) return ''; const cut=180; return txt.length>cut? txt.slice(0,cut)+'…' : txt; };
+  function normalizeTags(val){ if (Array.isArray(val)) return val; if (typeof val === 'string') { const s = val.trim(); if (!s) return []; if (/^\[.*\]$/.test(s)) { try { return JSON.parse(s.replace(/'/g,'"')); } catch(_){} } return s.split(',').map(x=>x.trim()).filter(Boolean); } return []; }
 
-  <!-- ===== Данные ===== -->
-  <script>
+  // ===== Данные =====
   let stories=[], notes=[], pergDocs=[], articles=[];
-
   async function firstJson(urls,{timeouts=[8000,8000,5000]}={}) {
     for (let i=0;i<urls.length;i++){
       const url=urls[i];
@@ -519,7 +380,6 @@
     }
     return null;
   }
-
   async function loadContent(){
     let j = CACHE.get('__contentIndex');
     if (!j) j = await firstJson(API_INDEX_CANDIDATES);
@@ -527,26 +387,18 @@
     else CACHE.set('__contentIndex', j);
 
     if (!Array.isArray(j.articles) || !j.articles.length) {
-      try {
-        const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}});
-        j.articles = Array.isArray(aj) ? aj : (aj.articles||[]);
-      } catch(_) {}
+      try { const aj = await fetchJson('content/articles/index.json',{timeoutMs:6000, headers:{'Accept':'application/json'}}); j.articles = Array.isArray(aj) ? aj : (aj.articles||[]); } catch(_) {}
     }
 
-    // НОВОЕ: грузим «Пергамент» с нескольких источников
     try{
       let pj = null;
       for (const u of PERG_API_CANDIDATES){
-        try{
-          const v = await fetchJson(u,{timeoutMs:7000, headers:{'Accept':'application/json'}});
-          if(Array.isArray(v)){ pj=v; break; }
-        }catch(_){}
+        try{ const v = await fetchJson(u,{timeoutMs:7000, headers:{'Accept':'application/json'}}); if(Array.isArray(v)){ pj=v; break; } }catch(_){}
       }
       pergDocs = Array.isArray(pj) ? pj : [];
     }catch(_){ pergDocs = []; }
 
     const tie = (a,b)=> String((a.slug||a.id||'') ).localeCompare(String(b.slug||b.id||''), 'ru');
-
     stories  = (Array.isArray(j.stories)?j.stories:[]).map(s=>({
       ...s,
       id:   s.id   || s.slug || '',
@@ -576,24 +428,50 @@
     notes.sort   ((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
     articles.sort((a,b)=> ts2(b.date)-ts2(a.date) || tie(a,b));
 
-    // сортировка и внутри документов, и между ними
     pergDocs.forEach(d=>{ (d.editions||[]).sort((a,b)=> String(a.date||'').localeCompare(String(b.date||''))); });
     pergDocs.sort((a,b)=> {
       const ad=(a.editions||[]), bd=(b.editions||[]); const al=ad[ad.length-1]?.date||'', bl=bd[bd.length-1]?.date||'';
       return String(bl).localeCompare(String(al));
     });
 
-    (async ()=> {
-      try{
-        const fresh = await firstJson(API_INDEX_CANDIDATES);
-        if (fresh) { CACHE.set('__contentIndex', fresh); }
-      }catch(_){}
-    })();
+    (async ()=> { try{ const fresh = await firstJson(API_INDEX_CANDIDATES); if (fresh) { CACHE.set('__contentIndex', fresh); } }catch(_){}})();
   }
-  </script>
 
-  <!-- ===== Роутер и рендер списков ===== -->
-  <script>
+  // ===== Бренд → меню на мобилке =====
+  function isMobileWidth(){ return window.matchMedia('(max-width:980px)').matches; }
+  (function(){
+    const brand = document.getElementById('brandLink');
+    if(!brand) return;
+    brand.addEventListener('click', (e)=>{
+      if (isMobileWidth()){
+        e.preventDefault();
+        location.hash = '#/menu';
+      }
+    });
+  })();
+
+  // ===== Телеграм deep link на мобилках =====
+  (function(){
+    function isMobileUA(){ return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent); }
+    function openTg(e){
+      const a = e.target.closest && e.target.closest('a.tg-link'); 
+      if(!a) return;
+      if (!isMobileUA()) return;
+      e.preventDefault();
+      const deep = 'tg://resolve?domain=kainrax';
+      const web  = a.href || 'https://t.me/kainrax';
+      let jumped = false;
+      const t = setTimeout(()=>{ if(!jumped) location.href = web; }, 700);
+      const ifr = document.createElement('iframe');
+      ifr.style.display='none'; ifr.src = deep; document.body.appendChild(ifr);
+      setTimeout(()=>{ jumped = true; document.body.removeChild(ifr); clearTimeout(t); }, 1200);
+    }
+    document.addEventListener('click', openTg, {passive:false});
+  })();
+
+  // ===== Рендеры списков и страниц =====
+  const app=document.getElementById('app');
+  const qEl=document.getElementById('q');
   addEventListener('hashchange',()=>{ state.route=location.hash.slice(1)||'/'; render(); restoreScroll(); }, {passive:true});
   qEl && qEl.addEventListener('input',()=>{ state.q=qEl.value.trim().toLowerCase(); renderList(); });
 
@@ -602,7 +480,6 @@
     kainrax: {id:'kainrax',  title:'Кайнракс',    desc:'Рассказы и повести внутри Кайнракс.'},
     ibut:    {id:'ibut',     title:'ИБУТ',        desc:'Лёгкое чтиво про попаданцев.'},
   };
-
   function buildArcs(){
     const map = {};
     for(const s of stories){
@@ -610,12 +487,9 @@
       if(!map[id]) map[id]={...(arcMeta[id]||{id,title:id,desc:''}), items:[]};
       map[id].items.push(s);
     }
-    for(const k in map){
-      map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) );
-    }
+    for(const k in map){ map[k].items.sort((a,b)=> ts(a.date)-ts(b.date) || String((a.slug||a.id)).localeCompare(String((b.slug||b.id))) ); }
     return Object.values(map);
   }
-
   function findStoryByKey(key){
     if(!key) return null;
     let s = stories.find(x=> (x.id||'') === key);
@@ -632,7 +506,6 @@
     bySlug.sort((a,b)=> ts(b.date)-ts(a.date) || String(a.id).localeCompare(String(b.id)));
     return bySlug[0] || null;
   }
-
   function parseHashQuery(){ const h = location.hash.split('?')[1]||''; const out={}; h.split('&').forEach(p=>{ if(!p) return; const [k,v]=p.split('='); out[decodeURIComponent(k)] = decodeURIComponent(v||''); }); return out; }
   function currentYearSelection(){ const hq = parseHashQuery(); const ySel = Number.isFinite(+hq.year) ? (+hq.year) : null; state.year = ySel; return ySel; }
 
@@ -657,7 +530,6 @@
   function renderList(){
     const q = state.q;
     const ySel = currentYearSelection();
-
     const baseStories = stories.filter(s=>{
       if (!q) return true;
       const hay=[s.title||'', (s.text||''), (s.tags||[]).join(' ')].join(' ').toLowerCase();
@@ -668,14 +540,11 @@
       const hay=[a.title||'', a.author||'', a.outlet||'', (a.text||''), (a.tags||[]).join(' ')].join(' ').toLowerCase();
       return hay.includes(q);
     });
-
     const unionForYears = baseStories.concat(baseArticles);
     const counts = collectYearCounts(unionForYears, {excludeArc:'ibut'});
     const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-
     const itemsStories = baseStories.filter(s=> ySel==null ? true : safeYear(s.year)===ySel);
     const itemsArticles = baseArticles.filter(a=> ySel==null ? true : safeYear(a.year)===ySel);
-
     const yearBar = yearBarHtml(years, counts, ySel);
 
     app.innerHTML=`
@@ -687,8 +556,8 @@
           <div class="list">
             ${itemsStories.length?itemsStories.map(s=>`
               <div class="story-item" data-arc="${s.arc||'kainrax'}">
-                <a href="#/read-id/${s.id}">
-                  <div class="title">✶ ${s.title||'Без названия'}</div>
+                <a href="${(Array.isArray(s.chapters)&&s.chapters.length)? `#/read-id/${s.id}/ch/0` : `#/read-id/${s.id}`}">
+                  <div class="title">✶ ${s.title||'Без названия'} ${(Array.isArray(s.chapters)&&s.chapters.length)?' · серия':''}</div>
                   <div class="muted">
                     ${fmtHumanDate(s.date)}
                     · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин чтения
@@ -733,7 +602,7 @@
               </div>`).join('')}
           </div>
           <h3 style="margin-top:14px">Подписка</h3>
-          <p class="muted">Телеграм: <a href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
+          <p class="muted">Телеграм: <a class="tg-link" href="https://t.me/kainrax" target="_blank" rel="noopener">@kainrax</a></p>
         </aside>
       </div>`;
 
@@ -754,11 +623,8 @@
     const needA = itemsArticles.filter(a=>!a.title || !a.date).slice(0,8);
     if(needA.length){ Promise.all(needA.map(a=>loadMdIntoArticle(a,isAdmin))).then(()=>{ renderList(); }); }
   }
-  </script>
 
-  <!-- ===== Ветки/теги/страницы ===== -->
-  <script>
-  function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><h1>Ветки</h1>
+  function renderArcs(){ const arcs=buildArcs(); app.innerHTML=`<section class="card"><a class="back" href="#/">← На главную</a><h1>Ветки</h1>
     <div class="list">${arcs.map(a=>`
       <div class="story-item" data-arc="${a.id}"><a href="#/arc/${a.id}">
         <div class="title">✶ ${a.title}</div>
@@ -774,8 +640,8 @@
       <h1>${a.title}</h1><div class="muted">${a.desc||''}</div>
       <ol class="list" style="margin-top:10px">${a.items.map((s,i)=>`
         <li class="story-item" data-arc="${s.arc||'kainrax'}">
-          <a href="#/read-id/${s.id}">
-            <div class="title">✶ ${i+1}. ${s.title}</div>
+          <a href="${(Array.isArray(s.chapters)&&s.chapters.length)? `#/read-id/${s.id}/ch/0` : `#/read-id/${s.id}`}">
+            <div class="title">✶ ${i+1}. ${s.title}${(Array.isArray(s.chapters)&&s.chapters.length)?' · серия':''}</div>
             <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин</div>
           </a>
           ${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}
@@ -793,8 +659,8 @@
 
       <h3>В рассказах</h3>
       <div class="list">${st.length?st.map(s=>`
-        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="#/read-id/${s.id}">
-          <div class="title">✶ ${s.title}</div>
+        <div class="story-item" data-arc="${s.arc||'kainrax'}"><a href="${(Array.isArray(s.chapters)&&s.chapters.length)? `#/read-id/${s.id}/ch/0` : `#/read-id/${s.id}`}">
+          <div class="title">✶ ${s.title}${(Array.isArray(s.chapters)&&s.chapters.length)?' · серия':''}</div>
           <div class="muted">${fmtHumanDate(s.date)} · ${s.minutes||Math.max(5,Math.round((s.text||'').length/1100))} мин · ветка: ${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</div>
         </a>${getAnno(s)?`<div class="anno">${getAnno(s)}</div>`:''}</div>`).join(''):`<div class="muted">—</div>`}</div>
 
@@ -807,10 +673,8 @@
     </section>`;
     adminDockHide(); ensureAdminUI();
   }
-  </script>
 
-  <!-- ===== Загрузка статей/историй ===== -->
-  <script>
+  // ===== Загрузка md для рассказов/статей + главы =====
   async function loadMdIntoStory(s, isAdmin){
     if (!s) return s;
     let file = s.file;
@@ -832,6 +696,20 @@
       const yRaw   = (attributes.year ?? attributes.worldYear ?? attributes.pergYear);
       s.year       = s.year ?? safeYear(yRaw);
       s.text       = body || '';
+
+      // chapters: ожидаем JSON-массив в YAML-строке
+      try{
+        let ch = attributes.chapters;
+        if (typeof ch === 'string' && /^\[/.test(ch)) { ch = JSON.parse(ch.replace(/'/g,'"')); }
+        if (Array.isArray(ch)) {
+          s.chapters = ch.map((c,idx)=>({
+            id:   c.id   || ('ch'+(idx+1)),
+            title:c.title|| '',
+            file: c.file || ''
+          })).filter(x=>x.file);
+        }
+        if (!Array.isArray(s.chapters)) s.chapters = [];
+      }catch(_){}
     }catch(e){}
     return s;
   }
@@ -862,6 +740,15 @@
     return a;
   }
 
+  // ===== Статьи =====
+  function collectYearCounts(list){ return list.reduce((a,x)=>{ const y=safeYear(x.year); if(y!=null) a[y]=(a[y]||0)+1; return a; },{}); }
+  function yearBarHtmlSimple(years, counts, ySel){
+    return `
+      <div class="yearbar" id="yearbar">
+        <span class="pill year" data-year="" data-active="${ySel==null}">Все</span>
+        ${years.map(y=>`<span class="pill year" data-year="${y}" data-active="${ySel===y}">${y}<span class="badge">${counts[y]}</span></span>`).join('')}
+      </div>`;
+  }
   function renderArticlesList(){
     const q = state.q;
     const ySel = currentYearSelection();
@@ -873,7 +760,7 @@
     const counts = collectYearCounts(base);
     const years  = Object.keys(counts).map(Number).sort((a,b)=>a-b);
     const items = base.filter(a=> ySel==null ? true : safeYear(a.year)===ySel);
-    const yearBar = yearBarHtml(years, counts, ySel);
+    const yearBar = yearBarHtmlSimple(years, counts, ySel);
 
     app.innerHTML = `
       <section class="card">
@@ -882,23 +769,22 @@
         <div class="muted">Архив: формулы, иллюстрации, источники, подписи.</div>
         ${yearBar}
         <div class="list" style="margin-top:8px">
-          ${
-            items.length
-              ? items.map(a => `
-                <div class="story-item" data-kind="article">
-                  <a href="#/read-article/${a.id}">
-                    <div class="title">📰 ${a.title || 'Без названия'}</div>
-                    <div class="muted">
-                      ${fmtHumanDateTime(a.date)}
-                      ${safeYear(a.year)!=null?` · год: ${safeYear(a.year)}`:''}
-                      ${a.outlet?` · ${a.outlet}`:''}
-                      ${a.author?` · ${a.author}`:''}
-                      · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
-                    </div>
-                  </a>
-                  ${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}
-                </div>`).join('')
-              : '<div class="muted">Пока пусто. Смотри <code>content/articles</code>.</div>'
+          ${items.length
+            ? items.map(a => `
+              <div class="story-item" data-kind="article">
+                <a href="#/read-article/${a.id}">
+                  <div class="title">📰 ${a.title || 'Без названия'}</div>
+                  <div class="muted">
+                    ${fmtHumanDateTime(a.date)}
+                    ${safeYear(a.year)!=null?` · год: ${safeYear(a.year)}`:''}
+                    ${a.outlet?` · ${a.outlet}`:''}
+                    ${a.author?` · ${a.author}`:''}
+                    · ${a.minutes||Math.max(6,Math.round((a.text||'').length/1000))} мин
+                  </div>
+                </a>
+                ${getAnno(a)?`<div class="anno">${getAnno(a)}</div>`:''}
+              </div>`).join('')
+            : '<div class="muted">Пока пусто. Смотри <code>content/articles</code>.</div>'
           }
         </div>
       </section>`;
@@ -913,11 +799,9 @@
     }
     adminDockHide(); ensureAdminUI();
   }
-
   async function renderArticleRead(id){
     const a=findArticleByKey(id); if(!a){ location.hash='#/articles'; return; }
     try{ await loadMdIntoArticle(a, isAdmin); }catch(e){}
-
     app.innerHTML = `
       <a class="back" href="#/articles">← К статьям</a>
       <article class="with-margin" data-id="${a.id}" data-slug="${a.slug||a.id}">
@@ -938,7 +822,6 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
-
     await typesetMath(document.querySelector('.article-body'));
     KX_refitMath(document);
     mountComments('article:'+(a.slug||a.id));
@@ -948,9 +831,12 @@
     window.hit && window.hit('article:'+(a.slug||a.id)).catch(()=>{});
   }
 
+  // ===== Одиночный рассказ без глав =====
   async function renderArticleByObj(s){
     if(!s){ location.hash='#/'; return; }
     try{ await loadMdIntoStory(s, isAdmin); }catch(e){}
+    // Если есть главы — переходим в режим глав
+    if (Array.isArray(s.chapters) && s.chapters.length){ location.hash = `#/read-id/${encodeURIComponent(s.id)}/ch/0`; return; }
 
     const arcs=buildArcs();
     const a=arcs.find(x=>x.id===(s.arc||'kainrax'))||{title:'Ветка',items:[]};
@@ -958,7 +844,7 @@
     const prev=order[pos-1], next=order[pos+1];
 
     app.innerHTML=`
-      <a class="back" href="#/">← К списку</a>
+      <a class="back" href="#/">← На главную</a>
       <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
         <div class="prose readbox">
           <h1>${s.title}</h1>
@@ -980,7 +866,6 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
-
     await typesetMath(document.querySelector('.prose.readbox'));
     KX_refitMath(document);
     mountComments('story:'+(s.slug||s.id));
@@ -989,12 +874,99 @@
     ensureAdminUI();
     window.hit && window.hit('story:'+(s.slug||s.id)).catch(()=>{});
   }
-  </script>
 
-  <!-- ===== Пергамент / комменты / прогресс / админ док ===== -->
-  <script>
+  // ===== Рассказ с главами =====
+  async function renderStoryWithChapters(s, chIndex){
+    if (!s){ location.hash = '#/'; return; }
+    await loadMdIntoStory(s, isAdmin);
+    const chapters = Array.isArray(s.chapters) ? s.chapters : [];
+    if (!chapters.length) { await renderArticleByObj(s); return; }
+
+    const i = Math.min(Math.max(0, chIndex|0), chapters.length - 1);
+    const ch = chapters[i];
+    if (!ch._text){
+      ch._text = await fetchText(ch.file, { timeoutMs: 7000 }).catch(()=> '');
+    }
+    const minutes = Math.max(4, Math.round((ch._text||'').length / 1100));
+
+    const toc = chapters.map((c, k)=> 
+      `<li><a class="btn" href="#/read-id/${encodeURIComponent(s.id)}/ch/${k}">${k+1}. ${c.title||('Глава '+(k+1))}</a></li>`).join('');
+
+    app.innerHTML = `
+      <a class="back" href="#/">← На главную</a>
+      <article class="with-margin" data-id="${s.id}" data-slug="${s.slug||s.id}">
+        <div class="prose readbox">
+          <h1>${s.title}</h1>
+          <div class="muted">
+            ${fmtHumanDate(s.date)} · глава ${i+1}/${chapters.length} · ~${minutes} мин
+            · ветка: <a href="#/arc/${s.arc||'kainrax'}">${(arcMeta[s.arc||'kainrax']||{title:'Ветка'}).title}</a>
+          </div>
+          <div style="margin:6px 0 12px">${(s.tags||[]).map(t=>`<a class='tag' href='#/tag/${encodeURIComponent(t)}'>${t}</a>`).join(' ')}</div>
+          <h3 style="margin-top:6px">${ch.title || ('Глава '+(i+1))}</h3>
+          <div class="article-body">${mdToHtml(ch._text||'')}</div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+          <div style="display:flex;justify-content:space-between;gap:10px">
+            ${i>0 ? `<a class="btn" href="#/read-id/${encodeURIComponent(s.id)}/ch/${i-1}">← ${chapters[i-1].title || 'Предыдущая'}</a>` : '<span></span>'}
+            ${i<chapters.length-1 ? `<a class="btn" href="#/read-id/${encodeURIComponent(s.id)}/ch/${i+1}">${chapters[i+1].title || 'Следующая'} →</a>` : '<span></span>'}
+          </div>
+        </div>
+        <aside class="margin-notes">
+          <div class="mnote"><strong>Оглавление</strong></div>
+          <ol style="padding-left:16px">${toc || '<li class="muted">—</li>'}</ol>
+        </aside>
+      </article>
+      <section class="card" style="margin-top:16px">
+        <h3>Комментарии</h3><section id="comments"></section>
+      </section>`;
+    await typesetMath(document.querySelector('.article-body'));
+    KX_refitMath(document);
+    mountComments('story:'+String(s.slug||s.id)+':ch:'+String(i));
+    adminDockFor('story', s.slug||s.id);
+    ensureAdminUI();
+    setTimeout(restoreScroll,0);
+  }
+
+  // ===== Страница «Меню» для мобилок =====
+  function renderMenu(){
+    const items = [
+      {href:'#/',           title:'На главную',     desc:'Лента: свежие рассказы и статьи без лорового барьера.'},
+      {href:'#/arcs',       title:'Ветки',          desc:'Сгруппированные подборки: Поверхность, Кайнракс, ИБУТ.'},
+      {href:'#/articles',   title:'Статьи',         desc:'Мини-архив статей с формулами и иллюстрациями.'},
+      {href:'#/perg',       title:'Пергамент',      desc:'Хроники мира. Несколько редакций, даты, заметки.'},
+      {href:'#/notes',      title:'Заметки',        desc:'Короткие рабочие записи, черновые мысли.'},
+      {href:'#/project',    title:'О проекте',      desc:'Что это, частота обновлений, куда смотреть дальше.'},
+      {href:'/o2log/',      title:'Логи O₂',        desc:'Внутримировые журналы кислорода. Открывается как раздел.'},
+      {href:'kids.html',    title:'Детская энциклопедия', desc:'Облегчённые объяснения для юных и взрослых.'},
+      {href:'https://chrishpoderi.netlify.app/', title:'Внутримировая доска', desc:'Сайд-проект с визуальными материалами.', ext:true},
+    ];
+    app.innerHTML = `
+      <section class="card">
+        <h1>Меню</h1>
+        <p class="muted">То, что тебе нужно, за 2 касания. Нажми на пункт, чтобы открыть, или раскрой описание.</p>
+        <div class="menu-grid">
+          ${items.map(it=>`
+            <div class="menu-item">
+              <div class="row">
+                <a class="btn" ${it.ext? 'target="_blank" rel="noopener"':''} href="${it.href}">${it.title}</a>
+                <details><summary class="muted">что это?</summary><div class="muted" style="margin-top:6px">${it.desc}</div></details>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="menu-item" style="margin-top:12px">
+          <div class="row">
+            <a class="btn tg-link" href="https://t.me/kainrax" target="_blank" rel="noopener">Открыть @kainrax</a>
+            <details open><summary class="muted">телеграм</summary><div class="muted" style="margin-top:6px">
+              На телефонах откроется приложение; если нет — упадёт в веб. Подпишись, чтобы новые тексты не терялись.
+            </div></details>
+          </div>
+        </div>
+      </section>`;
+    ensureAdminUI();
+  }
+
+  // ===== Пергамент / Комменты / Прогресс / Админ =====
   function lastEdition(d){ const es=d.editions||[]; return es[es.length-1]||null; }
-
   function renderPergList(){
     const items = Array.isArray(pergDocs) ? pergDocs : [];
     if(!items.length){
@@ -1004,30 +976,25 @@
       </section>`;
       adminDockHide(); ensureAdminUI(); return;
     }
-
-    app.innerHTML = `<section class="card"><h1>Пергамент</h1>
+    app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Пергамент</h1>
       <div class="list">${items.map(d=>{
         const e=lastEdition(d)||{};
         return `<div class="story-item" data-arc="kainrax">
           <a href="#/perg/${encodeURIComponent(d.id)}">
             <div class="title">📜 ${d.title||d.id}</div>
-            <div class="muted">последняя ред.: ${fmtPergDayYear(e.date||d.date||'')}</div>
+            <div class="muted">последняя ред.: ${e.date||d.date||''}</div>
           </a>
           ${getAnno(d)?`<div class="anno">${getAnno(d)}</div>`:''}
         </div>`; }).join('')}</div></section>`;
     adminDockHide(); ensureAdminUI();
   }
-
   async function renderPerg(id){
     const doc = (pergDocs||[]).find(d => String(d.id) === String(id));
     if(!doc){ location.hash = '#/perg'; return; }
-
     const hq = parseHashQuery();
     const idx = Number.isFinite(+hq.ed) ? Math.max(0, Math.min(+hq.ed, (doc.editions||[]).length-1))
                                         : (doc.editions||[]).length-1;
     const ed  = (doc.editions||[])[idx] || {};
-
-    // Загружаем конкретную редакцию
     let body = '';
     const filePath = ed.file || doc.file || '';
     const isMd = (filePath||'').toLowerCase().endsWith('.md');
@@ -1040,29 +1007,21 @@
         body = raw || '';
       }
     }catch(_){ body=''; }
-
     const title = doc.title || 'Пергамент';
     const anno  = (doc.annotation || doc.anno || '').trim();
-
     const edList = (doc.editions||[]).map((e,i)=>{
       const href = `#/perg/${encodeURIComponent(doc.id)}?ed=${i}`;
-      const date = fmtPergDayYear(e.date||'');
+      const date = e.date||'';
       return `<li style="margin:4px 0">${i===idx?'▸':''} <a class="btn" href="${href}">${date||('Редакция '+(i+1))}</a>${e.note?` <span class="muted">${e.note}</span>`:''}</li>`;
     }).join('');
-
-    function asHtml(txt){
-      const esc = (s)=> s.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]));
-      return txt.split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('\n');
-    }
-
+    function asHtml(txt){ const esc = (s)=> s.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch])); return txt.split(/\n{2,}/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('\n'); }
     const htmlBody = isMd ? mdToHtml(body) : asHtml(body);
-
     app.innerHTML = `
       <a class="back" href="#/perg">← Ко всем хроникам</a>
       <article class="with-margin" data-id="${doc.id}">
-        <div class="prose readbox parchment">
+        <div class="prose readbox">
           <h1>📜 ${title}</h1>
-          <div class="muted">редакция: ${fmtPergDayYear(ed.date || doc.date || '')}${doc.source?` · ${doc.source}`:''}</div>
+          <div class="muted">редакция: ${ed.date || doc.date || ''}${doc.source?` · ${doc.source}`:''}</div>
           ${anno ? `<div class="anno-box">${anno}</div>` : ''}
           <div class="article-body">${htmlBody}</div>
         </div>
@@ -1074,17 +1033,14 @@
       <section class="card" style="margin-top:16px">
         <h3>Комментарии</h3><section id="comments"></section>
       </section>`;
-
     if (isMd){ await typesetMath(document.querySelector('.article-body')); KX_refitMath(document); }
     mountComments('perg:'+String(doc.id));
     adminDockFor('perg', String(doc.id));
     ensureAdminUI();
     setTimeout(restoreScroll,0);
   }
-  </script>
 
-  <!-- ===== Комменты / служебки / прогресс ===== -->
-  <script>
+  // ===== Комменты / служебки / прогресс =====
   function mountComments(term){
     const wrap=document.getElementById('comments'); if(!wrap) return;
     wrap.innerHTML=`
@@ -1140,144 +1096,45 @@
     const y=+localStorage.getItem('read:'+id)||0;
     if(y>0) setTimeout(()=>scrollTo({top:y,behavior:'instant'}),0);
   }
-  </script>
 
-  <!-- ===== Косметика ===== -->
-  <script>
-  const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
-  let W,H,starsArr=[], running=true;
-  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
-  addEventListener('resize', resize, {passive:true});
-  function makeStars(){
-    const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80;
-    const k = (W*H)/60000;
-    const count = Math.floor(base + k);
-    starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
-  }
-  function drawStars(ts, once=false){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
-    for(const st of starsArr){
-      const a = once ? 0.7 : 0.55 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.35;
-      ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
-    }
-    if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
-  }
-  document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
-
-  function initSkyLine() {
-    const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
-    function updatePosition() {
-      const now = new Date();
-      const msSinceMidnight = (now.getHours()*3600000)+(now.getMinutes()*60000)+(now.getSeconds()*1000)+now.getMilliseconds();
-      const progress = msSinceMidnight / 86400000;
-      skyLine.style.top = `${progress * 100}vh`;
-      if (running) requestAnimationFrame(updatePosition);
-    }
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') { running = true; requestAnimationFrame(updatePosition); } else { running = false; }
-    });
-    requestAnimationFrame(updatePosition);
-  }
-  </script>
-
-  <!-- ===== Роутинг и запуск ===== -->
-  <script>
-  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
-  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
-  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
-  function ensureAdminUI(){
-    const adminBtns = document.getElementById('adminBtns');
-    if (adminBtns) adminBtns.style.display = isAdmin ? 'inline-flex' : 'none';
-    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
-    const mob = document.getElementById('adminMobile');
-    if (mob) mob.style.display = isAdmin ? '' : 'none';
-    if(!isAdmin) adminDockHide();
-  }
-
-  function renderNotes(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`; }
-  function renderProject(){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>О проекте</h1><div class="muted">Кайнракс — тёмная НФ. Обновления по пятницам и субботам.</div></section>`; }
-
-  async function render(){
-    const r=state.route;
-    if(r==='/'||r===''){ renderList(); return; }
-    if(r==='/arcs'){ renderArcs(); return; }
-    if(r==='/articles'){ renderArticlesList(); return; }
-    if(r==='/notes'){ renderNotes(); return; }
-    if(r==='/project'){ renderProject(); return; }
-    if(r==='/perg'){ renderPergList(); return; }
-
-    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
-    if(mReadId){ await renderArticleByObj(findStoryByKey(mReadId[1])); return; }
-
-    const mRead=r.match(/^\/read\/([^?]+)(?:\?.*)?$/);
-    if(mRead){ await renderArticleByObj(findStoryByKey(mRead[1])); return; }
-
-    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
-    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
-    const mNote=r.match(/^\/note\/([^?]+)(?:\?.*)?$/); if(mNote){ await renderNote(mNote[1]); return; }
-    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
-    const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
-    renderList();
-  }
-
-  async function init(){
-    app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
-    try { await loadContent(); } catch(_) {}
-    applyTheme();
-    render();
-    ensureAdminUI();
-    (function initStars(){ const canvas=document.getElementById('stars'); if(!canvas) return; resize(); const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; if (!prefersReduced) requestAnimationFrame(drawStars); })();
-    initSkyLine();
-  }
-  init();
-
+  // ===== Косметика: звёзды и линия суток =====
   (function(){
-    function fitLargeMath(root){
-      const scope = root || document;
-      const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
-      blocks.forEach(el=>{
-        let wrap = el.parentElement;
-        if(!wrap || !wrap.classList.contains('kx-math-fit')){
-          const w = document.createElement('div');
-          w.className = 'kx-math-fit';
-          (wrap || el.parentNode).insertBefore(w, el);
-          w.appendChild(el);
-          wrap = w;
-        }
-        el.style.transform = '';
-        wrap.style.height = '';
-        const cs = getComputedStyle(wrap);
-        const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
-        const need  = el.scrollWidth;
-        if(need > avail && avail > 0){
-          const scale = Math.max(0.30, Math.min(1, avail / need));
-          const rect  = el.getBoundingClientRect();
-          el.style.transform = `scale(${scale})`;
-          wrap.style.height = (rect.height * scale + 2) + 'px';
-        }
-      });
+    const canvas=document.getElementById('stars'); const ctx=canvas.getContext('2d');
+    let W,H,starsArr=[], running=true;
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function resize(){ W=canvas.width=innerWidth; H=canvas.height=innerHeight; makeStars(); if(prefersReduced){ drawStars(0,true); } }
+    addEventListener('resize', resize, {passive:true});
+    function makeStars(){
+      const base = document.documentElement.getAttribute('data-theme')==='light' ? 40 : 80;
+      const k = (W*H)/60000;
+      const count = Math.floor(base + k);
+      starsArr = Array.from({length: count}, ()=>({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1+0.3, s: Math.random()*0.5+0.2 }));
     }
-    let raf = 0;
-    function scheduleFit(target){
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(()=> fitLargeMath(target || document));
+    function drawStars(ts, once=false){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--star').trim() || 'rgba(255,255,255,.9)';
+      for(const st of starsArr){
+        const a = once ? 0.7 : 0.55 + Math.sin((ts/1200)*st.s + st.x*0.002)*0.35;
+        ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
+      }
+      if(!once && !prefersReduced && running) requestAnimationFrame(drawStars);
     }
-    addEventListener('resize', ()=> scheduleFit(), {passive:true});
-    addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
-    addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
-    window.KX_refitMath = scheduleFit;
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
-    } else {
-      scheduleFit();
+    document.addEventListener('visibilitychange',()=>{ running = document.visibilityState==='visible'; if(running && !prefersReduced) requestAnimationFrame(drawStars); });
+    function initSkyLine() {
+      const skyLine = document.getElementById('sky-line'); if (!skyLine) return; let running = true;
+      function updatePosition() {
+        const now = new Date();
+        const ms = now.getHours()*3600000+now.getMinutes()*60000+now.getSeconds()*1000+now.getMilliseconds();
+        skyLine.style.top = `${(ms/86400000) * 100}vh`;
+        if (running) requestAnimationFrame(updatePosition);
+      }
+      document.addEventListener('visibilitychange', () => { running = document.visibilityState === 'visible'; if (running) requestAnimationFrame(updatePosition); });
+      requestAnimationFrame(updatePosition);
     }
+    resize(); if (!prefersReduced) requestAnimationFrame(drawStars); initSkyLine();
   })();
-  </script>
 
-  <!-- MathJax loader (лениво) -->
-  <script>
+  // ===== MathJax =====
   let mjPending=null;
   function ensureMathJax(){
     if (window.MathJax) return Promise.resolve();
@@ -1309,6 +1166,86 @@
       }
     }catch(_){ }
   }
+  (function(){
+    function fitLargeMath(root){
+      const scope = root || document;
+      const blocks = scope.querySelectorAll('.prose .mjx-container[display="true"], .article-body .mjx-container[display="true"]');
+      blocks.forEach(el=>{
+        let wrap = el.parentElement;
+        if(!wrap || !wrap.classList.contains('kx-math-fit')){
+          const w = document.createElement('div'); w.className = 'kx-math-fit';
+          (wrap || el.parentNode).insertBefore(w, el); w.appendChild(el); wrap = w;
+        }
+        el.style.transform = ''; wrap.style.height = '';
+        const cs = getComputedStyle(wrap);
+        const avail = Math.max(0, wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0));
+        const need  = el.scrollWidth;
+        if(need > avail && avail > 0){
+          const scale = Math.max(0.30, Math.min(1, avail / need));
+          const rect  = el.getBoundingClientRect();
+          el.style.transform = `scale(${scale})`;
+          wrap.style.height = (rect.height * scale + 2) + 'px';
+        }
+      });
+    }
+    let raf = 0;
+    function scheduleFit(target){ cancelAnimationFrame(raf); raf = requestAnimationFrame(()=> fitLargeMath(target || document)); }
+    addEventListener('resize', ()=> scheduleFit(), {passive:true});
+    addEventListener('orientationchange', ()=> scheduleFit(), {passive:true});
+    addEventListener('hashchange', ()=> scheduleFit(), {passive:true});
+    window.KX_refitMath = scheduleFit;
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ()=>scheduleFit(), {once:true});
+    } else {
+      scheduleFit();
+    }
+  })();
+
+  // ===== Админ / режим =====
+  let isAdmin = new URLSearchParams(location.search).has('admin') || localStorage.getItem('admin')==='1';
+  if(new URLSearchParams(location.search).has('admin')){ localStorage.setItem('admin','1'); history.replaceState({},'',location.pathname+location.hash); }
+  addEventListener('keydown',e=>{ if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='a'){ isAdmin=!isAdmin; localStorage.setItem('admin',isAdmin?'1':'0'); ensureAdminUI(); } }, {passive:true});
+  function ensureAdminUI(){
+    const adminBtns = document.getElementById('adminBtns');
+    if (adminBtns) adminBtns.style.display = isAdmin ? 'inline-flex' : 'none';
+    document.querySelectorAll('[data-admin-only]').forEach(el => { el.style.display = isAdmin ? '' : 'none'; });
+    const mob = document.getElementById('adminMobile');
+    if (mob) mob.style.display = isAdmin ? '' : 'none';
+    if(!isAdmin) adminDockHide();
+  }
+
+  // ===== Роутер =====
+  async function render(){
+    const r=state.route;
+    if(r==='/'||r===''){ renderList(); return; }
+    if(r==='/arcs'){ renderArcs(); return; }
+    if(r==='/articles'){ renderArticlesList(); return; }
+    if(r==='/notes'){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>Заметки</h1><div class="muted">Раздел в разработке.</div></section>`; return; }
+    if(r==='/project'){ app.innerHTML = `<section class="card"><a class="back" href="#/">← На главную</a><h1>О проекте</h1><div class="muted">Кайнракс — тёмная НФ. Обновления по пятницам и субботам.</div></section>`; return; }
+    if(r==='/perg'){ renderPergList(); return; }
+    if(r==='/menu'){ renderMenu(); return; }
+
+    const mReadId=r.match(/^\/read-id\/([^?]+)(?:\?.*)?$/);
+    if(mReadId){ await renderArticleByObj(findStoryByKey(mReadId[1])); return; }
+
+    const mReadCh=r.match(/^\/read-id\/([^/]+)\/ch\/(\d+)(?:\?.*)?$/);
+    if(mReadCh){ await renderStoryWithChapters(findStoryByKey(mReadCh[1]), +mReadCh[2]); return; }
+
+    const mArc=r.match(/^\/arc\/([^?]+)(?:\?.*)?$/); if(mArc){ renderArc(mArc[1]); return; }
+    const mTag=r.match(/^\/tag\/([^?]+)(?:\?.*)?$/); if(mTag){ renderTag(decodeURIComponent(mTag[1])); return; }
+    const mPerg=r.match(/^\/perg\/([^?]+)(?:\?.*)?$/); if(mPerg){ await renderPerg(mPerg[1]); return; }
+    const mArt=r.match(/^\/read-article\/([^?]+)(?:\?.*)?$/); if(mArt){ await renderArticleRead(mArt[1]); return; }
+    renderList();
+  }
+
+  async function init(){
+    app.innerHTML = `<section class="card"><h1>Рассказы</h1><div class="muted">Загружается…</div></section>`;
+    try { await loadContent(); } catch(_) {}
+    applyTheme();
+    render();
+    ensureAdminUI();
+  }
+  init();
   </script>
 </body>
 </html>
