@@ -1,8 +1,0 @@
-
-.header-title{font-weight:700}
-.logo{font-weight:800;letter-spacing:.5px}
-.right{display:flex;gap:12px;align-items:center}
-.version-switch{display:flex;gap:8px;align-items:center}
-.kv{display:grid;grid-template-columns:160px 1fr;gap:6px 12px}
-.kv dt{color:var(--muted)}
-.section-title{margin:10px 0 6px 0;font-weight:600}
