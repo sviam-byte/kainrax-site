@@ -1,0 +1,26 @@
+
+:root{--bg:#0f1115;--fg:#e6e6e6;--muted:#a8b3cf;--accent:#7aa2f7;--warn:#ffb86c;--err:#ff5555;--card:#151923;--border:#22283a;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:16px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:linear-gradient(180deg,rgba(15,17,21,.98),rgba(15,17,21,.9));backdrop-filter:saturate(120%) blur(4px);}
+nav a{margin-right:12px}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.grid{display:grid;grid-template-columns:260px 1fr;gap:16px}
+.aside{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;position:sticky;top:64px;height:fit-content}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:#111827;color:var(--muted);font-size:12px;margin-right:6px}
+.badge.warn{border-color:var(--warn);color:var(--warn)}
+.badge.err{border-color:var(--err);color:var(--err)}
+.badge.ok{border-color:#3fb950;color:#3fb950}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:left}
+.meta{color:var(--muted);font-size:14px}
+.hstack{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.vstack{display:flex;gap:10px;flex-direction:column}
+input[type=range]{width:100%}
+input[type=search],select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:#0b0e14;color:var(--fg)}
+.spark{height:24px;width:100%;display:block;background:linear-gradient(180deg,#0b0e14,#0b0e14),linear-gradient(90deg,var(--accent),transparent);background-size:100% 100%,var(--val,0%) 100%;background-repeat:no-repeat;border-radius:6px;border:1px solid var(--border)}
+footer{padding:24px;color:var(--muted);text-align:center}
+hr{border:0;border-top:1px solid var(--border);margin:16px 0}

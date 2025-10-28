@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Канонар</title>
+    <link rel="stylesheet" href="/v-current/assets/styles/base.css">
+    <link rel="stylesheet" href="/v-current/assets/styles/layout.css">
+    <link rel="stylesheet" href="/v-current/assets/styles/theme-dark.css">
+  </head>
+  <body data-version="v-current" data-version-path="/v-current" >
+    
+<header>
+  <div class="logo">Канонар</div>
+  <nav>
+    <a href="/v-current/index.html">Главная</a>
+    <a href="/v-current/objects/index.html">Канонар</a>
+    <a href="/v-current/characters/index.html">Персонажи</a>
+    <a href="/v-current/timeline/index.html">Хронология</a>
+    <a href="/v-current/docs/index.html">Документы</a>
+    <a href="/v-current/about.html">О проекте</a>
+  </nav>
+  <div class="right">
+    <div class="version-switch">
+      <label class="meta">Версия</label>
+      <select data-role="version-switch"><option value="v-pre-borders" >v-pre-borders</option><option value="v-current" selected>v-current</option></select>
+    </div>
+    <input type="search" data-role="search" placeholder="Поиск">
+  </div>
+</header>
+<script type="module">
+import {initVersionSwitcher} from '/v-current/scripts/version-switcher.js';
+import {initSearch} from '/v-current/scripts/search.js';
+initVersionSwitcher();
+initSearch();
+</script>
+
+    <div class="container">
+<div class="grid">
+  <aside class="aside vstack">
+    <div class="section-title">Фильтры</div>
+    <input type="search" data-role="search" placeholder="Название, тег, тип">
+  </aside>
+  <main class="vstack">
+    <div class="card"><strong>Каталог объектов</strong><div class="meta">Файлы этой версии</div></div>
+    <div data-role="list" class="vstack"></div>
+  </main>
+</div>
+</div>
+    <footer>© Кайнракс. Статическая демо-сборка.</footer>
+  </body>
+</html>

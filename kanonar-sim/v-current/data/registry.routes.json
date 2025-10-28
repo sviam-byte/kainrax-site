@@ -1,0 +1,20 @@
+{
+  "power-node": {
+    "type": "object",
+    "path": "objects/power-node.html",
+    "title": "Power Node (обновлён)",
+    "tags": [
+      "энергия",
+      "узел",
+      "v2"
+    ]
+  },
+  "kaeya": {
+    "type": "character",
+    "path": "characters/kaeya.html",
+    "title": "Кэйя",
+    "tags": [
+      "король"
+    ]
+  }
+}
