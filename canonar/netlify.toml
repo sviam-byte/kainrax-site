@@ -1,20 +1,21 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [[redirects]]
-  from = "/kainrax/canonar/e/*"
-  to = "/kainrax/canonar/index.html"
+  from = "/e/*"
+  to = "/index.html"
   status = 200
 [[redirects]]
-  from = "/kainrax/canonar/entities"
-  to = "/kainrax/canonar/index.html"
+  from = "/entities"
+  to = "/index.html"
   status = 200
 [[redirects]]
-  from = "/kainrax/canonar/overview"
-  to = "/kainrax/canonar/index.html"
+  from = "/overview"
+  to = "/index.html"
   status = 200
 [[redirects]]
-  from = "/kainrax/canonar/scenarios"
-  to = "/kainrax/canonar/index.html"
+  from = "/scenarios"
+  to = "/index.html"
   status = 200
