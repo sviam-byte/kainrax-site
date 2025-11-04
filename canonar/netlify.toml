@@ -1,0 +1,12 @@
+[build]
+  base = "kainrax/canonar"
+  publish = "dist"
+  command = "npm ci && npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/"
+  to = "/"
+  status = 200
