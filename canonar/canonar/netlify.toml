@@ -1,0 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/kainrax/canonar/e/*"
+  to = "/kainrax/canonar/index.html"
+  status = 200
+[[redirects]]
+  from = "/kainrax/canonar/entities"
+  to = "/kainrax/canonar/index.html"
+  status = 200
+[[redirects]]
+  from = "/kainrax/canonar/overview"
+  to = "/kainrax/canonar/index.html"
+  status = 200
+[[redirects]]
+  from = "/kainrax/canonar/scenarios"
+  to = "/kainrax/canonar/index.html"
+  status = 200
