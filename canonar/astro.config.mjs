@@ -1,6 +1,8 @@
+// canonar/astro.config.mjs
 import { defineConfig } from 'astro/config';
 export default defineConfig({
-  base: '/',                // важное отличие от варианта с под-путём
-  site: 'https://canonar.<твой-домен>', // опционально, но полезно
+  base: '/',                 // обязательно
+  // либо вообще без site, либо:
+  site: 'https://canonar.netlify.app',
   output: 'static'
 });
