@@ -1,0 +1,13 @@
+---
+const {branch, type, slug} = Astro.params;
+const entry = await fetch(`/b/${branch}/e/${type}/${slug}.json`).then(r=>r.json());
+---
+<html lang="ru">
+  <head><meta charset="utf-8" /><title>{entry.title} | {type} | {branch} | Канонар</title><link rel="stylesheet" href="/src/styles/global.css" /></head>
+  <body>
+    <main class="container">
+      <h1>{entry.title}</h1>
+      <div set:html={entry.content}></div>
+    </main>
+  </body>
+</html>
