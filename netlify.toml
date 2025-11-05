@@ -1,62 +1,58 @@
-# ── СБОРКА ───────────────────────────────────────────────────────
 [build]
-  command   = "node scripts/build-pergament.mjs"
-  publish   = "."
+  command   = "npm run build"
+  publish   = "build"
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION       = "18"
-  # Пока правишь контент, можно не падать из-за отсутствующих редакций:
-  PERGAMENT_STRICT   = "0"
-  # MEDIA_* — опционально
-  # MEDIA_HUB_BASE    = "https://hub.example.com/media"
-  # MEDIA_ASSETS_BASE = "https://assets.example.com"
-  # MEDIA_DOMAIN_WHITELIST = "hub.example.com,assets.example.com,cdn.example.org"
+  NODE_VERSION = "20"
 
-# ── ФУНКЦИИ ──────────────────────────────────────────────────────
 [functions]
-  node_bundler           = "esbuild"
-  external_node_modules  = ["deta"]
-  included_files         = ["content/**"]
+  node_bundler          = "esbuild"
+  external_node_modules = ["deta"]
+  included_files        = ["content/**"]
 
-# ── ГЛАВНАЯ: новый лендинг на корне ─────────────────────────────
+# Root landing
 [[redirects]]
-  from   = "/"
-  to     = "/home.html"
+  from = "/"
+  to   = "/home.html"
   status = 200
 
-# ── ПЕРГАМЕНТ: реальные тексты (.txt) ───────────────────────────
-# Канонический проход к файлам внутри /content/pergament/*
+# Pergament: expose plain text under /pergament/*
 [[redirects]]
-  from   = "/pergament/*"
-  to     = "/content/pergament/:splat"
+  from = "/pergament/*"
+  to   = "/content/pergament/:splat"
   status = 200
 
-# ── /o2log: статическое мини-приложение ─────────────────────────
+# /o2log mini-app
 [[redirects]]
-  from   = "/o2log"
-  to     = "/o2log/"
+  from = "/o2log"
+  to   = "/o2log/"
   status = 301
 
 [[redirects]]
-  from   = "/o2log/*"
-  to     = "/o2log/:splat"
+  from = "/o2log/*"
+  to   = "/o2log/:splat"
   status = 200
 
-# ── API: человекопонятный алиас ─────────────────────────────────
+# API -> Netlify functions
 [[redirects]]
-  from   = "/api/*"
-  to     = "/.netlify/functions/:splat"
+  from = "/api/*"
+  to   = "/.netlify/functions/:splat"
   status = 200
 
-# ── Статика /content/* как есть ─────────────────────────────────
+# Pass-through for /content/*
 [[redirects]]
-  from   = "/content/*"
-  to     = "/content/:splat"
+  from = "/content/*"
+  to   = "/content/:splat"
   status = 200
 
-# ── КЭШИ ─────────────────────────────────────────────────────────
-# Пергамент всегда как text/plain и с лёгким кэшем
+# SPA fallback ONLY for canonar
+[[redirects]]
+  from = "/canonar/*"
+  to   = "/canonar/index.html"
+  status = 200
+
+# Caching and content-type for pergament
 [[headers]]
   for = "/pergament/*"
   [headers.values]
@@ -69,13 +65,13 @@
     Cache-Control = "public, max-age=600"
     Content-Type  = "text/plain; charset=utf-8"
 
-# Общий кэш для прочего /content/*
+# Generic cache for /content/*
 [[headers]]
   for = "/content/*"
   [headers.values]
     Cache-Control = "public, max-age=600"
 
-# Главные HTML не кэшируем
+# Do not cache main html
 [[headers]]
   for = "/index.html"
   [headers.values]
@@ -85,9 +81,3 @@
   for = "/home.html"
   [headers.values]
     Cache-Control = "no-store"
-
-# ── SPA-фоллбек (ПОСЛЕДНИМ!) ────────────────────────────────────
-[[redirects]]
-  from   = "/*"
-  to     = "/index.html"
-  status = 200
