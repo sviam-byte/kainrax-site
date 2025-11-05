@@ -1,0 +1,13 @@
+---
+const {branch} = Astro.params;
+const br = await fetch(`/index.json`).then(r=>r.json()).then(d=>d.branches.find((b:any)=>b.name===branch));
+---
+<html lang="ru">
+  <head><meta charset="utf-8" /><title>{branch} | Канонар</title><link rel="stylesheet" href="/src/styles/global.css" /></head>
+  <body>
+    <main class="container">
+      <h1>Ветка: {branch}</h1>
+      <ul>{br.types.map((t:string)=> <li><a href={`/b/${branch}/list/${t}`}>{t}</a></li>)}</ul>
+    </main>
+  </body>
+</html>
