@@ -9,7 +9,11 @@
   },
   "scripts": {
     "build:perg": "node scripts/build-pergament.mjs",
-    "build": "npm run build:perg",
+    "build:canon:ci": "npm --prefix kainrax/canonar ci",
+    "build:canon": "npm --prefix kainrax/canonar run build",
+    "build": "npm run build:perg && node scripts/monobuild.mjs",
+    "dev:serve": "npx serve build -l 4173",
+    "clean": "node -e \"require('fs').rmSync('build',{recursive:true,force:true})\"",
     "postinstall": "echo deps ok"
   }
 }
