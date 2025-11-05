@@ -1,7 +1,6 @@
 [build]
-  command   = "npm run build"
-  publish   = "build"
-  functions = "netlify/functions"
+  command = "npm run build"
+  publish = "build"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -11,19 +10,36 @@
   external_node_modules = ["deta"]
   included_files        = ["content/**"]
 
-# Root landing
+# root landing
 [[redirects]]
   from = "/"
   to   = "/home.html"
   status = 200
 
-# Pergament plain text under /pergament/*
+# canonar (subpath + SPA fallback)
+[[redirects]]
+  from = "/canonar"
+  to   = "/canonar/"
+  status = 301
+
+[[redirects]]
+  from = "/canonar/*"
+  to   = "/canonar/index.html"
+  status = 200
+
+# pergament (plain text from /content/pergament)
 [[redirects]]
   from = "/pergament/*"
   to   = "/content/pergament/:splat"
   status = 200
 
-# /o2log mini-app
+# raw content pass-through
+[[redirects]]
+  from = "/content/*"
+  to   = "/content/:splat"
+  status = 200
+
+# /o2log static mini-app
 [[redirects]]
   from = "/o2log"
   to   = "/o2log/"
@@ -34,25 +50,45 @@
   to   = "/o2log/:splat"
   status = 200
 
+# forum sections as static
+[[redirects]]
+  from = "/forum"
+  to   = "/forum/"
+  status = 301
+
+[[redirects]]
+  from = "/forum/*"
+  to   = "/forum/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/forumen"
+  to   = "/forumen/"
+  status = 301
+
+[[redirects]]
+  from = "/forumen/*"
+  to   = "/forumen/:splat"
+  status = 200
+
+# kids section (dir or single html — оба кейса покрыты)
+[[redirects]]
+  from = "/kids"
+  to   = "/kids/"
+  status = 301
+
+[[redirects]]
+  from = "/kids/*"
+  to   = "/kids/:splat"
+  status = 200
+
 # API -> Netlify functions
 [[redirects]]
   from = "/api/*"
   to   = "/.netlify/functions/:splat"
   status = 200
 
-# Pass-through for /content/*
-[[redirects]]
-  from = "/content/*"
-  to   = "/content/:splat"
-  status = 200
-
-# SPA fallback ONLY for canonar
-[[redirects]]
-  from = "/canonar/*"
-  to   = "/canonar/index.html"
-  status = 200
-
-# Caching/text for pergament
+# headers for pergament
 [[headers]]
   for = "/pergament/*"
   [headers.values]
@@ -65,13 +101,13 @@
     Cache-Control = "public, max-age=600"
     Content-Type  = "text/plain; charset=utf-8"
 
-# Generic cache for /content/*
+# generic cache for other /content/*
 [[headers]]
   for = "/content/*"
   [headers.values]
     Cache-Control = "public, max-age=600"
 
-# Do not cache main html
+# avoid caching main html
 [[headers]]
   for = "/index.html"
   [headers.values]
