@@ -1,33 +1,38 @@
-# netlify.toml (root) — сборка "пергамента" и статики в корне
+# ── СБОРКА ───────────────────────────────────────────────────────
 [build]
   command   = "node scripts/build-pergament.mjs"
   publish   = "."
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION     = "18"
-  PERGAMENT_STRICT = "0"
-  # MEDIA_* переменные можно раскомментировать и заполнить при необходимости:
-  # MEDIA_HUB_BASE = "https://hub.example.com/media"
+  NODE_VERSION       = "18"
+  # Пока правишь контент, можно не падать из-за отсутствующих редакций:
+  PERGAMENT_STRICT   = "0"
+  # MEDIA_* — опционально
+  # MEDIA_HUB_BASE    = "https://hub.example.com/media"
   # MEDIA_ASSETS_BASE = "https://assets.example.com"
   # MEDIA_DOMAIN_WHITELIST = "hub.example.com,assets.example.com,cdn.example.org"
 
+# ── ФУНКЦИИ ──────────────────────────────────────────────────────
 [functions]
-  node_bundler          = "esbuild"
-  external_node_modules = ["deta"]
-  included_files        = ["content/**"]
+  node_bundler           = "esbuild"
+  external_node_modules  = ["deta"]
+  included_files         = ["content/**"]
 
-# redirects / headers — оставляем в том виде, как хотел
+# ── ГЛАВНАЯ: новый лендинг на корне ─────────────────────────────
 [[redirects]]
   from   = "/"
   to     = "/home.html"
   status = 200
 
+# ── ПЕРГАМЕНТ: реальные тексты (.txt) ───────────────────────────
+# Канонический проход к файлам внутри /content/pergament/*
 [[redirects]]
   from   = "/pergament/*"
   to     = "/content/pergament/:splat"
   status = 200
 
+# ── /o2log: статическое мини-приложение ─────────────────────────
 [[redirects]]
   from   = "/o2log"
   to     = "/o2log/"
@@ -38,16 +43,20 @@
   to     = "/o2log/:splat"
   status = 200
 
+# ── API: человекопонятный алиас ─────────────────────────────────
 [[redirects]]
   from   = "/api/*"
   to     = "/.netlify/functions/:splat"
   status = 200
 
+# ── Статика /content/* как есть ─────────────────────────────────
 [[redirects]]
   from   = "/content/*"
   to     = "/content/:splat"
   status = 200
 
+# ── КЭШИ ─────────────────────────────────────────────────────────
+# Пергамент всегда как text/plain и с лёгким кэшем
 [[headers]]
   for = "/pergament/*"
   [headers.values]
@@ -60,11 +69,13 @@
     Cache-Control = "public, max-age=600"
     Content-Type  = "text/plain; charset=utf-8"
 
+# Общий кэш для прочего /content/*
 [[headers]]
   for = "/content/*"
   [headers.values]
     Cache-Control = "public, max-age=600"
 
+# Главные HTML не кэшируем
 [[headers]]
   for = "/index.html"
   [headers.values]
@@ -75,7 +86,7 @@
   [headers.values]
     Cache-Control = "no-store"
 
-# SPA fallback (последним)
+# ── SPA-фоллбек (ПОСЛЕДНИМ!) ────────────────────────────────────
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
