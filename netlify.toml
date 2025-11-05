@@ -17,7 +17,7 @@
   to   = "/home.html"
   status = 200
 
-# Pergament: expose plain text under /pergament/*
+# Pergament plain text under /pergament/*
 [[redirects]]
   from = "/pergament/*"
   to   = "/content/pergament/:splat"
@@ -52,7 +52,7 @@
   to   = "/canonar/index.html"
   status = 200
 
-# Caching and content-type for pergament
+# Caching/text for pergament
 [[headers]]
   for = "/pergament/*"
   [headers.values]
