@@ -1,6 +1,5 @@
-// scripts/monobuild.mjs  (ESM, .mjs)
 import { execSync } from 'node:child_process';
-import { rmSync, mkdirSync, cpSync, existsSync, statSync } from 'node:fs';
+import { rmSync, mkdirSync, cpSync, existsSync, statSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 
 const sh = (cmd, cwd) => execSync(cmd, { stdio: 'inherit', cwd });
@@ -17,17 +16,17 @@ const copyItem = (rel) => {
   cpSync(src, dst, { recursive: isDir, force: true });
 };
 
-// 1) чистый артефакт
+// clean build/
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
-// 2) корневая статика/HTML
+// root static/html — дополни по факту наличия
 [
-  'assets', 'images', 'content', 'o2log', 'forum', 'forumen', 'admin',
+  'assets', 'images', 'content', 'o2log', 'forum', 'forumen', 'kids',
   'index.html', 'home.html', 'kids.html'
 ].forEach(copyItem);
 
-// 3) Канонар → /build/canonar
+// build canonar -> /build/canonar
 const CANONAR = path.join(ROOT, 'kainrax', 'canonar');
 if (existsSync(CANONAR)) {
   const hasLock = existsSync(path.join(CANONAR, 'package-lock.json'));
@@ -36,5 +35,10 @@ if (existsSync(CANONAR)) {
   sh('npm run build', CANONAR);
   cpSync(path.join(CANONAR, 'dist'), path.join(OUT, 'canonar'), { recursive: true, force: true });
 }
+
+// убрать catch-all _redirects, если случайно попал
+const kill = (p) => { try { unlinkSync(p); } catch (_) {} };
+kill(path.join(OUT, '_redirects'));
+kill(path.join(OUT, 'canonar', '_redirects'));
 
 console.log('✓ build/ ready');
