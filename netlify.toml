@@ -55,6 +55,14 @@
   to     = "/content/:splat"
   status = 200
 
+[build]
+  base    = "kainrax/canonar"
+  publish = "dist"
+  command = "npm ci && npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
 # ── КЭШИ ─────────────────────────────────────────────────────────
 # Пергамент всегда как text/plain и с лёгким кэшем
 [[headers]]
