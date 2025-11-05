@@ -1,10 +1,13 @@
 import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
-  srcDir: './src',
-  publicDir: './public',
-  outDir: './dist',
-  build: {
-    format: 'directory'
-  }
+  output: 'static',
+  vite: {
+    resolve: {
+      alias: {
+        '@content': fileURLToPath(new URL('./content', import.meta.url)),
+      },
+    },
+  },
 });
