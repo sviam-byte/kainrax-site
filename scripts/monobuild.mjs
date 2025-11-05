@@ -1,40 +1,40 @@
-// scripts/monobuild.mjs
-import {exec as _exec} from 'node:child_process';
-import {promisify} from 'node:util';
-import {mkdir, rm, cp, stat} from 'node:fs/promises';
-import {existsSync} from 'node:fs';
+// scripts/monobuild.mjs  (ESM, .mjs)
+import { execSync } from 'node:child_process';
+import { rmSync, mkdirSync, cpSync, existsSync, statSync } from 'node:fs';
 import path from 'node:path';
-const exec = promisify(_exec);
+
+const sh = (cmd, cwd) => execSync(cmd, { stdio: 'inherit', cwd });
+
 const ROOT = process.cwd();
-const BUILD = path.join(ROOT, 'build');
+const OUT  = path.join(ROOT, 'build');
 
-// что кладём в корень билда как есть
-const STATIC_COPY = ['assets','images','content','o2log','forum','forumen','admin',
-                     'home.html','index.html','kids.html'];
-
-async function safeCopy(rel){
+const copyItem = (rel) => {
   const src = path.join(ROOT, rel);
   if (!existsSync(src)) return;
-  const dest = path.join(BUILD, rel);
-  await mkdir(path.dirname(dest), {recursive:true});
-  const s = await stat(src);
-  await cp(src, dest, {recursive: s.isDirectory(), force:true});
+  const dst = path.join(OUT, rel);
+  mkdirSync(path.dirname(dst), { recursive: true });
+  const isDir = statSync(src).isDirectory();
+  cpSync(src, dst, { recursive: isDir, force: true });
+};
+
+// 1) чистый артефакт
+rmSync(OUT, { recursive: true, force: true });
+mkdirSync(OUT, { recursive: true });
+
+// 2) корневая статика/HTML
+[
+  'assets', 'images', 'content', 'o2log', 'forum', 'forumen', 'admin',
+  'index.html', 'home.html', 'kids.html'
+].forEach(copyItem);
+
+// 3) Канонар → /build/canonar
+const CANONAR = path.join(ROOT, 'kainrax', 'canonar');
+if (existsSync(CANONAR)) {
+  const hasLock = existsSync(path.join(CANONAR, 'package-lock.json'));
+  sh(hasLock ? 'npm ci --ignore-scripts --no-audit --no-fund'
+             : 'npm install --no-audit --no-fund', CANONAR);
+  sh('npm run build', CANONAR);
+  cpSync(path.join(CANONAR, 'dist'), path.join(OUT, 'canonar'), { recursive: true, force: true });
 }
 
-async function buildCanonar(){
-  const cwd = path.join(ROOT, 'canonar');
-  if (!existsSync(cwd)) return;
-  await exec('npm ci', {cwd});
-  await exec('npm run build', {cwd});
-  await mkdir(path.join(BUILD, 'canonar'), {recursive:true});
-  await cp(path.join(cwd,'dist'), path.join(BUILD,'canonar'), {recursive:true, force:true});
-}
-
-async function main(){
-  await rm(BUILD, {recursive:true, force:true});
-  await mkdir(BUILD, {recursive:true});
-  for (const item of STATIC_COPY) await safeCopy(item);
-  await buildCanonar();
-  console.log('Build ready at /build');
-}
-main().catch(e=>{ console.error(e); process.exit(1); });
+console.log('✓ build/ ready');
